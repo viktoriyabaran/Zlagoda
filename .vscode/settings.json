@@ -1,0 +1,92 @@
+{
+  // Python
+  "python.defaultInterpreterPath": "python",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.autoImportCompletions": true,
+
+  // Formatting
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    }
+  },
+  "[html]": {
+    "editor.defaultFormatter": "monosans.djlint",
+    "editor.formatOnSave": true
+  },
+  "[django-html]": {
+    "editor.defaultFormatter": "monosans.djlint",
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+
+  // Ruff
+  "ruff.lineLength": 88,
+
+  // Django
+  "files.associations": {
+    "**/templates/**/*.html": "django-html",
+    "**/templates/**/*": "django-txt"
+  },
+  "emmet.includeLanguages": {
+    "django-html": "html"
+  },
+
+  // Tailwind
+  "tailwindCSS.includeLanguages": {
+    "django-html": "html"
+  },
+  "tailwindCSS.emmetCompletions": true,
+
+  // Todo Highlight
+  "todohighlight.isEnable": true,
+  "todohighlight.keywords": [
+    {"text": "TODO:", "color": "#fff", "backgroundColor": "#ffbd2a"},
+    {"text": "FIXME:", "color": "#fff", "backgroundColor": "#f06292"},
+    {"text": "NOTE:", "color": "#fff", "backgroundColor": "#64b5f6"}
+  ],
+
+  // Editor
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true,
+  "editor.rulers": [88, 120],
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+
+  // Files
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    ".git": true
+  },
+
+  // SQL
+  "sqltools.connections": [
+    {
+      "name": "Zlagoda Local",
+      "driver": "PostgreSQL",
+      "server": "localhost",
+      "port": 5432,
+      "database": "zlagoda",
+      "username": "zlagoda",
+      "askForPassword": true
+    }
+  ],
+  "djlint.showInstallError": false
+}

@@ -1,0 +1,39 @@
+{
+  "recommendations": [
+    // Python
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.debugpy",
+
+    // Django & HTML templates
+    "batisteo.vscode-django",
+    "monosans.djlint",
+
+    // Formatting & Linting
+    "esbenp.prettier-vscode",
+    "charliermarsh.ruff",
+
+    // Tailwind CSS
+    "bradlc.vscode-tailwindcss",
+
+    // SQL
+    "mtxr.sqltools",
+    "mtxr.sqltools-driver-pg",
+
+    // Productivity
+    "wayou.vscode-todo-highlight",
+    "gruntfuggly.todo-tree",
+    "streetsidesoftware.code-spell-checker",
+
+    // Git
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+
+    // Docker
+    "ms-azuretools.vscode-docker",
+
+    // General
+    "editorconfig.editorconfig",
+    "christian-kohler.path-intellisense"
+  ]
+}
