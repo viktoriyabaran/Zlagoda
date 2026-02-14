@@ -4,6 +4,7 @@ Raw SQL utilities for database operations.
 All data queries must use these utilities instead of Django ORM.
 Django ORM is ONLY used for model definitions and migrations.
 """
+
 from django.db import connection
 
 
