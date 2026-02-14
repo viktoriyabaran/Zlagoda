@@ -21,5 +21,8 @@ media/
 *.swp
 *.swo
 
+# Tailwind build output
+theme/static/css/dist/
+
 # Docker
 *.log

@@ -166,14 +166,37 @@ Docker дозволяє запускати базу даних (PostgreSQL) у �
 
 ---
 
-## Крок 8: Запуск сервера розробки
+## Крок 8: Встановлення Tailwind CSS
 
-1. У тому ж терміналі (з активованим venv) запусти Django-сервер:
+Tailwind CSS відповідає за стилі (зовнішній вигляд) застосунку. Його потрібно встановити один раз після клонування проєкту.
+
+1. У тому ж терміналі (з активованим venv) виконай:
    ```bash
+   python manage.py tailwind install
+   ```
+
+   Це завантажить бінарний файл Tailwind (Node.js не потрібен).
+
+---
+
+## Крок 9: Запуск сервера розробки
+
+Для розробки потрібно запустити **два процеси** — сервер Django і компілятор Tailwind.
+
+1. У тому ж терміналі (з активованим venv) запусти Tailwind у режимі спостереження:
+   ```bash
+   python manage.py tailwind start
+   ```
+   Це автоматично перекомпілює CSS кожного разу, коли ти змінюєш шаблони. **Залиш цей термінал працювати.**
+
+2. **Відкрий ще один термінал** і виконай:
+   ```bash
+   cd /mnt/c/Users/ТВОЄ_ІМYA_КОРИСТУВАЧА_WINDOWS/Documents/Zlagoda
+   source venv/bin/activate
    python manage.py runserver
    ```
 
-2. Відкрий браузер і перейди за адресою: http://localhost:8000
+3. Відкрий браузер і перейди за адресою: http://localhost:8000
 
    Ти маєш побачити запущений застосунок!
 
@@ -185,21 +208,28 @@ Docker дозволяє запускати базу даних (PostgreSQL) у �
 
 1. **Відкрий Docker Desktop** (або переконайся, що він уже запущений)
 
-2. **Відкрий термінал Ubuntu** і виконай:
+2. **Термінал 1 — база даних:**
    ```bash
-   cd /mnt/c/Users/ТВОЄ_ІМ\'A_КОРИСТУВАЧА_WINDOWS/Documents/Zlagoda
+   cd /mnt/c/Users/ТВОЄ_ІМYA_КОРИСТУВАЧА_WINDOWS/Documents/Zlagoda
    source venv/bin/activate
    docker-compose up db
    ```
 
-3. **Відкрий інший термінал** і виконай:
+3. **Термінал 2 — Tailwind CSS:**
+   ```bash
+   cd /mnt/c/Users/ТВОЄ_ІМYA_КОРИСТУВАЧА_WINDOWS/Documents/Zlagoda
+   source venv/bin/activate
+   python manage.py tailwind start
+   ```
+
+4. **Термінал 3 — Django-сервер:**
    ```bash
    cd /mnt/c/Users/ТВОЄ_ІМYA_КОРИСТУВАЧА_WINDOWS/Documents/Zlagoda
    source venv/bin/activate
    python manage.py runserver
    ```
 
-4. Відкрий http://localhost:8000 у браузері.
+5. Відкрий http://localhost:8000 у браузері.
 
 ---
 
@@ -212,6 +242,9 @@ Docker дозволяє запускати базу даних (PostgreSQL) у �
 | `docker-compose up db` | Запускає базу даних |
 | `docker-compose down` | Зупиняє всі контейнери |
 | `python manage.py runserver` | Запускає сервер розробки Django |
+| `python manage.py tailwind start` | Запускає Tailwind у режимі спостереження (перекомпілює CSS при змінах) |
+| `python manage.py tailwind build` | Одноразова компіляція CSS (для продакшену) |
+| `python manage.py tailwind install` | Встановлює Tailwind (потрібно лише один раз) |
 | `python manage.py migrate` | Застосовує міграції бази даних |
 | `python manage.py makemigrations` | Створює нові міграції після зміни моделей |
 
