@@ -9,6 +9,12 @@
   */
 @source "../../../**/*.{html,py,js}";
 
+::view-transition-old(card),
+::view-transition-new(card) {
+  animation-duration: 0.5s;
+  animation-timing-function: ease-out;
+}
+
 @layer components {
   .btn {
     @apply block w-full py-3.5 px-6 border-2 border-white/35 rounded-xl

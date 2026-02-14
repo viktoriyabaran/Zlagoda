@@ -9,10 +9,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     {% tailwind_css %}
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <meta name="htmx-config" content='{"globalViewTransitions":true}'>
     {% block head %}{% endblock %}
 </head>
-<body class="min-h-screen flex items-center justify-center font-[Montserrat] overflow-hidden"
-      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<body class="min-h-screen flex items-center font-[Montserrat] overflow-hidden"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+      hx-boost="true">
 
     <div class="fixed inset-0 bg-cover bg-center bg-no-repeat z-0"
          style="background-image: url('{% static 'images/background.jpg' %}')"></div>
@@ -21,7 +23,9 @@
                 flex flex-col items-center pt-12 pb-10 px-8
                 backdrop-blur-xl bg-white/[0.08]
                 shadow-[0_8px_32px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.12)]
-                max-[480px]:w-[92vw] max-[480px]:min-h-[85vh] max-[480px]:px-6 max-[480px]:pt-9 max-[480px]:pb-8 max-[480px]:rounded-2xl">
+                max-[480px]:w-[92vw] max-[480px]:min-h-[85vh] max-[480px]:px-6 max-[480px]:pt-9 max-[480px]:pb-8 max-[480px]:rounded-2xl
+                {% block card_class %}mx-auto{% endblock %}"
+         style="view-transition-name: card">
         {% block content %}{% endblock %}
     </div>
 </body>
