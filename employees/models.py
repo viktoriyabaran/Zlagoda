@@ -1,3 +1,6 @@
 from django.db import models
 
-# Define Employee model here
+
+class EmployeeRole(models.TextChoices):
+    MANAGER = "Manager", "Manager"
+    CASHIER = "Cashier", "Cashier"

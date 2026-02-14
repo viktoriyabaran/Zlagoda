@@ -1,10 +1,11 @@
-"""
-Core models - used ONLY for schema generation via migrations.
-All queries must use raw SQL from core.db module.
-"""
 from django.db import models
 
 
-class UserRole(models.TextChoices):
-    MANAGER = 'Manager', 'Manager'
-    CASHIER = 'Cashier', 'Cashier'
+class User(models.Model):
+    username = models.CharField(max_length=50, unique=True)
+    password = models.CharField(max_length=128)
+    # employee = models.OneToOneField(
+    #     'employees.Employee',
+    #     on_delete=models.CASCADE,
+    #     db_column='employee_id',
+    # )
