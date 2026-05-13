@@ -1,3 +1,13 @@
 from django.db import models
+from django.core.validators import MinValueValidator
 
-# Define CustomerCard model here
+class CustomerCard(models.Model):
+    card_number = models.CharField(max_length=13, primary_key=True)
+    cust_surname = models.CharField(max_length=50)
+    cust_name = models.CharField(max_length=50)
+    cust_patronymic = models.CharField(max_length=50, null=True, blank=True)
+    phone_number = models.CharField(max_length=13)
+    city = models.CharField(max_length=50, null=True, blank=True)
+    street = models.CharField(max_length=50, null=True, blank=True)
+    zip_code = models.CharField(max_length=9, null=True, blank=True)
+    percent = models.IntegerField(validators=[MinValueValidator(0)])
