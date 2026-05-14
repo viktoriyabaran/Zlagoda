@@ -3,6 +3,7 @@ from django.views import View
 
 from core.services import AuthService, IAuthService
 
+from .decorators import login_required
 from .forms import UserForm
 
 
@@ -21,11 +22,13 @@ class LoginView(View):
                 form.cleaned_data["password"],
             )
             if user:
+                request.session.cycle_key()
                 request.session["user_id"] = user["id"]
                 return redirect("core:home")
             form.add_error(None, "Invalid credentials")
         return render(request, "login.html", {"form": form})
 
 
+@login_required
 def home(request):
     return render(request, "home.html")
