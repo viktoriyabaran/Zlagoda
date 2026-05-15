@@ -1,19 +1,20 @@
 from django.contrib import admin
+from django.contrib.auth.hashers import make_password
+
+from .forms import UserAdminForm
 from .models import User
 
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = [
-        "username",
-        # "employee__full_name"
-        # "employee__role"
-    ]
-    search_fields = [
-        "username",
-        # "employee__full_name"
-        # "employee__role"
-    ]
-    list_filter = [
-        # "employee__full_name"
-    ]
+    form = UserAdminForm
+    list_display = ["username"]
+    search_fields = ["username"]
+
+    def save_model(self, request, obj, form, change):
+        new_password = form.cleaned_data.get("password")
+        if new_password:
+            obj.password = make_password(new_password)
+        elif change:
+            obj.password = type(obj).objects.get(pk=obj.pk).password
+        super().save_model(request, obj, form, change)
