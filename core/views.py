@@ -22,11 +22,18 @@ class LoginView(View):
                 form.cleaned_data["password"],
             )
             if user:
-                request.session.cycle_key()
-                request.session["user_id"] = user["id"]
+                self.auth_service.register_session_user(request, user["id"])
                 return redirect("core:home")
             form.add_error(None, "Invalid credentials")
         return render(request, "login.html", {"form": form})
+
+
+class LogoutView(View):
+    auth_service: IAuthService = AuthService()
+
+    def post(self, request):
+        self.auth_service.unregister_session_user(request)
+        return redirect("core:login")
 
 
 @login_required
