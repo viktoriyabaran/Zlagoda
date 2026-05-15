@@ -1,0 +1,33 @@
+<header id="site-header"
+        class="fixed top-4 left-0 right-4 z-20
+               h-[52px] flex items-center justify-between gap-6
+               px-6 rounded-2xl
+               backdrop-blur-xl bg-white/[0.08]
+               {% comment %} border-2 border-white/35 {% endcomment %}
+               shadow-[0_8px_32px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.12)]
+               text-white ml-[1%]"
+        style="view-transition-name: header">
+    <a href="{% url 'core:home' %}"
+       class="font-black tracking-[2px] text-lg no-underline hover:opacity-80 transition-opacity"
+       style="view-transition-name: header-logo">
+        ZLAGODA
+    </a>
+
+    <nav class="flex gap-8 text-xs font-semibold tracking-widest uppercase"
+         style="view-transition-name: header-nav">
+        <a href="#" class="hover:opacity-80 transition-opacity">Checks</a>
+        <a href="#" class="hover:opacity-80 transition-opacity">Products</a>
+        <a href="#" class="hover:opacity-80 transition-opacity">Customers</a>
+        <a href="#" class="hover:opacity-80 transition-opacity">Employees</a>
+    </nav>
+
+    <form action="{% url 'core:logout' %}" method="post" class="m-0"
+          style="view-transition-name: header-logout">
+      {% csrf_token %}
+      <button type="submit"
+              class="text-xs font-semibold tracking-widest uppercase hover:opacity-80 transition-opacity
+                     bg-transparent border-0 p-0 cursor-pointer text-white font-[Montserrat]">
+          Log out
+      </button>
+    </form>
+</header>

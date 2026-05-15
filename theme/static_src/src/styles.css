@@ -9,8 +9,8 @@
   */
 @source "../../../**/*.{html,py,js}";
 
-::view-transition-old(card),
-::view-transition-new(card) {
+::view-transition-old(*),
+::view-transition-new(*) {
   animation-duration: 0.5s;
   animation-timing-function: ease-out;
 }

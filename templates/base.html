@@ -19,6 +19,8 @@
     <div class="fixed inset-0 bg-cover bg-center bg-no-repeat z-0"
          style="background-image: url('{% static 'images/background.jpg' %}')"></div>
 
+    {% block header %}{% include "_header.html" %}{% endblock %}
+
     <div class="relative z-10 w-[420px] min-h-[680px] rounded-3xl overflow-hidden
                 flex flex-col items-center pt-12 pb-10 px-8
                 backdrop-blur-xl bg-white/[0.08]
