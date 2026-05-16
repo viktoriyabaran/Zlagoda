@@ -10,7 +10,7 @@ class Category(models.Model):
 
 class Product(models.Model):
     id_product = models.IntegerField(primary_key=True)
-    category_number = models.ForeignKey(Category, on_delete=models.RESTRICT)
+    category_number = models.ForeignKey(Category, on_delete=models.DO_NOTHING)
     product_name = models.CharField(max_length=50)
     characteristics = models.CharField(max_length=100)
 
@@ -23,7 +23,7 @@ class StoreProduct(models.Model):
     UPC_prom = models.ForeignKey(
         "products.StoreProduct", null=True, on_delete=models.SET_NULL
     )
-    id_product = models.ForeignKey(Product, on_delete=models.RESTRICT)
+    id_product = models.ForeignKey(Product, on_delete=models.DO_NOTHING)
     selling_price = models.DecimalField(max_digits=13, decimal_places=4)
     products_number = models.IntegerField()
     promotional_product = models.BooleanField()
