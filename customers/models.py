@@ -1,5 +1,6 @@
-from django.db import models
 from django.core.validators import MinValueValidator
+from django.db import models
+
 
 class CustomerCard(models.Model):
     card_number = models.CharField(max_length=13, primary_key=True)
@@ -11,3 +12,6 @@ class CustomerCard(models.Model):
     street = models.CharField(max_length=50, null=True, blank=True)
     zip_code = models.CharField(max_length=9, null=True, blank=True)
     percent = models.IntegerField(validators=[MinValueValidator(0)])
+
+    def __str__(self):
+        return f"Customer {self.card_number}: {self.cust_surname} {self.cust_name}"

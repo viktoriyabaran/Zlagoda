@@ -10,3 +10,6 @@ class User(models.Model):
         db_column="id_employee",
         null=True,
     )
+
+    def __str__(self):
+        return self.username

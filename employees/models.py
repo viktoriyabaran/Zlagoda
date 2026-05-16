@@ -1,8 +1,10 @@
 from django.db import models
 
+
 class EmployeeRole(models.TextChoices):
     MANAGER = "Manager", "Manager"
     CASHIER = "Cashier", "Cashier"
+
 
 class Employee(models.Model):
     id_employee = models.CharField(max_length=10, primary_key=True)
@@ -18,4 +20,5 @@ class Employee(models.Model):
     street = models.CharField(max_length=50)
     zip_code = models.CharField(max_length=9)
 
-
+    def __str__(self):
+        return f"{self.empl_surname} {self.empl_name}: {self.empl_role}"
