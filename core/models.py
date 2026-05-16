@@ -6,7 +6,7 @@ class User(models.Model):
     password = models.CharField(max_length=128)
     employee = models.OneToOneField(
         "employees.Employee",
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         db_column="id_employee",
         null=True,
     )
