@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Product
+from .models import Category, Product, StoreProduct
 
 
 @admin.register(Category)
@@ -26,4 +26,23 @@ class ProductAdmin(admin.ModelAdmin):
     ]
     list_filter = [
         "category_number",
+    ]
+
+
+@admin.register(StoreProduct)
+class StoreProductAdmin(admin.ModelAdmin):
+    list_display = [
+        "UPC",
+        "id_product",
+        "selling_price",
+        "products_number",
+        "promotional_product",
+        "UPC_prom",
+    ]
+    search_fields = [
+        "UPC",
+        "id_product__product_name",
+    ]
+    list_filter = [
+        "promotional_product",
     ]
