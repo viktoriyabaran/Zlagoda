@@ -4,18 +4,18 @@ from django.views import View
 from core.services import AuthService, IAuthService
 
 from .decorators import login_required
-from .forms import UserForm
+from .forms import UserLoginForm
 
 
 class LoginView(View):
     auth_service: IAuthService = AuthService()
 
     def get(self, request):
-        form = UserForm()
+        form = UserLoginForm()
         return render(request, "login.html", {"form": form})
 
     def post(self, request):
-        form = UserForm(request.POST)
+        form = UserLoginForm(request.POST)
         if form.is_valid():
             user = self.auth_service.authenticate(
                 form.cleaned_data["username"],

@@ -8,8 +8,8 @@ from .models import User
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     form = UserAdminForm
-    list_display = ["username"]
-    search_fields = ["username"]
+    list_display = ["username", "employee__empl_surname", "employee__empl_name"]
+    search_fields = ["username", "employee__empl_surname", "employee__empl_name"]
 
     def save_model(self, request, obj, form, change):
         new_password = form.cleaned_data.get("password")
