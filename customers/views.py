@@ -1,7 +1,5 @@
 from django.shortcuts import redirect, render
 from django.views import View
-
-from core.decorators import login_required
 from .forms import CustomerCardForm
 from .services import CustomerService
 
@@ -19,9 +17,9 @@ class AddCustomerView(View):
             return redirect("customers:customers")
         return render(request, "customers/add-customer.html", {"form": form})
 
+class GetCustomersView(View):
+    customer_service = CustomerService()
 
-@login_required
-def customers(request):
-    service = CustomerService()
-    all_customers = service.get_all()
-    return render(request, "customers/customers.html", {"customers": all_customers})
+    def get(self, request):
+        all_customers = self.customer_service.get_all()
+        return render(request, "customers/customers.html", {"customers": all_customers})
