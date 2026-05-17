@@ -27,3 +27,11 @@ class EmployeeForm(forms.ModelForm):
         value = self.cleaned_data["salary"]
         validate_salary(value)
         return value
+
+    def clean_phone_number(self):
+        value = self.cleaned_data["phone_number"]
+        if not value.startswith("+"):
+            raise forms.ValidationError("Phone number must start with '+'")
+        if len(value) > 13:
+            raise forms.ValidationError("Phone number must be at most 13 characters")
+        return value
