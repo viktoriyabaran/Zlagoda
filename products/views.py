@@ -1,8 +1,5 @@
-# Define product views here
 from django.shortcuts import redirect, render
 from django.views import View
-
-from core.decorators import login_required
 from .forms import CategoryForm
 from .services import CategoryService
 
@@ -20,8 +17,9 @@ class AddCategoryView(View):
             return redirect("products:categories")
         return render(request, "products/add-category.html", {"form": form})
 
-@login_required
-def categories(request):
-    service = CategoryService()
-    all_categories = service.get_all()
-    return render(request, "products/categories.html", {"categories": all_categories})
+class GetCategoriesView(View):
+    category_service = CategoryService()
+
+    def get(self, request):
+        all_categories = self.category_service.get_all()
+        return render(request, "products/categories.html", {"categories": all_categories})
