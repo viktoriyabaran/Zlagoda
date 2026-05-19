@@ -4,7 +4,7 @@ from .models import EmployeeRole
 from .validators import validate_age, validate_salary
 
 
-class EmployeeForm(forms.ModelForm):
+class EmployeeForm(forms.Form):
     id_employee = forms.CharField(max_length=10)
     empl_surname = forms.CharField(max_length=50)
     empl_name = forms.CharField(max_length=50)
