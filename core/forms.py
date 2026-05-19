@@ -2,6 +2,31 @@ from django import forms
 
 from .models import User
 
+CHECKBOX_CLASS = "w-4 h-4 accent-white cursor-pointer"
+
+
+class LayoutForm(forms.Form):
+    conditional_groups: dict[str, list[str]] = {}
+
+    def iter_layout(self):
+        nested = {c for children in self.conditional_groups.values() for c in children}
+        for bound_field in self:
+            if bound_field.name in nested:
+                continue
+            yield self._row(bound_field)
+
+    def _row(self, bound_field):
+        if bound_field.name in self.conditional_groups:
+            return {
+                "type": "toggle",
+                "field": bound_field,
+                "children": [
+                    self._row(self[c])
+                    for c in self.conditional_groups[bound_field.name]
+                ],
+            }
+        return {"type": "field", "field": bound_field}
+
 
 class UserLoginForm(forms.Form):
     username = forms.CharField(

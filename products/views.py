@@ -2,8 +2,8 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
 
-from .forms import CategoryForm, ProductForm
-from .services import CategoryService, ProductService
+from .forms import CategoryForm, ProductForm, StoreProductForm
+from .services import CategoryService, ProductService, StoreProductService
 
 
 class AddCategoryView(View):
@@ -72,5 +72,35 @@ class AddProductView(View):
                 "form": form,
                 "form_title": "Add Product",
                 "form_action": reverse("products:add-product"),
+            },
+        )
+
+
+class AddStoreProductView(View):
+    store_product_service = StoreProductService()
+
+    def get(self, request):
+        return render(
+            request,
+            "home.html",
+            {
+                "form": StoreProductForm(),
+                "form_title": "Add Store Product",
+                "form_action": reverse("products:add-store-product"),
+            },
+        )
+
+    def post(self, request):
+        form = StoreProductForm(request.POST)
+        if form.is_valid():
+            self.store_product_service.create(form.cleaned_data)
+            return redirect("core:home")
+        return render(
+            request,
+            "home.html",
+            {
+                "form": form,
+                "form_title": "Add Store Product",
+                "form_action": reverse("products:add-store-product"),
             },
         )

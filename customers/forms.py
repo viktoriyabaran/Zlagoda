@@ -1,9 +1,11 @@
 from django import forms
 
+from core.forms import LayoutForm
+
 TEXT_INPUT_CLASS = "bg-transparent border border-white/50 rounded-lg px-3 py-2 w-full text-white text-sm outline-none focus:border-white"
 
 
-class CustomerCardForm(forms.Form):
+class CustomerCardForm(LayoutForm):
     card_number = forms.CharField(
         max_length=13, required=True,
         widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),

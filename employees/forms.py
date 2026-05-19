@@ -1,12 +1,15 @@
 from django import forms
 
+from core.forms import CHECKBOX_CLASS, LayoutForm
+from core.repository import get_user_by_username
+
 from .models import EmployeeRole
 from .validators import validate_age, validate_salary
 
 TEXT_INPUT_CLASS = "bg-transparent border border-white/50 rounded-lg px-3 py-2 w-full text-white text-sm outline-none focus:border-white"
 
 
-class EmployeeForm(forms.Form):
+class EmployeeForm(LayoutForm):
     id_employee = forms.CharField(
         max_length=10, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
     )
@@ -50,6 +53,29 @@ class EmployeeForm(forms.Form):
         max_length=9, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
     )
 
+    has_user_account = forms.BooleanField(
+        required=False,
+        label="Has user account?",
+        widget=forms.CheckboxInput(
+            attrs={
+                "class": CHECKBOX_CLASS,
+                "data-toggle-target": "extra-has_user_account",
+            }
+        ),
+    )
+    username = forms.CharField(
+        max_length=50,
+        required=False,
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
+    )
+    password = forms.CharField(
+        max_length=128,
+        required=False,
+        widget=forms.PasswordInput(attrs={"class": TEXT_INPUT_CLASS}),
+    )
+
+    conditional_groups = {"has_user_account": ["username", "password"]}
+
     def clean_date_of_birth(self):
         value = self.cleaned_data["date_of_birth"]
         validate_age(value)
@@ -67,3 +93,18 @@ class EmployeeForm(forms.Form):
         if len(value) > 13:
             raise forms.ValidationError("Phone number must be at most 13 characters")
         return value
+
+    def clean_username(self):
+        username = self.cleaned_data.get("username")
+        if username and get_user_by_username(username):
+            raise forms.ValidationError("Username already taken")
+        return username
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("has_user_account"):
+            if not cleaned.get("username"):
+                self.add_error("username", "Username is required")
+            if not cleaned.get("password"):
+                self.add_error("password", "Password is required")
+        return cleaned

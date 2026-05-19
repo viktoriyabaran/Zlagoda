@@ -1,0 +1,24 @@
+{% if row.type == "toggle" %}
+    <label class="col-span-full flex items-center gap-3 text-white text-[11px] font-semibold tracking-widest uppercase cursor-pointer py-1">
+        {{ row.field }}
+        <span>{{ row.field.label }}</span>
+    </label>
+    <div id="extra-{{ row.field.name }}"
+         class="col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3
+                {% if not row.field.value %}hidden{% endif %}">
+        {% for child in row.children %}
+            {% include "_form_row.html" with row=child %}
+        {% endfor %}
+    </div>
+{% else %}
+    <div>
+        {% if row.field.errors %}
+            <div class="text-red-300 text-[11px] mb-1">{{ row.field.errors }}</div>
+        {% endif %}
+        <label class="block text-white text-[10px] font-semibold tracking-widest uppercase mb-1"
+               for="{{ row.field.id_for_label }}">
+            {{ row.field.label }}
+        </label>
+        {{ row.field }}
+    </div>
+{% endif %}
