@@ -9,19 +9,11 @@
   */
 @source "../../../**/*.{html,py,js}";
 
-::view-transition-old(*),
-::view-transition-new(*) {
-  animation-duration: 0.5s;
-  animation-timing-function: ease-out;
-}
-
 @layer components {
   .btn {
-    @apply block w-full py-3.5 px-6 border-2 border-white/35 rounded-xl
-           bg-white/[0.08] text-white font-[Montserrat] text-base font-bold
+    @apply block w-full py-2.5 px-5 border-2 border-white/35 rounded-xl
+           bg-white/[0.08] text-white font-[Montserrat] text-sm font-bold
            text-center no-underline tracking-[0.5px] cursor-pointer
-           transition-all duration-200
-           hover:bg-white/[0.18] hover:border-white/60 hover:-translate-y-0.5
-           active:translate-y-0;
+           hover:bg-white/[0.18] hover:border-white/60;
   }
 }

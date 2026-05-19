@@ -1,4 +1,5 @@
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views import View
 
 from .forms import EmployeeForm
@@ -9,12 +10,27 @@ class AddEmployeeView(View):
     employee_service = EmployeeService()
 
     def get(self, request):
-        form = EmployeeForm()
-        return render(request, "employees/add-employee.html", {"form": form})
+        return render(
+            request,
+            "home.html",
+            {
+                "form": EmployeeForm(),
+                "form_title": "Add Employee",
+                "form_action": reverse("employees:add-employee"),
+            },
+        )
 
     def post(self, request):
         form = EmployeeForm(request.POST)
         if form.is_valid():
             self.employee_service.create_employee(form.cleaned_data)
-            return redirect("employees:employees")
-        return render(request, "employees/add-employee.html", {"form": form})
+            return redirect("core:home")
+        return render(
+            request,
+            "home.html",
+            {
+                "form": form,
+                "form_title": "Add Employee",
+                "form_action": reverse("employees:add-employee"),
+            },
+        )

@@ -3,11 +3,18 @@
 {% block title %}Categories{% endblock %}
 
 {% block content %}
-    <h1>Categories</h1>
-    <a href="{% url 'products:add-category' %}">Add category</a>
-    <ul>
+    <h1 class="text-white text-[32px] font-black tracking-[2px] mb-1">CATEGORIES</h1>
+    <p class="text-white/80 text-[13px] font-normal tracking-[0.5px] mb-6">Product categories</p>
+
+    <ul class="w-full flex-1 overflow-y-auto pr-1 -mr-1 space-y-2">
         {% for category in categories %}
-        <li>{{ category.category_name }}</li>
+        <li class="px-4 py-3 rounded-xl border border-white/25 bg-white/[0.05] text-white text-sm font-semibold">
+            {{ category.category_name }}
+        </li>
+        {% empty %}
+        <li class="text-white/70 text-sm text-center mt-8">No categories yet.</li>
         {% endfor %}
     </ul>
+
+    <a href="{% url 'products:add-category' %}" class="btn mt-6">Add category</a>
 {% endblock %}

@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     {% tailwind_css %}
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-    <meta name="htmx-config" content='{"globalViewTransitions":true}'>
     {% block head %}{% endblock %}
 </head>
 <body class="min-h-screen flex items-center font-[Montserrat] overflow-hidden"
@@ -21,14 +20,15 @@
 
     {% block header %}{% include "_header.html" %}{% endblock %}
 
-    <div class="relative z-10 w-[420px] min-h-[680px] rounded-3xl overflow-hidden
-                flex flex-col items-center pt-12 pb-10 px-8
-                backdrop-blur-xl bg-white/[0.08]
+    {% block layout %}
+    <div class="relative z-10 isolate w-[340px] min-h-[520px] rounded-2xl overflow-hidden
+                flex flex-col items-center pt-8 pb-6 px-6
+                backdrop-blur-md bg-white/[0.08]
                 shadow-[0_8px_32px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.12)]
-                max-[480px]:w-[92vw] max-[480px]:min-h-[85vh] max-[480px]:px-6 max-[480px]:pt-9 max-[480px]:pb-8 max-[480px]:rounded-2xl
-                {% block card_class %}mx-auto{% endblock %}"
-         style="view-transition-name: card">
+                max-[480px]:w-[92vw] max-[480px]:min-h-[80vh] max-[480px]:px-5 max-[480px]:pt-6 max-[480px]:pb-5
+                {% block card_class %}mx-auto{% endblock %}">
         {% block content %}{% endblock %}
     </div>
+    {% endblock %}
 </body>
 </html>

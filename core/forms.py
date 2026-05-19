@@ -8,7 +8,7 @@ class UserLoginForm(forms.Form):
         required=True,
         widget=forms.TextInput(
             attrs={
-                "class": "bg-transparent border border-white/50 rounded-lg px-4 py-2.5 w-full text-white outline-none focus:border-white transition-colors",
+                "class": "bg-transparent border border-white/50 rounded-lg px-3 py-2 w-full text-white text-sm outline-none focus:border-white",
                 "placeholder": "Enter your username",
             }
         ),
@@ -16,7 +16,7 @@ class UserLoginForm(forms.Form):
     password = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
-                "class": "bg-transparent border border-white/50 rounded-lg px-4 py-2.5 w-full text-white outline-none focus:border-white transition-colors",
+                "class": "bg-transparent border border-white/50 rounded-lg px-3 py-2 w-full text-white text-sm outline-none focus:border-white",
                 "placeholder": "Enter your password",
             }
         ),

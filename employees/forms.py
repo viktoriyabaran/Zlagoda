@@ -3,7 +3,7 @@ from django import forms
 from .models import EmployeeRole
 from .validators import validate_age, validate_salary
 
-TEXT_INPUT_CLASS = "bg-transparent border border-white/50 rounded-lg px-4 py-2.5 w-full text-white outline-none focus:border-white transition-colors"
+TEXT_INPUT_CLASS = "bg-transparent border border-white/50 rounded-lg px-3 py-2 w-full text-white text-sm outline-none focus:border-white"
 
 
 class EmployeeForm(forms.Form):

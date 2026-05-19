@@ -1,31 +1,77 @@
 <header id="site-header"
-        class="fixed top-4 left-0 right-4 z-20
-               h-[52px] flex items-center justify-between gap-6
-               px-6 rounded-2xl
-               backdrop-blur-xl bg-white/[0.08]
-               {% comment %} border-2 border-white/35 {% endcomment %}
+        class="fixed top-3 left-3 right-3 z-20 isolate
+               h-[44px] flex items-center justify-between gap-6
+               px-5 rounded-xl
+               backdrop-blur-md bg-white/[0.08]
                shadow-[0_8px_32px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.12)]
-               text-white ml-[1%]"
-        style="view-transition-name: header">
+               text-white">
     <a href="{% url 'core:home' %}"
-       class="font-black tracking-[2px] text-lg no-underline hover:opacity-80 transition-opacity"
-       style="view-transition-name: header-logo">
+       class="font-black tracking-[2px] text-base no-underline hover:opacity-80">
         ZLAGODA
     </a>
 
-    <nav class="flex gap-8 text-xs font-semibold tracking-widest uppercase"
-         style="view-transition-name: header-nav">
-        <a href="#" class="hover:opacity-80 transition-opacity">Checks</a>
-        <a href="#" class="hover:opacity-80 transition-opacity">Products</a>
-        <a href="#" class="hover:opacity-80 transition-opacity">Customers</a>
-        <a href="#" class="hover:opacity-80 transition-opacity">Employees</a>
+    <nav class="flex gap-7 text-[11px] font-semibold tracking-widest uppercase items-center h-full">
+        <a href="#" class="hover:opacity-80">Checks</a>
+
+        <div class="relative group h-full flex items-center">
+            <button type="button" class="hover:opacity-80 tracking-widest uppercase bg-transparent border-0 p-0 cursor-pointer text-white font-[Montserrat] text-[11px] font-semibold">
+                Products
+            </button>
+            <div class="absolute left-1/2 -translate-x-1/2 top-full pt-2 hidden group-hover:block z-30">
+                <div class="isolate rounded-xl backdrop-blur-md bg-white/[0.08] border-2 border-white/35 shadow-[0_8px_32px_rgba(0,0,0,0.25)] py-2 min-w-[200px]">
+                    <a href="{% url 'products:add-product' %}"
+                       class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
+                        Add Product
+                    </a>
+                    <a href="{% url 'products:add-category' %}"
+                       class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
+                        Add Category
+                    </a>
+                    <a href="{% url 'products:categories' %}"
+                       class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
+                        View Categories
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="relative group h-full flex items-center">
+            <button type="button" class="hover:opacity-80 tracking-widest uppercase bg-transparent border-0 p-0 cursor-pointer text-white font-[Montserrat] text-[11px] font-semibold">
+                Customers
+            </button>
+            <div class="absolute left-1/2 -translate-x-1/2 top-full pt-2 hidden group-hover:block z-30">
+                <div class="isolate rounded-xl backdrop-blur-md bg-white/[0.08] border-2 border-white/35 shadow-[0_8px_32px_rgba(0,0,0,0.25)] py-2 min-w-[200px]">
+                    <a href="{% url 'customers:add-customer' %}"
+                       class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
+                        Add Customer
+                    </a>
+                    <a href="{% url 'customers:customers' %}"
+                       class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
+                        View Customers
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="relative group h-full flex items-center">
+            <button type="button" class="hover:opacity-80 tracking-widest uppercase bg-transparent border-0 p-0 cursor-pointer text-white font-[Montserrat] text-[11px] font-semibold">
+                Employees
+            </button>
+            <div class="absolute left-1/2 -translate-x-1/2 top-full pt-2 hidden group-hover:block z-30">
+                <div class="isolate rounded-xl backdrop-blur-md bg-white/[0.08] border-2 border-white/35 shadow-[0_8px_32px_rgba(0,0,0,0.25)] py-2 min-w-[200px]">
+                    <a href="{% url 'employees:add-employee' %}"
+                       class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
+                        Add Employee
+                    </a>
+                </div>
+            </div>
+        </div>
     </nav>
 
-    <form action="{% url 'core:logout' %}" method="post" class="m-0"
-          style="view-transition-name: header-logout">
+    <form action="{% url 'core:logout' %}" method="post" class="m-0">
       {% csrf_token %}
       <button type="submit"
-              class="text-xs font-semibold tracking-widest uppercase hover:opacity-80 transition-opacity
+              class="text-[11px] font-semibold tracking-widest uppercase hover:opacity-80
                      bg-transparent border-0 p-0 cursor-pointer text-white font-[Montserrat]">
           Log out
       </button>

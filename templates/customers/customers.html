@@ -3,11 +3,19 @@
 {% block title %}Customers{% endblock %}
 
 {% block content %}
-    <h1>Customers</h1>
-    <a href="{% url 'customers:add-customer' %}">Add customer</a>
-    <ul>
+    <h1 class="text-white text-[32px] font-black tracking-[2px] mb-1">CUSTOMERS</h1>
+    <p class="text-white/80 text-[13px] font-normal tracking-[0.5px] mb-6">Loyalty card holders</p>
+
+    <ul class="w-full flex-1 overflow-y-auto pr-1 -mr-1 space-y-2">
         {% for customer in customers %}
-        <li>{{ customer.cust_surname }} {{ customer.cust_name }} — {{ customer.card_number }}</li>
+        <li class="px-4 py-3 rounded-xl border border-white/25 bg-white/[0.05] text-white">
+            <div class="text-sm font-semibold">{{ customer.cust_surname }} {{ customer.cust_name }}</div>
+            <div class="text-xs text-white/70 tracking-widest uppercase mt-0.5">{{ customer.card_number }}</div>
+        </li>
+        {% empty %}
+        <li class="text-white/70 text-sm text-center mt-8">No customers yet.</li>
         {% endfor %}
     </ul>
+
+    <a href="{% url 'customers:add-customer' %}" class="btn mt-6">Add customer</a>
 {% endblock %}

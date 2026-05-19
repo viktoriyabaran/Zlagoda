@@ -1,15 +1,45 @@
 from django import forms
 
+TEXT_INPUT_CLASS = "bg-transparent border border-white/50 rounded-lg px-3 py-2 w-full text-white text-sm outline-none focus:border-white"
+
+
 class CustomerCardForm(forms.Form):
-    card_number = forms.CharField(max_length=13, required=True)
-    cust_surname = forms.CharField(max_length=50, required=True)
-    cust_name = forms.CharField(max_length=50, required=True)
-    cust_patronymic = forms.CharField(max_length=50, required=False)
-    phone_number = forms.CharField(max_length=13, required=True)
-    city = forms.CharField(max_length=50, required=False)
-    street = forms.CharField(max_length=50, required=False)
-    zip_code = forms.CharField(max_length=9, required=False)
-    percent = forms.IntegerField(min_value=0, required=True)
+    card_number = forms.CharField(
+        max_length=13, required=True,
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
+    )
+    cust_surname = forms.CharField(
+        max_length=50, required=True,
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
+    )
+    cust_name = forms.CharField(
+        max_length=50, required=True,
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
+    )
+    cust_patronymic = forms.CharField(
+        max_length=50, required=False,
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
+    )
+    phone_number = forms.CharField(
+        max_length=13, required=True,
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
+    )
+    city = forms.CharField(
+        max_length=50, required=False,
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
+    )
+    street = forms.CharField(
+        max_length=50, required=False,
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
+    )
+    zip_code = forms.CharField(
+        max_length=9, required=False,
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
+    )
+    percent = forms.IntegerField(
+        min_value=0, required=True,
+        widget=forms.NumberInput(attrs={"class": TEXT_INPUT_CLASS}),
+    )
 
     def clean_phone_number(self):
         value = self.cleaned_data["phone_number"]
