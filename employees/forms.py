@@ -3,20 +3,52 @@ from django import forms
 from .models import EmployeeRole
 from .validators import validate_age, validate_salary
 
+TEXT_INPUT_CLASS = "bg-transparent border border-white/50 rounded-lg px-4 py-2.5 w-full text-white outline-none focus:border-white transition-colors"
+
 
 class EmployeeForm(forms.Form):
-    id_employee = forms.CharField(max_length=10)
-    empl_surname = forms.CharField(max_length=50)
-    empl_name = forms.CharField(max_length=50)
-    empl_patronymic = forms.CharField(max_length=50, required=False)
-    empl_role = forms.ChoiceField(choices=EmployeeRole.choices)
-    salary = forms.DecimalField(max_digits=13, decimal_places=4, min_value=0)
-    date_of_birth = forms.DateField()
-    date_of_start = forms.DateField()
-    phone_number = forms.CharField(max_length=13)
-    city = forms.CharField(max_length=50)
-    street = forms.CharField(max_length=50)
-    zip_code = forms.CharField(max_length=9)
+    id_employee = forms.CharField(
+        max_length=10, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+    )
+    empl_surname = forms.CharField(
+        max_length=50, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+    )
+    empl_name = forms.CharField(
+        max_length=50, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+    )
+    empl_patronymic = forms.CharField(
+        max_length=50,
+        required=False,
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
+    )
+    empl_role = forms.ChoiceField(
+        choices=EmployeeRole.choices,
+        widget=forms.Select(attrs={"class": TEXT_INPUT_CLASS}),
+    )
+    salary = forms.DecimalField(
+        max_digits=13,
+        decimal_places=4,
+        min_value=0,
+        widget=forms.NumberInput(attrs={"class": TEXT_INPUT_CLASS}),
+    )
+    date_of_birth = forms.DateField(
+        widget=forms.DateInput(attrs={"class": TEXT_INPUT_CLASS, "type": "date"})
+    )
+    date_of_start = forms.DateField(
+        widget=forms.DateInput(attrs={"class": TEXT_INPUT_CLASS, "type": "date"})
+    )
+    phone_number = forms.CharField(
+        max_length=13, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+    )
+    city = forms.CharField(
+        max_length=50, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+    )
+    street = forms.CharField(
+        max_length=50, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+    )
+    zip_code = forms.CharField(
+        max_length=9, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+    )
 
     def clean_date_of_birth(self):
         value = self.cleaned_data["date_of_birth"]

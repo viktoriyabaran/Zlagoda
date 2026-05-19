@@ -2,16 +2,28 @@ from django import forms
 
 from .services import CategoryService
 
+TEXT_INPUT_CLASS = "bg-transparent border border-white/50 rounded-lg px-4 py-2.5 w-full text-white outline-none focus:border-white transition-colors"
+
 
 class CategoryForm(forms.Form):
-    category_name = forms.CharField(required=True)
+    category_name = forms.CharField(
+        required=True, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+    )
 
 
 class ProductForm(forms.Form):
-    id_product = forms.IntegerField()
-    category_number = forms.ChoiceField(choices=[])
-    product_name = forms.CharField(max_length=50)
-    characteristics = forms.CharField(max_length=100)
+    id_product = forms.IntegerField(
+        widget=forms.NumberInput(attrs={"class": TEXT_INPUT_CLASS})
+    )
+    category_number = forms.ChoiceField(
+        choices=[], widget=forms.Select(attrs={"class": TEXT_INPUT_CLASS})
+    )
+    product_name = forms.CharField(
+        max_length=50, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+    )
+    characteristics = forms.CharField(
+        max_length=100, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
