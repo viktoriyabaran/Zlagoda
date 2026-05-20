@@ -1,4 +1,4 @@
-from core.db import execute_write
+from core.db import execute_write, execute_query
 
 
 def create_employee(data: dict):
@@ -25,3 +25,6 @@ def create_employee(data: dict):
             data["zip_code"],
         ],
     )
+
+def get_all_employees_sorted():
+    return execute_query("SELECT * FROM employees_employee ORDER BY empl_surname")
