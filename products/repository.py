@@ -7,8 +7,8 @@ def get_category_by_id(category_id: int):
     )
 
 
-def get_all_categories():
-    return execute_query("SELECT * FROM products_category")
+def get_all_categories(order_by: str = ""):
+    return execute_query(f"SELECT * FROM products_category{order_by}")
 
 
 def create_category(category_name: str):

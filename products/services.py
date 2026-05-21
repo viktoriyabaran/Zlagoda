@@ -3,6 +3,7 @@ from typing import Protocol
 
 from django.db import transaction
 
+from core.sorting import order_by_sql
 from products.repository import (
     create_category,
     create_product,
@@ -39,13 +40,13 @@ def _create_store_product_with_optional_promo(data: dict) -> None:
 
 
 class ICategoryService(Protocol):
-    def get_all(self) -> list: ...
+    def get_all(self, sort_by: str, sort_dir: str) -> list: ...
     def create(self, category_name: str) -> None: ...
 
 
 class CategoryService:
-    def get_all(self) -> list:
-        return get_all_categories()
+    def get_all(self, sort_by: str, sort_dir: str) -> list:
+        return get_all_categories(order_by_sql(sort_by, sort_dir))
 
     def create(self, category_name: str) -> None:
         create_category(category_name)

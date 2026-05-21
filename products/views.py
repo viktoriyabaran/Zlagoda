@@ -2,8 +2,15 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
 
+from core.sorting import resolve_sort
 from .forms import CategoryForm, ProductForm, StoreProductForm
 from .services import CategoryService, ProductService, StoreProductService
+
+
+CATEGORY_COLUMNS = [
+    {"key": "category_name", "label": "Category", "sortable": True},
+]
+CATEGORY_SORTABLE = {c["key"] for c in CATEGORY_COLUMNS if c["sortable"]}
 
 
 class AddCategoryView(View):
@@ -40,9 +47,23 @@ class GetCategoriesView(View):
     category_service = CategoryService()
 
     def get(self, request):
-        all_categories = self.category_service.get_all()
+        sort_by, sort_dir = resolve_sort(request, CATEGORY_SORTABLE, default="category_name")
+        rows = self.category_service.get_all(sort_by, sort_dir)
         return render(
-            request, "products/categories.html", {"categories": all_categories}
+            request,
+            "home.html",
+            {
+                "list": {
+                    "title": "CATEGORIES",
+                    "subtitle": "Product categories",
+                    "rows": rows,
+                    "columns": CATEGORY_COLUMNS,
+                    "sort": {"by": sort_by, "dir": sort_dir},
+                    "add_url": reverse("products:add-category"),
+                    "add_label": "Add category",
+                    "empty_message": "No categories yet.",
+                },
+            },
         )
 
 

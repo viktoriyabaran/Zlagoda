@@ -1,0 +1,52 @@
+{% load list_extras %}
+<h2 class="text-white text-[24px] max-[480px]:text-[20px] font-black tracking-[2px] mb-1 text-center">
+    {{ list.title }}
+</h2>
+<p class="text-white/80 text-[12px] font-normal tracking-[0.5px] mb-5 text-center">
+    {{ list.subtitle|default:"" }}
+</p>
+
+<div class="flex-1 overflow-y-auto pr-1 -mr-1">
+    <table class="w-full text-white text-sm border-separate border-spacing-0">
+        <thead class="sticky top-0 backdrop-blur-md bg-white/[0.08]">
+            <tr>
+                {% for col in list.columns %}
+                <th class="text-left text-[10px] font-semibold tracking-widest uppercase text-white/80 px-3 py-2 border-b border-white/20">
+                    {% if col.sortable %}
+                        {% if list.sort.by == col.key and list.sort.dir == 'asc' %}
+                            <a href="?sort={{ col.key }}&dir=desc" class="inline-flex items-center gap-1 hover:text-white">{{ col.label }} ↑</a>
+                        {% elif list.sort.by == col.key %}
+                            <a href="?sort={{ col.key }}&dir=asc" class="inline-flex items-center gap-1 hover:text-white">{{ col.label }} ↓</a>
+                        {% else %}
+                            <a href="?sort={{ col.key }}&dir=asc" class="inline-flex items-center gap-1 opacity-70 hover:opacity-100 hover:text-white">{{ col.label }}</a>
+                        {% endif %}
+                    {% else %}
+                        {{ col.label }}
+                    {% endif %}
+                </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in list.rows %}
+            <tr class="hover:bg-white/[0.04]">
+                {% for col in list.columns %}
+                <td class="px-3 py-2 border-b border-white/10">{{ row|cell:col.key }}</td>
+                {% endfor %}
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="{{ list.columns|length }}" class="text-white/70 text-sm text-center py-8">
+                    {{ list.empty_message|default:"No records yet." }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if list.add_url %}
+<div class="mt-5 flex justify-end">
+    <a href="{{ list.add_url }}" class="btn w-auto px-10">{{ list.add_label|default:"Add" }}</a>
+</div>
+{% endif %}

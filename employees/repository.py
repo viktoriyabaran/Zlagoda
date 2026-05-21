@@ -26,5 +26,6 @@ def create_employee(data: dict):
         ],
     )
 
-def get_all_employees_sorted():
-    return execute_query("SELECT * FROM employees_employee ORDER BY empl_surname")
+
+def get_all_employees(order_by: str = ""):
+    return execute_query(f"SELECT * FROM employees_employee{order_by}")

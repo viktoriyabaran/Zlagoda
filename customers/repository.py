@@ -1,7 +1,7 @@
 from core.db import execute_query, execute_single, execute_write
 
-def get_all_customers():
-    return execute_query("SELECT * FROM customers_customercard")
+def get_all_customers(order_by: str = ""):
+    return execute_query(f"SELECT * FROM customers_customercard{order_by}")
 
 
 def get_customer_by_card(card_number: str):
