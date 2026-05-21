@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 
 
@@ -24,8 +25,10 @@ class StoreProduct(models.Model):
         "products.StoreProduct", null=True, on_delete=models.SET_NULL
     )
     id_product = models.ForeignKey(Product, on_delete=models.DO_NOTHING)
-    selling_price = models.DecimalField(max_digits=13, decimal_places=4)
-    products_number = models.IntegerField()
+    selling_price = models.DecimalField(
+        max_digits=13, decimal_places=4, validators=[MinValueValidator(0)]
+    )
+    products_number = models.IntegerField(validators=[MinValueValidator(0)])
     promotional_product = models.BooleanField()
 
     def __str__(self):

@@ -43,8 +43,10 @@ class Sale(models.Model):
         on_delete=models.CASCADE,
         db_column="check_number",
     )
-    product_number = models.IntegerField()
-    selling_price = models.DecimalField(max_digits=13, decimal_places=4)
+    product_number = models.IntegerField(validators=[MinValueValidator(0)])
+    selling_price = models.DecimalField(
+        max_digits=13, decimal_places=4, validators=[MinValueValidator(0)]
+    )
 
     def __str__(self):
         return f"Sale {self.UPC}, check {self.check_number}: {self.product_number} for {self.selling_price}"
