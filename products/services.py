@@ -9,6 +9,7 @@ from products.repository import (
     create_product,
     create_store_product,
     get_all_categories,
+    get_all_products,
 )
 
 PROMO_DISCOUNT = Decimal("0.8")
@@ -54,9 +55,13 @@ class CategoryService:
 
 class IProductService(Protocol):
     def create(self, data: dict) -> None: ...
+    def get_all(self, sort_by: str, sort_dir: str) -> list: ...
 
 
 class ProductService:
+    def get_all(self, sort_by: str, sort_dir: str) -> list:
+        return get_all_products(order_by_sql(sort_by, sort_dir))
+
     def create(self, data: dict) -> None:
         with transaction.atomic():
             create_product(data)

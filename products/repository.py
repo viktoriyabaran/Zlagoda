@@ -18,10 +18,8 @@ def create_category(category_name: str):
     )
 
 
-def get_all_products():
-    return execute_query(
-        "SELECT id_product, product_name FROM products_product ORDER BY product_name"
-    )
+def get_all_products(order_by: str = ""):
+    return execute_query(f"SELECT * FROM products_product{order_by}")
 
 
 def create_product(data: dict):

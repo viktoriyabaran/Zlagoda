@@ -66,6 +66,12 @@ class GetCategoriesView(View):
             },
         )
 
+PRODUCT_COLUMNS = [
+    {"key": "product_name", "label": "Product Name", "sortable": True},
+    {"key": "characteristics", "label": "Characteristics", "sortable": False},
+    {"key": "category_number_id", "label": "Category ID", "sortable": True},
+]
+PRODUCT_SORTABLE = {c["key"] for c in PRODUCT_COLUMNS if c["sortable"]}
 
 class AddProductView(View):
     product_service = ProductService()
@@ -96,6 +102,29 @@ class AddProductView(View):
             },
         )
 
+class GetProductsView(View):
+    product_service = ProductService()
+
+    def get(self, request):
+        sort_by, sort_dir = resolve_sort(request, PRODUCT_SORTABLE, default="product_name")
+        rows = self.product_service.get_all(sort_by, sort_dir)
+
+        return render(
+            request,
+            "home.html",
+            {
+                "list": {
+                    "title": "PRODUCTS",
+                    "subtitle": "All products available in database",
+                    "rows": rows,
+                    "columns": PRODUCT_COLUMNS,
+                    "sort": {"by": sort_by, "dir": sort_dir},
+                    "add_url": reverse("products:add-product"),
+                    "add_label": "Add product",
+                    "empty_message": "No products yet.",
+                },
+            },
+        )
 
 class AddStoreProductView(View):
     store_product_service = StoreProductService()
