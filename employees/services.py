@@ -5,17 +5,25 @@ from django.db import transaction
 
 from core.repository import create_user
 from core.sorting import order_by_sql
-from employees.repository import create_employee, get_all_employees
+from employees.repository import (
+    EMPLOYEE_FILTERS,
+    create_employee,
+    get_all_employees,
+    resolve_filters,
+)
 
 
 class IEmployeeService(Protocol):
     def create_employee(self, data: dict) -> None: ...
-    def get_all(self, sort_by: str, sort_dir: str) -> list: ...
+    def get_all(self, request, sort_by: str, sort_dir: str) -> list: ...
 
 
 class EmployeeService:
-    def get_all(self, sort_by: str, sort_dir: str) -> list:
-        return get_all_employees(order_by_sql(sort_by, sort_dir))
+    def get_all(self, request, sort_by: str, sort_dir: str) -> list:
+        applied, where_sql, where_params = resolve_filters(request, EMPLOYEE_FILTERS)
+        return get_all_employees(
+            where_sql, where_params, order_by_sql(sort_by, sort_dir)
+        )
 
     def create_employee(self, data: dict) -> None:
         with transaction.atomic():

@@ -3,9 +3,10 @@ from django.urls import reverse
 from django.views import View
 
 from core.sorting import resolve_sort
-from .forms import EmployeeForm
-from .services import EmployeeService
 
+from .forms import EmployeeForm
+from .repository import EMPLOYEE_FILTERS
+from .services import EmployeeService
 
 EMPLOYEE_COLUMNS = [
     {"key": "empl_surname", "label": "Surname", "sortable": True},
@@ -51,8 +52,10 @@ class GetEmployeesView(View):
     employee_service = EmployeeService()
 
     def get(self, request):
-        sort_by, sort_dir = resolve_sort(request, EMPLOYEE_SORTABLE, default="empl_surname")
-        rows = self.employee_service.get_all(sort_by, sort_dir)
+        sort_by, sort_dir = resolve_sort(
+            request, EMPLOYEE_SORTABLE, default="empl_surname"
+        )
+        rows = self.employee_service.get_all(request, sort_by, sort_dir)
         return render(
             request,
             "home.html",
@@ -66,6 +69,7 @@ class GetEmployeesView(View):
                     "add_url": reverse("employees:add-employee"),
                     "add_label": "Add employee",
                     "empty_message": "No employees yet.",
+                    "filters": EMPLOYEE_FILTERS,
                 },
             },
         )
