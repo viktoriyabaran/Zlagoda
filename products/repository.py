@@ -1,4 +1,9 @@
-from core.db import execute_insert_returning, execute_query, execute_single, execute_write
+from core.db import (
+    execute_insert_returning,
+    execute_query,
+    execute_single,
+    execute_write,
+)
 
 
 def get_category_by_id(category_id: int):
@@ -26,6 +31,7 @@ def get_all_products(order_by: str = ""):
         {order_by}
     """)
 
+
 def create_product(data: dict) -> int:
     return execute_insert_returning(
         "INSERT INTO products_product (category_id, product_name, characteristics) VALUES (%s, %s, %s) RETURNING id",
@@ -38,9 +44,7 @@ def create_product(data: dict) -> int:
 
 
 def get_store_product_by_upc(upc: str):
-    return execute_single(
-        'SELECT * FROM products_storeproduct WHERE "UPC" = %s', [upc]
-    )
+    return execute_single('SELECT * FROM products_storeproduct WHERE "UPC" = %s', [upc])
 
 
 def get_store_products_by_product(product_id):
@@ -51,9 +55,9 @@ def get_store_products_by_product(product_id):
 
 def create_store_product(data: dict):
     execute_write(
-        '''INSERT INTO products_storeproduct
+        """INSERT INTO products_storeproduct
            ("UPC", "UPC_prom_id", product_id, selling_price, products_number, promotional_product)
-           VALUES (%s, %s, %s, %s, %s, %s)''',
+           VALUES (%s, %s, %s, %s, %s, %s)""",
         [
             data["UPC"],
             data["UPC_prom"],
@@ -62,4 +66,17 @@ def create_store_product(data: dict):
             data["products_number"],
             data["promotional_product"],
         ],
+    )
+
+
+def get_all_store_products(where_sql="", where_params=(), order_by=""):
+    return execute_query(
+        f"""
+        SELECT sp."UPC", p.product_name, p.characteristics,
+               sp.selling_price, sp.products_number, sp.promotional_product
+        FROM products_storeproduct sp
+        JOIN products_product p ON sp.id_product_id = p.id_product
+        {where_sql}{order_by}
+    """,
+        list(where_params),
     )

@@ -10,6 +10,7 @@ from products.repository import (
     create_store_product,
     get_all_categories,
     get_all_products,
+    get_all_store_products,
 )
 
 PROMO_DISCOUNT = Decimal("0.8")
@@ -27,7 +28,9 @@ def _create_store_product_with_optional_promo(data: dict) -> None:
         }
     )
     if data.get("add_promo_variant"):
-        promo_price = (data["selling_price"] * PROMO_DISCOUNT).quantize(Decimal("0.0001"))
+        promo_price = (data["selling_price"] * PROMO_DISCOUNT).quantize(
+            Decimal("0.0001")
+        )
         create_store_product(
             {
                 "UPC": data["promo_upc"],
@@ -66,7 +69,9 @@ class ProductService:
         with transaction.atomic():
             product_id = create_product(data)
             if data.get("add_store_product"):
-                _create_store_product_with_optional_promo({**data, "product": product_id})
+                _create_store_product_with_optional_promo(
+                    {**data, "product": product_id}
+                )
 
 
 class IStoreProductService(Protocol):
@@ -77,3 +82,12 @@ class StoreProductService:
     def create(self, data: dict) -> None:
         with transaction.atomic():
             _create_store_product_with_optional_promo(data)
+
+
+class IStoreProductListService(Protocol):
+    def get_all(self, sort_by: str, sort_dir: str) -> list: ...
+
+
+class StoreProductListService:
+    def get_all(self, sort_by: str, sort_dir: str) -> list:
+        return get_all_store_products(order_by=order_by_sql(sort_by, sort_dir))
