@@ -19,8 +19,12 @@ def create_category(category_name: str):
 
 
 def get_all_products(order_by: str = ""):
-    return execute_query(f"SELECT * FROM products_product{order_by}")
-
+    return execute_query(f"""
+        SELECT p.id_product, p.product_name, p.characteristics, c.category_name
+        FROM products_product p
+        JOIN products_category c ON p.category_number_id = c.category_number
+        {order_by}
+    """)
 
 def create_product(data: dict) -> int:
     return execute_insert_returning(
