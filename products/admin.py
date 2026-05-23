@@ -17,15 +17,15 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = [
-        "id_product",
+        "id",
         "product_name",
-        "category_number",
+        "category",
     ]
     search_fields = [
         "product_name",
     ]
     list_filter = [
-        "category_number",
+        "category",
     ]
 
 
@@ -33,7 +33,7 @@ class ProductAdmin(admin.ModelAdmin):
 class StoreProductAdmin(admin.ModelAdmin):
     list_display = [
         "UPC",
-        "id_product",
+        "product",
         "selling_price",
         "products_number",
         "promotional_product",
@@ -41,7 +41,7 @@ class StoreProductAdmin(admin.ModelAdmin):
     ]
     search_fields = [
         "UPC",
-        "id_product__product_name",
+        "product__product_name",
     ]
     list_filter = [
         "promotional_product",

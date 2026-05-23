@@ -7,7 +7,6 @@ class User(models.Model):
     employee = models.OneToOneField(
         "employees.Employee",
         on_delete=models.SET_NULL,
-        db_column="id_employee",
         null=True,
     )
 

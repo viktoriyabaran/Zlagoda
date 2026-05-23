@@ -1,4 +1,4 @@
-from core.db import execute_query, execute_single, execute_write
+from core.db import execute_insert_returning, execute_query, execute_single, execute_write
 
 
 def get_category_by_id(category_id: int):
@@ -22,12 +22,11 @@ def get_all_products(order_by: str = ""):
     return execute_query(f"SELECT * FROM products_product{order_by}")
 
 
-def create_product(data: dict):
-    execute_write(
-        "INSERT INTO products_product (id_product, category_number_id, product_name, characteristics) VALUES (%s, %s, %s, %s)",
+def create_product(data: dict) -> int:
+    return execute_insert_returning(
+        "INSERT INTO products_product (category_id, product_name, characteristics) VALUES (%s, %s, %s) RETURNING id",
         [
-            data["id_product"],
-            data["category_number"],
+            data["category"],
             data["product_name"],
             data["characteristics"],
         ],
@@ -40,21 +39,21 @@ def get_store_product_by_upc(upc: str):
     )
 
 
-def get_store_products_by_product(id_product):
+def get_store_products_by_product(product_id):
     return execute_query(
-        "SELECT * FROM products_storeproduct WHERE id_product_id = %s", [id_product]
+        "SELECT * FROM products_storeproduct WHERE product_id = %s", [product_id]
     )
 
 
 def create_store_product(data: dict):
     execute_write(
         '''INSERT INTO products_storeproduct
-           ("UPC", "UPC_prom_id", id_product_id, selling_price, products_number, promotional_product)
+           ("UPC", "UPC_prom_id", product_id, selling_price, products_number, promotional_product)
            VALUES (%s, %s, %s, %s, %s, %s)''',
         [
             data["UPC"],
             data["UPC_prom"],
-            data["id_product"],
+            data["product"],
             data["selling_price"],
             data["products_number"],
             data["promotional_product"],

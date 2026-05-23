@@ -69,7 +69,7 @@ class GetCategoriesView(View):
 PRODUCT_COLUMNS = [
     {"key": "product_name", "label": "Product Name", "sortable": True},
     {"key": "characteristics", "label": "Characteristics", "sortable": False},
-    {"key": "category_number_id", "label": "Category ID", "sortable": True},
+    {"key": "category_id", "label": "Category ID", "sortable": True},
 ]
 PRODUCT_SORTABLE = {c["key"] for c in PRODUCT_COLUMNS if c["sortable"]}
 

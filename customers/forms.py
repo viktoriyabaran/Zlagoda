@@ -6,10 +6,6 @@ TEXT_INPUT_CLASS = "bg-transparent border border-white/50 rounded-lg px-3 py-2 w
 
 
 class CustomerCardForm(LayoutForm):
-    card_number = forms.CharField(
-        max_length=13, required=True,
-        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
-    )
     cust_surname = forms.CharField(
         max_length=50, required=True,
         widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),

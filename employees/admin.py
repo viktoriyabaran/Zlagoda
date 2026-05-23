@@ -4,7 +4,7 @@ from .models import Employee
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = [
-        "id_employee",
+        "id",
         "empl_surname",
         "empl_name",
         "empl_role",

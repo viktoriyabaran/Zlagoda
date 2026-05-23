@@ -7,7 +7,6 @@ class EmployeeRole(models.TextChoices):
 
 
 class Employee(models.Model):
-    id_employee = models.CharField(max_length=10, primary_key=True)
     empl_surname = models.CharField(max_length=50)
     empl_name = models.CharField(max_length=50)
     empl_patronymic = models.CharField(max_length=50, null=True, blank=True)

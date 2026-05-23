@@ -20,7 +20,7 @@ def _create_store_product_with_optional_promo(data: dict) -> None:
         {
             "UPC": data["upc"],
             "UPC_prom": None,
-            "id_product": data["id_product"],
+            "product": data["product"],
             "selling_price": data["selling_price"],
             "products_number": data["products_number"],
             "promotional_product": False,
@@ -32,7 +32,7 @@ def _create_store_product_with_optional_promo(data: dict) -> None:
             {
                 "UPC": data["promo_upc"],
                 "UPC_prom": data["upc"],
-                "id_product": data["id_product"],
+                "product": data["product"],
                 "selling_price": promo_price,
                 "products_number": data["promo_products_number"],
                 "promotional_product": True,
@@ -64,9 +64,9 @@ class ProductService:
 
     def create(self, data: dict) -> None:
         with transaction.atomic():
-            create_product(data)
+            product_id = create_product(data)
             if data.get("add_store_product"):
-                _create_store_product_with_optional_promo(data)
+                _create_store_product_with_optional_promo({**data, "product": product_id})
 
 
 class IStoreProductService(Protocol):

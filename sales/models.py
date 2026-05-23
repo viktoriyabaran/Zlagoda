@@ -6,18 +6,15 @@ from employees.models import Employee
 
 
 class Check(models.Model):
-    check_number = models.CharField(max_length=10, primary_key=True)
-    id_employee = models.ForeignKey(
+    employee = models.ForeignKey(
         Employee,
         on_delete=models.DO_NOTHING,
-        db_column="id_employee",
     )
-    card_number = models.ForeignKey(
+    card = models.ForeignKey(
         CustomerCard,
         on_delete=models.DO_NOTHING,
         null=True,
         blank=True,
-        db_column="card_number",
     )
     print_date = models.DateTimeField()
     sum_total = models.DecimalField(
@@ -28,7 +25,7 @@ class Check(models.Model):
     )
 
     def __str__(self):
-        return f"Check {self.check_number}: {self.sum_total} by {self.id_employee} on {self.print_date}"
+        return f"Check #{self.pk}: {self.sum_total} by {self.employee} on {self.print_date}"
 
 
 class Sale(models.Model):
@@ -41,7 +38,6 @@ class Sale(models.Model):
     check_number = models.ForeignKey(
         Check,
         on_delete=models.CASCADE,
-        db_column="check_number",
     )
     product_number = models.IntegerField(validators=[MinValueValidator(0)])
     selling_price = models.DecimalField(

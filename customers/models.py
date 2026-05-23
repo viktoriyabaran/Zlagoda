@@ -3,7 +3,6 @@ from django.db import models
 
 
 class CustomerCard(models.Model):
-    card_number = models.CharField(max_length=13, primary_key=True)
     cust_surname = models.CharField(max_length=50)
     cust_name = models.CharField(max_length=50)
     cust_patronymic = models.CharField(max_length=50, null=True, blank=True)
@@ -14,4 +13,4 @@ class CustomerCard(models.Model):
     percent = models.IntegerField(validators=[MinValueValidator(0)])
 
     def __str__(self):
-        return f"Customer {self.card_number}: {self.cust_surname} {self.cust_name}"
+        return f"Customer #{self.pk}: {self.cust_surname} {self.cust_name}"

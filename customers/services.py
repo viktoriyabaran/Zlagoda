@@ -14,7 +14,6 @@ class CustomerService:
 
     def create(self, data: dict) -> None:
         create_customer(
-            data["card_number"],
             data["cust_surname"],
             data["cust_name"],
             data.get("cust_patronymic"),

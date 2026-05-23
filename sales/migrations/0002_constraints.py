@@ -3,29 +3,29 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("sales", "0002_sale"),
+        ("sales", "0001_initial"),
     ]
 
     operations = [
         migrations.RunSQL(
             sql="""
                 ALTER TABLE sales_check
-                    DROP CONSTRAINT sales_check_id_employee_ef643ddd_fk_employees;
+                    DROP CONSTRAINT sales_check_employee_id_6f07d1d2_fk_employees_employee_id;
 
                 ALTER TABLE sales_check
-                    ADD CONSTRAINT sales_check_id_employee_fk_employees_employee
-                    FOREIGN KEY (id_employee)
-                    REFERENCES employees_employee(id_employee)
+                    ADD CONSTRAINT sales_check_employee_fk_employees_employee
+                    FOREIGN KEY (employee_id)
+                    REFERENCES employees_employee(id)
                     ON UPDATE CASCADE ON DELETE NO ACTION
                     DEFERRABLE INITIALLY DEFERRED;
 
                 ALTER TABLE sales_check
-                    DROP CONSTRAINT sales_check_card_number_7ebc27d4_fk_customers;
+                    DROP CONSTRAINT sales_check_card_id_bef4d934_fk_customers_customercard_id;
 
                 ALTER TABLE sales_check
-                    ADD CONSTRAINT sales_check_card_number_fk_customers_customercard
-                    FOREIGN KEY (card_number)
-                    REFERENCES customers_customercard(card_number)
+                    ADD CONSTRAINT sales_check_card_fk_customers_customercard
+                    FOREIGN KEY (card_id)
+                    REFERENCES customers_customercard(id)
                     ON UPDATE CASCADE ON DELETE NO ACTION
                     DEFERRABLE INITIALLY DEFERRED;
 
@@ -40,32 +40,32 @@ class Migration(migrations.Migration):
                     DEFERRABLE INITIALLY DEFERRED;
 
                 ALTER TABLE sales_sale
-                    DROP CONSTRAINT sales_sale_check_number_6c8d1882_fk_sales_check_check_number;
+                    DROP CONSTRAINT sales_sale_check_number_id_e240bb29_fk_sales_check_id;
 
                 ALTER TABLE sales_sale
                     ADD CONSTRAINT sales_sale_check_number_fk_sales_check
-                    FOREIGN KEY (check_number)
-                    REFERENCES sales_check(check_number)
+                    FOREIGN KEY (check_number_id)
+                    REFERENCES sales_check(id)
                     ON UPDATE CASCADE ON DELETE CASCADE
                     DEFERRABLE INITIALLY DEFERRED;
             """,
             reverse_sql="""
                 ALTER TABLE sales_check
-                    DROP CONSTRAINT sales_check_id_employee_fk_employees_employee;
+                    DROP CONSTRAINT sales_check_employee_fk_employees_employee;
 
                 ALTER TABLE sales_check
-                    ADD CONSTRAINT sales_check_id_employee_ef643ddd_fk_employees
-                    FOREIGN KEY (id_employee)
-                    REFERENCES employees_employee(id_employee)
+                    ADD CONSTRAINT sales_check_employee_id_6f07d1d2_fk_employees_employee_id
+                    FOREIGN KEY (employee_id)
+                    REFERENCES employees_employee(id)
                     DEFERRABLE INITIALLY DEFERRED;
 
                 ALTER TABLE sales_check
-                    DROP CONSTRAINT sales_check_card_number_fk_customers_customercard;
+                    DROP CONSTRAINT sales_check_card_fk_customers_customercard;
 
                 ALTER TABLE sales_check
-                    ADD CONSTRAINT sales_check_card_number_7ebc27d4_fk_customers
-                    FOREIGN KEY (card_number)
-                    REFERENCES customers_customercard(card_number)
+                    ADD CONSTRAINT sales_check_card_id_bef4d934_fk_customers_customercard_id
+                    FOREIGN KEY (card_id)
+                    REFERENCES customers_customercard(id)
                     DEFERRABLE INITIALLY DEFERRED;
 
                 ALTER TABLE sales_sale
@@ -81,9 +81,9 @@ class Migration(migrations.Migration):
                     DROP CONSTRAINT sales_sale_check_number_fk_sales_check;
 
                 ALTER TABLE sales_sale
-                    ADD CONSTRAINT sales_sale_check_number_6c8d1882_fk_sales_check_check_number
-                    FOREIGN KEY (check_number)
-                    REFERENCES sales_check(check_number)
+                    ADD CONSTRAINT sales_sale_check_number_id_e240bb29_fk_sales_check_id
+                    FOREIGN KEY (check_number_id)
+                    REFERENCES sales_check(id)
                     DEFERRABLE INITIALLY DEFERRED;
             """,
         ),

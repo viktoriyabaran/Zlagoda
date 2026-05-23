@@ -10,7 +10,6 @@ from .services import CustomerService
 CUSTOMER_COLUMNS = [
     {"key": "cust_surname", "label": "Surname", "sortable": True},
     {"key": "cust_name", "label": "Name", "sortable": False},
-    {"key": "card_number", "label": "Card", "sortable": False},
     {"key": "phone_number", "label": "Phone", "sortable": False},
     {"key": "percent", "label": "Discount %", "sortable": True},
 ]

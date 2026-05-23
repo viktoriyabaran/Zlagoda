@@ -19,10 +19,7 @@ class CategoryForm(LayoutForm):
 
 
 class ProductForm(LayoutForm):
-    id_product = forms.IntegerField(
-        widget=forms.NumberInput(attrs={"class": TEXT_INPUT_CLASS})
-    )
-    category_number = forms.ChoiceField(
+    category = forms.ChoiceField(
         choices=[], widget=forms.Select(attrs={"class": TEXT_INPUT_CLASS})
     )
     product_name = forms.CharField(
@@ -97,7 +94,7 @@ class ProductForm(LayoutForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         categories = get_all_categories()
-        self.fields["category_number"].choices = [
+        self.fields["category"].choices = [
             (c["id"], c["category_name"]) for c in categories
         ]
 
@@ -132,7 +129,7 @@ class ProductForm(LayoutForm):
 
 
 class StoreProductForm(LayoutForm):
-    id_product = forms.ChoiceField(
+    product = forms.ChoiceField(
         choices=[],
         label="Product",
         widget=forms.Select(attrs={"class": TEXT_INPUT_CLASS}),
@@ -183,18 +180,17 @@ class StoreProductForm(LayoutForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         products = get_all_products()
-        self.fields["id_product"].choices = [
-            (p["id_product"], f'{p["product_name"]} (#{p["id_product"]})')
-            for p in products
+        self.fields["product"].choices = [
+            (p["id"], p["product_name"]) for p in products
         ]
 
-    def clean_id_product(self):
-        id_product = self.cleaned_data["id_product"]
-        if get_store_products_by_product(id_product):
+    def clean_product(self):
+        product_id = self.cleaned_data["product"]
+        if get_store_products_by_product(product_id):
             raise forms.ValidationError(
                 "This product already has store products (max 2 per product)"
             )
-        return id_product
+        return product_id
 
     def clean_upc(self):
         upc = self.cleaned_data.get("upc")

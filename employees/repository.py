@@ -1,17 +1,17 @@
-from core.db import execute_write, execute_query
+from core.db import execute_insert_returning, execute_query
 
 
-def create_employee(data: dict):
-    execute_write(
+def create_employee(data: dict) -> int:
+    return execute_insert_returning(
         """
         INSERT INTO employees_employee (
-            id_employee, empl_surname, empl_name, empl_patronymic,
+            empl_surname, empl_name, empl_patronymic,
             empl_role, salary, date_of_birth, date_of_start,
             phone_number, city, street, zip_code
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        RETURNING id
         """,
         [
-            data["id_employee"],
             data["empl_surname"],
             data["empl_name"],
             data["empl_patronymic"],

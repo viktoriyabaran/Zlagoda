@@ -10,9 +10,6 @@ TEXT_INPUT_CLASS = "bg-transparent border border-white/50 rounded-lg px-3 py-2 w
 
 
 class EmployeeForm(LayoutForm):
-    id_employee = forms.CharField(
-        max_length=10, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
-    )
     empl_surname = forms.CharField(
         max_length=50, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
     )
