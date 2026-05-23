@@ -20,9 +20,9 @@ def create_category(category_name: str):
 
 def get_all_products(order_by: str = ""):
     return execute_query(f"""
-        SELECT p.id_product, p.product_name, p.characteristics, c.category_name
+        SELECT p.id, p.product_name, p.characteristics, c.category_name
         FROM products_product p
-        JOIN products_category c ON p.category_number_id = c.category_number
+        JOIN products_category c ON p.category_id = c.id
         {order_by}
     """)
 
