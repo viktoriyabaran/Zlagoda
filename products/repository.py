@@ -64,6 +64,19 @@ def update_product(product_id: int, data: dict):
         [data["category"], data["product_name"], data["characteristics"], product_id],
     )
 
+def delete_product(product_id: int):
+    execute_write(
+        """DELETE FROM sales_sale WHERE "UPC" IN (
+            SELECT "UPC" FROM products_storeproduct WHERE product_id = %s
+        )""",
+        [product_id],
+    )
+    execute_write(
+        "DELETE FROM products_storeproduct WHERE product_id = %s", [product_id]
+    )
+    execute_write(
+        "DELETE FROM products_product WHERE id = %s", [product_id]
+    )
 
 def get_store_product_by_upc(upc: str):
     return execute_single('SELECT * FROM products_storeproduct WHERE "UPC" = %s', [upc])

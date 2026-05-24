@@ -164,6 +164,13 @@ class GetProductsView(View):
                             "url_name": "products:edit-product",
                             "icon": "✎",
                         },
+                        {
+                            "label": "Delete",
+                            "url_name": "products:delete-product",
+                            "icon": "✕",
+                            "method": "post",
+                            "confirm": "Delete this product?",
+                        },
                     ],
                 },
             },
@@ -212,6 +219,12 @@ class EditProductView(View):
             },
         )
 
+class DeleteProductView(View):
+    product_service = ProductService()
+
+    def post(self, request, product_id):
+        self.product_service.delete(product_id)
+        return HttpResponse("")
 
 class AddStoreProductView(View):
     store_product_service = StoreProductService()
