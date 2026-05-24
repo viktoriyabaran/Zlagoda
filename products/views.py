@@ -17,6 +17,7 @@ from .services import (
     ProductService,
     StoreProductListService,
     StoreProductService,
+    PromotionalProductService,
 )
 
 CATEGORY_COLUMNS = [
@@ -40,6 +41,12 @@ STORE_PRODUCT_COLUMNS = [
 ]
 STORE_PRODUCT_SORTABLE = {c["key"] for c in STORE_PRODUCT_COLUMNS if c["sortable"]}
 
+PROMOTIONAL_COLUMNS = [
+    {"key": "product_name", "label": "Product Name", "sortable": True},
+    {"key": "selling_price", "label": "Price", "sortable": True},
+    {"key": "products_number", "label": "Quantity", "sortable": True},
+]
+PROMOTIONAL_SORTABLE = {c["key"] for c in PROMOTIONAL_COLUMNS if c["sortable"]}
 
 class AddCategoryView(View):
     category_service = CategoryService()
@@ -398,5 +405,28 @@ class EditCategoryView(View):
                 "form_title": "Edit Category",
                 "form_action": reverse("products:edit-category", args=[category_id]),
                 "submit_label": "Save",
+            },
+        )
+
+class GetPromotionalProductsView(View):
+    service = PromotionalProductService()
+
+    def get(self, request):
+        sort_by, sort_dir = resolve_sort(
+            request, PROMOTIONAL_SORTABLE, default="products_number"
+        )
+        rows = self.service.get_all(sort_by, sort_dir)
+        return render(
+            request,
+            "home.html",
+            {
+                "list": {
+                    "title": "PROMOTIONAL PRODUCTS",
+                    "subtitle": "All promotional products in store",
+                    "rows": rows,
+                    "columns": PROMOTIONAL_COLUMNS,
+                    "sort": {"by": sort_by, "dir": sort_dir},
+                    "empty_message": "No promotional products yet.",
+                },
             },
         )

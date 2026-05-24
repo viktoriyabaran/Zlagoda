@@ -141,3 +141,15 @@ def update_category(category_id: int, category_name: str):
         "UPDATE products_category SET category_name = %s WHERE id = %s",
         [category_name, category_id],
     )
+
+def get_promotional_store_products(order_by=""):
+    return execute_query(
+        f"""
+        SELECT sp."UPC", p.product_name, p.characteristics,
+               sp.selling_price, sp.products_number, sp.promotional_product
+        FROM products_storeproduct sp
+        JOIN products_product p ON sp.product_id = p.id
+        WHERE sp.promotional_product = TRUE
+        {order_by}
+        """,
+    )

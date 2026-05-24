@@ -13,6 +13,7 @@ from .views import (
     GetCategoriesView,
     GetProductsView,
     GetStoreProductsView,
+    GetPromotionalProductsView,
 )
 
 app_name = "products"
@@ -36,6 +37,7 @@ urlpatterns = [
     ),
     path("store-products/", GetStoreProductsView.as_view(), name="store-products"),
     path("", GetProductsView.as_view(), name="products"),
+    path("store-products/promotional/", GetPromotionalProductsView.as_view(), name="promotional-products"),
     path(
         "products/<int:product_id>/edit/",
         EditProductView.as_view(),
