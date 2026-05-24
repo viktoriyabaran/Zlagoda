@@ -1,4 +1,4 @@
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
@@ -76,6 +76,13 @@ class GetCustomersView(View):
                             "url_name": "customers:edit-customer",
                             "icon": "✎",
                         },
+                        {
+                            "label": "Delete",
+                            "url_name": "customers:delete-customer",
+                            "icon": "✕",
+                            "method": "post",
+                            "confirm": "Delete this customer?",
+                        },
                     ],
                 },
             },
@@ -132,3 +139,10 @@ class EditCustomerView(View):
                 "submit_label": "Save",
             },
         )
+
+class DeleteCustomerView(View):
+    customer_service = CustomerService()
+
+    def post(self, request, customer_id):
+        self.customer_service.delete(customer_id)
+        return HttpResponse("")

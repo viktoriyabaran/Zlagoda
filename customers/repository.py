@@ -56,3 +56,8 @@ def update_customer(customer_card_id: int, data: dict):
             customer_card_id,
         ],
     )
+
+def delete_customer(customer_id: int):
+    execute_write(
+        "DELETE FROM customers_customercard WHERE id = %s", [customer_id]
+    )

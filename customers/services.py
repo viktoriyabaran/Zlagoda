@@ -7,6 +7,7 @@ from .repository import (
     get_all_customers,
     get_customer_by_id,
     update_customer,
+    delete_customer,
 )
 
 
@@ -38,3 +39,6 @@ class CustomerService:
 
     def update(self, id: int, data: dict) -> None:
         return update_customer(id, data)
+
+    def delete(self, customer_id: int) -> None:
+        delete_customer(customer_id)
