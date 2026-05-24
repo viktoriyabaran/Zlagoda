@@ -52,8 +52,8 @@
                     {% endif %}
                 </th>
                 {% endfor %}
-                {% if list.edit_url_name %}
-                <th class="px-3 py-2 border-b border-white/20"></th>
+                {% if list.actions %}
+                <th class="px-3 py-2 border-b border-white/20 w-10"></th>
                 {% endif %}
             </tr>
         </thead>
@@ -63,15 +63,38 @@
                 {% for col in list.columns %}
                 <td class="px-3 py-2 border-b border-white/10">{{ row|cell:col.key }}</td>
                 {% endfor %}
-                {% if list.edit_url_name %}
-                <td class="px-3 py-2 border-b border-white/10">
-                    <a href="{% url list.edit_url_name row.id %}" class="text-white/70 hover:text-white text-xs tracking-widest uppercase">Edit</a>
+                {% if list.actions %}
+                <td class="px-3 py-2 border-b border-white/10 text-right">
+                    {% visible_actions list.actions request.session.user_role as acts %}
+                    <div class="inline-flex items-center gap-2">
+                        {% for a in acts %}
+                            {% if a.method == "post" %}
+                            <button
+                                type="button"
+                                title="{{ a.label }}"
+                                aria-label="{{ a.label }}"
+                                hx-post="{% action_url a row list.row_id_key %}"
+                                {% if a.confirm %}hx-confirm="{{ a.confirm }}"{% endif %}
+                                hx-target="closest tr"
+                                hx-swap="outerHTML"
+                                class="text-white/70 hover:text-white text-base leading-none px-1"
+                            >{{ a.icon }}</button>
+                            {% else %}
+                            <a
+                                href="{% action_url a row list.row_id_key %}"
+                                title="{{ a.label }}"
+                                aria-label="{{ a.label }}"
+                                class="text-white/70 hover:text-white text-base leading-none px-1"
+                            >{{ a.icon }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 </td>
                 {% endif %}
             </tr>
             {% empty %}
             <tr>
-                <td colspan="{{ list.columns|length }}" class="text-white/70 text-sm text-center py-8">
+                <td colspan="{% if list.actions %}{{ list.columns|length|add:1 }}{% else %}{{ list.columns|length }}{% endif %}" class="text-white/70 text-sm text-center py-8">
                     {{ list.empty_message|default:"No records yet." }}
                 </td>
             </tr>

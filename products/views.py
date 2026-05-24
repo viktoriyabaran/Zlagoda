@@ -134,7 +134,14 @@ class GetProductsView(View):
                     "add_url": reverse("products:add-product"),
                     "add_label": "Add product",
                     "empty_message": "No products yet.",
-                    "edit_url_name": "products:edit-product",
+                    "row_id_key": "id",
+                    "actions": [
+                        {
+                            "label": "Edit",
+                            "url_name": "products:edit-product",
+                            "icon": "✎",
+                        },
+                    ],
                 },
             },
         )
@@ -153,6 +160,7 @@ class EditProductView(View):
             "form": form,
             "form_title": "Edit Product",
             "form_action": reverse("products:edit-product", args=[product_id]),
+            "submit_label": "Save",
         })
 
     def post(self, request, product_id):
@@ -164,6 +172,7 @@ class EditProductView(View):
             "form": form,
             "form_title": "Edit Product",
             "form_action": reverse("products:edit-product", args=[product_id]),
+            "submit_label": "Save",
         })
 
 class AddStoreProductView(View):

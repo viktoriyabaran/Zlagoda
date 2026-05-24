@@ -1,9 +1,11 @@
 from django.db import models
 
+from core.roles import Role
+
 
 class EmployeeRole(models.TextChoices):
-    MANAGER = "Manager", "Manager"
-    CASHIER = "Cashier", "Cashier"
+    MANAGER = Role.MANAGER, Role.MANAGER
+    CASHIER = Role.CASHIER, Role.CASHIER
 
 
 class Employee(models.Model):

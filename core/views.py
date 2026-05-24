@@ -22,7 +22,9 @@ class LoginView(View):
                 form.cleaned_data["password"],
             )
             if user:
-                self.auth_service.register_session_user(request, user["id"])
+                self.auth_service.register_session_user(
+                    request, user["id"], user.get("empl_role")
+                )
                 return redirect("core:home")
             form.add_error(None, "Invalid credentials")
         return render(request, "login.html", {"form": form})
