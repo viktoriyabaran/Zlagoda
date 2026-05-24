@@ -1,3 +1,5 @@
+from xml.dom import NotFoundErr
+
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
@@ -146,34 +148,49 @@ class GetProductsView(View):
             },
         )
 
+
 class EditProductView(View):
     product_service = ProductService()
 
     def get(self, request, product_id):
         product = self.product_service.get_by_id(product_id)
-        form = EditProductForm(initial={
-            "category": product["category_id"],
-            "product_name": product["product_name"],
-            "characteristics": product["characteristics"],
-        })
-        return render(request, "home.html", {
-            "form": form,
-            "form_title": "Edit Product",
-            "form_action": reverse("products:edit-product", args=[product_id]),
-            "submit_label": "Save",
-        })
+        if not product:
+            raise NotFoundErr(f"Product with id {product_id} was not found")
+
+        form = EditProductForm(
+            initial={
+                "category": product["category_id"],
+                "product_name": product["product_name"],
+                "characteristics": product["characteristics"],
+            }
+        )
+        return render(
+            request,
+            "home.html",
+            {
+                "form": form,
+                "form_title": "Edit Product",
+                "form_action": reverse("products:edit-product", args=[product_id]),
+                "submit_label": "Save",
+            },
+        )
 
     def post(self, request, product_id):
         form = EditProductForm(request.POST)
         if form.is_valid():
             self.product_service.update(product_id, form.cleaned_data)
             return redirect("products:products")
-        return render(request, "home.html", {
-            "form": form,
-            "form_title": "Edit Product",
-            "form_action": reverse("products:edit-product", args=[product_id]),
-            "submit_label": "Save",
-        })
+        return render(
+            request,
+            "home.html",
+            {
+                "form": form,
+                "form_title": "Edit Product",
+                "form_action": reverse("products:edit-product", args=[product_id]),
+                "submit_label": "Save",
+            },
+        )
+
 
 class AddStoreProductView(View):
     store_product_service = StoreProductService()

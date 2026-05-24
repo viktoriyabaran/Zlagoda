@@ -61,6 +61,8 @@ class CategoryService:
 class IProductService(Protocol):
     def create(self, data: dict) -> None: ...
     def get_all(self, sort_by: str, sort_dir: str) -> list: ...
+    def get_by_id(self, product_id: int) -> dict | None: ...
+    def update(self, product_id: int, data: dict) -> None: ...
 
 
 class ProductService:
@@ -75,7 +77,7 @@ class ProductService:
                     {**data, "product": product_id}
                 )
 
-    def get_by_id(self, product_id: int) -> dict:
+    def get_by_id(self, product_id: int) -> dict | None:
         return get_product_by_id(product_id)
 
     def update(self, product_id: int, data: dict) -> None:
