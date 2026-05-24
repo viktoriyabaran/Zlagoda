@@ -5,7 +5,7 @@ from django.views import View
 
 from core.sorting import resolve_sort
 
-from .forms import CategoryForm, EditProductForm, ProductForm, StoreProductForm
+from .forms import CategoryForm, EditProductForm, EditStoreProductForm, ProductForm, StoreProductForm
 from .services import (
     CategoryService,
     ProductService,
@@ -246,6 +246,45 @@ class GetStoreProductsView(View):
                     "add_url": reverse("products:add-store-product"),
                     "add_label": "Add store product",
                     "empty_message": "No store products yet.",
+                    "row_id_key": "UPC",
+                    "actions": [
+                        {
+                            "label": "Edit",
+                            "url_name": "products:edit-store-product",
+                            "icon": "✎",
+                        },
+                    ]
                 },
             },
         )
+
+class EditStoreProductView(View):
+    store_product_service = StoreProductService()
+
+    def get(self, request, upc):
+        store_product = self.store_product_service.get_by_upc(upc)
+        if not store_product:
+            raise Http404(f"Store product with UPC {upc} was not found")
+        form = EditStoreProductForm(initial={
+            "selling_price": store_product["selling_price"],
+            "products_number": store_product["products_number"],
+            "promotional_product": store_product["promotional_product"],
+        })
+        return render(request, "home.html", {
+            "form": form,
+            "form_title": "Edit Store Product",
+            "form_action": reverse("products:edit-store-product", args=[upc]),
+            "submit_label": "Save",
+        })
+
+    def post(self, request, upc):
+        form = EditStoreProductForm(request.POST)
+        if form.is_valid():
+            self.store_product_service.update(upc, form.cleaned_data)
+            return redirect("products:store-products")
+        return render(request, "home.html", {
+            "form": form,
+            "form_title": "Edit Store Product",
+            "form_action": reverse("products:edit-store-product", args=[upc]),
+            "submit_label": "Save",
+        })

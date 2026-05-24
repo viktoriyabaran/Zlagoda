@@ -13,6 +13,7 @@ from products.repository import (
     get_all_store_products,
     get_product_by_id,
     update_product,
+    update_store_product,
 )
 
 PROMO_DISCOUNT = Decimal("0.8")
@@ -92,6 +93,12 @@ class StoreProductService:
     def create(self, data: dict) -> None:
         with transaction.atomic():
             _create_store_product_with_optional_promo(data)
+
+    def get_by_upc(self, upc: str) -> dict | None:
+        return get_store_product_by_upc(upc)
+
+    def update(self, upc: str, data: dict) -> None:
+        update_store_product(upc, data)
 
 
 class IStoreProductListService(Protocol):

@@ -232,3 +232,19 @@ class StoreProductForm(LayoutForm):
             if upc and promo_upc and upc == promo_upc:
                 self.add_error("promo_upc", "Must differ from the regular UPC")
         return cleaned
+
+class EditStoreProductForm(LayoutForm):
+    selling_price = forms.DecimalField(
+        max_digits=13,
+        decimal_places=4,
+        min_value=0,
+        widget=forms.NumberInput(attrs={"class": TEXT_INPUT_CLASS, "step": "0.01"}),
+    )
+    products_number = forms.IntegerField(
+        min_value=0,
+        widget=forms.NumberInput(attrs={"class": TEXT_INPUT_CLASS}),
+    )
+    promotional_product = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={"class": CHECKBOX_CLASS}),
+    )

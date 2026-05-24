@@ -8,6 +8,7 @@ from .views import (
     GetCategoriesView,
     GetProductsView,
     GetStoreProductsView,
+    EditStoreProductView,
 )
 
 app_name = "products"
@@ -22,4 +23,5 @@ urlpatterns = [
     path("store-products/", GetStoreProductsView.as_view(), name="store-products"),
     path("", GetProductsView.as_view(), name="products"),
     path("products/<int:product_id>/edit/", EditProductView.as_view(), name="edit-product"),
+    path("store-products/<str:upc>/edit/", EditStoreProductView.as_view(), name="edit-store-product"),
 ]

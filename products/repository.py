@@ -70,7 +70,6 @@ def get_store_products_by_product(product_id):
         "SELECT * FROM products_storeproduct WHERE product_id = %s", [product_id]
     )
 
-
 def create_store_product(data: dict):
     execute_write(
         """INSERT INTO products_storeproduct
@@ -86,7 +85,6 @@ def create_store_product(data: dict):
         ],
     )
 
-
 def get_all_store_products(where_sql="", where_params=(), order_by=""):
     return execute_query(
         f"""
@@ -97,4 +95,12 @@ def get_all_store_products(where_sql="", where_params=(), order_by=""):
         {where_sql}{order_by}
     """,
         list(where_params),
+    )
+
+def update_store_product(upc: str, data: dict):
+    execute_write(
+        """UPDATE products_storeproduct
+           SET selling_price = %s, products_number = %s, promotional_product = %s
+           WHERE "UPC" = %s""",
+        [data["selling_price"], data["products_number"], data["promotional_product"], upc],
     )
