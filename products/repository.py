@@ -121,3 +121,11 @@ def update_store_product(upc: str, data: dict):
            WHERE "UPC" = %s""",
         [data["selling_price"], data["products_number"], data["promotional_product"], upc],
     )
+
+def delete_store_product(upc: str):
+    execute_write(
+        'DELETE FROM sales_sale WHERE "UPC" = %s', [upc]
+    )
+    execute_write(
+        'DELETE FROM products_storeproduct WHERE "UPC" = %s', [upc]
+    )

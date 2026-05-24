@@ -17,6 +17,7 @@ from products.repository import (
     update_store_product,
     delete_category,
     delete_product,
+    delete_store_product,
 )
 
 PROMO_DISCOUNT = Decimal("0.8")
@@ -107,6 +108,9 @@ class StoreProductService:
 
     def update(self, upc: str, data: dict) -> None:
         update_store_product(upc, data)
+
+    def delete(self, upc: str) -> None:
+        delete_store_product(upc)
 
 
 class IStoreProductListService(Protocol):

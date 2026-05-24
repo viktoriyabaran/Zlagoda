@@ -11,6 +11,7 @@ from .views import (
     EditStoreProductView,
     DeleteCategoryView,
     DeleteProductView,
+    DeleteStoreProductView,
 )
 
 app_name = "products"
@@ -28,4 +29,5 @@ urlpatterns = [
     path("products/<int:product_id>/edit/", EditProductView.as_view(), name="edit-product"),
     path("store-products/<str:upc>/edit/", EditStoreProductView.as_view(), name="edit-store-product"),
     path("products/<int:product_id>/delete/", DeleteProductView.as_view(), name="delete-product"),
+    path("store-products/<str:upc>/delete/", DeleteStoreProductView.as_view(), name="delete-store-product"),
 ]

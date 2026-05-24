@@ -283,6 +283,13 @@ class GetStoreProductsView(View):
                             "url_name": "products:edit-store-product",
                             "icon": "✎",
                         },
+                        {
+                            "label": "Delete",
+                            "url_name": "products:delete-store-product",
+                            "icon": "✕",
+                            "method": "post",
+                            "confirm": "Delete this store product?",
+                        }
                     ]
                 },
             },
@@ -318,3 +325,10 @@ class EditStoreProductView(View):
             "form_action": reverse("products:edit-store-product", args=[upc]),
             "submit_label": "Save",
         })
+
+class DeleteStoreProductView(View):
+    store_product_service = StoreProductService()
+
+    def post(self, request, upc):
+        self.store_product_service.delete(upc)
+        return HttpResponse("")
