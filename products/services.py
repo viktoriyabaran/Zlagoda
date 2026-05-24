@@ -12,6 +12,7 @@ from products.repository import (
     get_all_products,
     get_all_store_products,
     get_product_by_id,
+    get_store_product_by_upc,
     update_product,
     update_store_product,
 )
