@@ -21,6 +21,7 @@ from products.repository import (
     update_product,
     update_store_product,
     get_promotional_store_products,
+    get_non_promotional_store_products,
 )
 
 PROMO_DISCOUNT = Decimal("0.8")
@@ -137,3 +138,7 @@ class IPromotionalProductService(Protocol):
 class PromotionalProductService:
     def get_all(self, sort_by: str, sort_dir: str) -> list:
         return get_promotional_store_products(order_by_sql(sort_by, sort_dir))
+
+class NonPromotionalProductService:
+    def get_all(self, sort_by: str, sort_dir: str) -> list:
+        return get_non_promotional_store_products(order_by_sql(sort_by, sort_dir))

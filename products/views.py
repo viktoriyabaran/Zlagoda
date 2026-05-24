@@ -18,6 +18,7 @@ from .services import (
     StoreProductListService,
     StoreProductService,
     PromotionalProductService,
+    NonPromotionalProductService,
 )
 
 CATEGORY_COLUMNS = [
@@ -43,10 +44,18 @@ STORE_PRODUCT_SORTABLE = {c["key"] for c in STORE_PRODUCT_COLUMNS if c["sortable
 
 PROMOTIONAL_COLUMNS = [
     {"key": "product_name", "label": "Product Name", "sortable": True},
-    {"key": "selling_price", "label": "Price", "sortable": True},
+    {"key": "selling_price", "label": "Price", "sortable": False},
     {"key": "products_number", "label": "Quantity", "sortable": True},
 ]
 PROMOTIONAL_SORTABLE = {c["key"] for c in PROMOTIONAL_COLUMNS if c["sortable"]}
+
+NON_PROMOTIONAL_COLUMNS = [
+    {"key": "product_name", "label": "Product Name", "sortable": True},
+    {"key": "selling_price", "label": "Price", "sortable": False},
+    {"key": "products_number", "label": "Quantity", "sortable": True},
+]
+NON_PROMOTIONAL_SORTABLE = {c["key"] for c in NON_PROMOTIONAL_COLUMNS if c["sortable"]}
+
 
 class AddCategoryView(View):
     category_service = CategoryService()
@@ -427,6 +436,29 @@ class GetPromotionalProductsView(View):
                     "columns": PROMOTIONAL_COLUMNS,
                     "sort": {"by": sort_by, "dir": sort_dir},
                     "empty_message": "No promotional products yet.",
+                },
+            },
+        )
+
+class GetNonPromotionalProductsView(View):
+    service = NonPromotionalProductService()
+
+    def get(self, request):
+        sort_by, sort_dir = resolve_sort(
+            request, NON_PROMOTIONAL_SORTABLE, default="products_number"
+        )
+        rows = self.service.get_all(sort_by, sort_dir)
+        return render(
+            request,
+            "home.html",
+            {
+                "list": {
+                    "title": "NON-PROMOTIONAL PRODUCTS",
+                    "subtitle": "All non-promotional products in store",
+                    "rows": rows,
+                    "columns": NON_PROMOTIONAL_COLUMNS,
+                    "sort": {"by": sort_by, "dir": sort_dir},
+                    "empty_message": "No non-promotional products yet.",
                 },
             },
         )

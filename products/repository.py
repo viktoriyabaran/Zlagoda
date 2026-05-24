@@ -153,3 +153,15 @@ def get_promotional_store_products(order_by=""):
         {order_by}
         """,
     )
+
+def get_non_promotional_store_products(order_by=""):
+    return execute_query(
+        f"""
+        SELECT sp."UPC", p.product_name, p.characteristics,
+               sp.selling_price, sp.products_number, sp.promotional_product
+        FROM products_storeproduct sp
+        JOIN products_product p ON sp.product_id = p.id
+        WHERE sp.promotional_product = FALSE
+        {order_by}
+        """,
+    )
