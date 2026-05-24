@@ -52,6 +52,9 @@
                     {% endif %}
                 </th>
                 {% endfor %}
+                {% if list.edit_url_name %}
+                <th class="px-3 py-2 border-b border-white/20"></th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
@@ -60,6 +63,11 @@
                 {% for col in list.columns %}
                 <td class="px-3 py-2 border-b border-white/10">{{ row|cell:col.key }}</td>
                 {% endfor %}
+                {% if list.edit_url_name %}
+                <td class="px-3 py-2 border-b border-white/10">
+                    <a href="{% url list.edit_url_name row.id %}" class="text-white/70 hover:text-white text-xs tracking-widest uppercase">Edit</a>
+                </td>
+                {% endif %}
             </tr>
             {% empty %}
             <tr>

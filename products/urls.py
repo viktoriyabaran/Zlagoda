@@ -3,6 +3,7 @@ from django.urls import path
 from .views import (
     AddCategoryView,
     AddProductView,
+    EditProductView,
     AddStoreProductView,
     GetCategoriesView,
     GetProductsView,
@@ -20,4 +21,5 @@ urlpatterns = [
     ),
     path("store-products/", GetStoreProductsView.as_view(), name="store-products"),
     path("", GetProductsView.as_view(), name="products"),
+    path("products/<int:product_id>/edit/", EditProductView.as_view(), name="edit-product"),
 ]

@@ -127,6 +127,23 @@ class ProductForm(LayoutForm):
                 self.add_error("promo_upc", "Must differ from the regular UPC")
         return cleaned
 
+class EditProductForm(LayoutForm):
+    category = forms.ChoiceField(
+        choices=[], widget=forms.Select(attrs={"class": TEXT_INPUT_CLASS})
+    )
+    product_name = forms.CharField(
+        max_length=50, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+    )
+    characteristics = forms.CharField(
+        max_length=100, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        categories = get_all_categories()
+        self.fields["category"].choices = [
+            (c["id"], c["category_name"]) for c in categories
+        ]
 
 class StoreProductForm(LayoutForm):
     product = forms.ChoiceField(

@@ -42,6 +42,16 @@ def create_product(data: dict) -> int:
         ],
     )
 
+def get_product_by_id(product_id: int):
+    return execute_single(
+        "SELECT * FROM products_product WHERE id = %s", [product_id]
+    )
+
+def update_product(product_id: int, data: dict):
+    execute_write(
+        "UPDATE products_product SET category_id = %s, product_name = %s, characteristics = %s WHERE id = %s",
+        [data["category"], data["product_name"], data["characteristics"], product_id],
+    )
 
 def get_store_product_by_upc(upc: str):
     return execute_single('SELECT * FROM products_storeproduct WHERE "UPC" = %s', [upc])

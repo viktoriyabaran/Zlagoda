@@ -4,7 +4,7 @@ from django.views import View
 
 from core.sorting import resolve_sort
 
-from .forms import CategoryForm, ProductForm, StoreProductForm
+from .forms import CategoryForm, EditProductForm, ProductForm, StoreProductForm
 from .services import (
     CategoryService,
     ProductService,
@@ -134,10 +134,37 @@ class GetProductsView(View):
                     "add_url": reverse("products:add-product"),
                     "add_label": "Add product",
                     "empty_message": "No products yet.",
+                    "edit_url_name": "products:edit-product",
                 },
             },
         )
 
+class EditProductView(View):
+    product_service = ProductService()
+
+    def get(self, request, product_id):
+        product = self.product_service.get_by_id(product_id)
+        form = EditProductForm(initial={
+            "category": product["category_id"],
+            "product_name": product["product_name"],
+            "characteristics": product["characteristics"],
+        })
+        return render(request, "home.html", {
+            "form": form,
+            "form_title": "Edit Product",
+            "form_action": reverse("products:edit-product", args=[product_id]),
+        })
+
+    def post(self, request, product_id):
+        form = EditProductForm(request.POST)
+        if form.is_valid():
+            self.product_service.update(product_id, form.cleaned_data)
+            return redirect("products:products")
+        return render(request, "home.html", {
+            "form": form,
+            "form_title": "Edit Product",
+            "form_action": reverse("products:edit-product", args=[product_id]),
+        })
 
 class AddStoreProductView(View):
     store_product_service = StoreProductService()
