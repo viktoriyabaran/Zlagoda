@@ -5,7 +5,13 @@ from django.views import View
 
 from core.sorting import resolve_sort
 
-from .forms import CategoryForm, EditProductForm, EditStoreProductForm, ProductForm, StoreProductForm
+from .forms import (
+    CategoryForm,
+    EditProductForm,
+    EditStoreProductForm,
+    ProductForm,
+    StoreProductForm,
+)
 from .services import (
     CategoryService,
     ProductService,
@@ -33,6 +39,7 @@ STORE_PRODUCT_COLUMNS = [
     {"key": "promotional_product", "label": "Promo", "sortable": False},
 ]
 STORE_PRODUCT_SORTABLE = {c["key"] for c in STORE_PRODUCT_COLUMNS if c["sortable"]}
+
 
 class AddCategoryView(View):
     category_service = CategoryService()
@@ -63,6 +70,7 @@ class AddCategoryView(View):
             },
         )
 
+
 class GetCategoriesView(View):
     category_service = CategoryService()
 
@@ -86,6 +94,11 @@ class GetCategoriesView(View):
                     "empty_message": "No categories yet.",
                     "actions": [
                         {
+                            "label": "Edit",
+                            "url_name": "products:edit-category",
+                            "icon": "✎",
+                        },
+                        {
                             "label": "Delete",
                             "url_name": "products:delete-category",
                             "icon": "✕",
@@ -98,12 +111,14 @@ class GetCategoriesView(View):
             },
         )
 
+
 class DeleteCategoryView(View):
     category_service = CategoryService()
 
     def post(self, request, category_id):
         self.category_service.delete(category_id)
         return HttpResponse("")
+
 
 class AddProductView(View):
     product_service = ProductService()
@@ -219,12 +234,14 @@ class EditProductView(View):
             },
         )
 
+
 class DeleteProductView(View):
     product_service = ProductService()
 
     def post(self, request, product_id):
         self.product_service.delete(product_id)
         return HttpResponse("")
+
 
 class AddStoreProductView(View):
     store_product_service = StoreProductService()
@@ -254,6 +271,7 @@ class AddStoreProductView(View):
                 "form_action": reverse("products:add-store-product"),
             },
         )
+
 
 class GetStoreProductsView(View):
     store_product_list_service = StoreProductListService()
@@ -289,11 +307,12 @@ class GetStoreProductsView(View):
                             "icon": "✕",
                             "method": "post",
                             "confirm": "Delete this store product?",
-                        }
-                    ]
+                        },
+                    ],
                 },
             },
         )
+
 
 class EditStoreProductView(View):
     store_product_service = StoreProductService()
@@ -302,29 +321,40 @@ class EditStoreProductView(View):
         store_product = self.store_product_service.get_by_upc(upc)
         if not store_product:
             raise Http404(f"Store product with UPC {upc} was not found")
-        form = EditStoreProductForm(initial={
-            "selling_price": store_product["selling_price"],
-            "products_number": store_product["products_number"],
-            "promotional_product": store_product["promotional_product"],
-        })
-        return render(request, "home.html", {
-            "form": form,
-            "form_title": "Edit Store Product",
-            "form_action": reverse("products:edit-store-product", args=[upc]),
-            "submit_label": "Save",
-        })
+        form = EditStoreProductForm(
+            initial={
+                "selling_price": store_product["selling_price"],
+                "products_number": store_product["products_number"],
+                "promotional_product": store_product["promotional_product"],
+            }
+        )
+        return render(
+            request,
+            "home.html",
+            {
+                "form": form,
+                "form_title": "Edit Store Product",
+                "form_action": reverse("products:edit-store-product", args=[upc]),
+                "submit_label": "Save",
+            },
+        )
 
     def post(self, request, upc):
         form = EditStoreProductForm(request.POST)
         if form.is_valid():
             self.store_product_service.update(upc, form.cleaned_data)
             return redirect("products:store-products")
-        return render(request, "home.html", {
-            "form": form,
-            "form_title": "Edit Store Product",
-            "form_action": reverse("products:edit-store-product", args=[upc]),
-            "submit_label": "Save",
-        })
+        return render(
+            request,
+            "home.html",
+            {
+                "form": form,
+                "form_title": "Edit Store Product",
+                "form_action": reverse("products:edit-store-product", args=[upc]),
+                "submit_label": "Save",
+            },
+        )
+
 
 class DeleteStoreProductView(View):
     store_product_service = StoreProductService()
@@ -332,3 +362,41 @@ class DeleteStoreProductView(View):
     def post(self, request, upc):
         self.store_product_service.delete(upc)
         return HttpResponse("")
+
+
+class EditCategoryView(View):
+    category_service = CategoryService()
+
+    def get(self, request, category_id):
+        category = self.category_service.get_by_id(category_id)
+        if not category:
+            raise Http404(f"Category with id {category_id} was not found")
+        form = CategoryForm(initial={"category_name": category["category_name"]})
+        return render(
+            request,
+            "home.html",
+            {
+                "form": form,
+                "form_title": "Edit Category",
+                "form_action": reverse("products:edit-category", args=[category_id]),
+                "submit_label": "Save",
+            },
+        )
+
+    def post(self, request, category_id):
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            self.category_service.update(
+                category_id, form.cleaned_data["category_name"]
+            )
+            return redirect("products:categories")
+        return render(
+            request,
+            "home.html",
+            {
+                "form": form,
+                "form_title": "Edit Category",
+                "form_action": reverse("products:edit-category", args=[category_id]),
+                "submit_label": "Save",
+            },
+        )

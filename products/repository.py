@@ -22,10 +22,10 @@ def create_category(category_name: str):
         [category_name],
     )
 
+
 def delete_category(category_id: int):
-    execute_write(
-        "DELETE FROM products_category WHERE id = %s", [category_id]
-    )
+    execute_write("DELETE FROM products_category WHERE id = %s", [category_id])
+
 
 def get_all_products(order_by: str = ""):
     return execute_query(f"""
@@ -64,6 +64,7 @@ def update_product(product_id: int, data: dict):
         [data["category"], data["product_name"], data["characteristics"], product_id],
     )
 
+
 def delete_product(product_id: int):
     execute_write(
         """DELETE FROM sales_sale WHERE "UPC" IN (
@@ -74,9 +75,8 @@ def delete_product(product_id: int):
     execute_write(
         "DELETE FROM products_storeproduct WHERE product_id = %s", [product_id]
     )
-    execute_write(
-        "DELETE FROM products_product WHERE id = %s", [product_id]
-    )
+    execute_write("DELETE FROM products_product WHERE id = %s", [product_id])
+
 
 def get_store_product_by_upc(upc: str):
     return execute_single('SELECT * FROM products_storeproduct WHERE "UPC" = %s', [upc])
@@ -86,6 +86,7 @@ def get_store_products_by_product(product_id):
     return execute_query(
         "SELECT * FROM products_storeproduct WHERE product_id = %s", [product_id]
     )
+
 
 def create_store_product(data: dict):
     execute_write(
@@ -102,6 +103,7 @@ def create_store_product(data: dict):
         ],
     )
 
+
 def get_all_store_products(where_sql="", where_params=(), order_by=""):
     return execute_query(
         f"""
@@ -114,18 +116,28 @@ def get_all_store_products(where_sql="", where_params=(), order_by=""):
         list(where_params),
     )
 
+
 def update_store_product(upc: str, data: dict):
     execute_write(
         """UPDATE products_storeproduct
            SET selling_price = %s, products_number = %s, promotional_product = %s
            WHERE "UPC" = %s""",
-        [data["selling_price"], data["products_number"], data["promotional_product"], upc],
+        [
+            data["selling_price"],
+            data["products_number"],
+            data["promotional_product"],
+            upc,
+        ],
     )
 
+
 def delete_store_product(upc: str):
+    execute_write('DELETE FROM sales_sale WHERE "UPC" = %s', [upc])
+    execute_write('DELETE FROM products_storeproduct WHERE "UPC" = %s', [upc])
+
+
+def update_category(category_id: int, category_name: str):
     execute_write(
-        'DELETE FROM sales_sale WHERE "UPC" = %s', [upc]
-    )
-    execute_write(
-        'DELETE FROM products_storeproduct WHERE "UPC" = %s', [upc]
+        "UPDATE products_category SET category_name = %s WHERE id = %s",
+        [category_name, category_id],
     )

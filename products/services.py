@@ -8,16 +8,18 @@ from products.repository import (
     create_category,
     create_product,
     create_store_product,
-    get_all_categories,
-    get_all_products,
-    get_all_store_products,
-    get_product_by_id,
-    get_store_product_by_upc,
-    update_product,
-    update_store_product,
     delete_category,
     delete_product,
     delete_store_product,
+    get_all_categories,
+    get_all_products,
+    get_all_store_products,
+    get_category_by_id,
+    get_product_by_id,
+    get_store_product_by_upc,
+    update_category,
+    update_product,
+    update_store_product,
 )
 
 PROMO_DISCOUNT = Decimal("0.8")
@@ -64,6 +66,13 @@ class CategoryService:
 
     def delete(self, category_id: int) -> None:
         delete_category(category_id)
+
+    def get_by_id(self, category_id: int) -> dict | None:
+        return get_category_by_id(category_id)
+
+    def update(self, category_id: int, category_name: str) -> None:
+        update_category(category_id, category_name)
+
 
 class IProductService(Protocol):
     def create(self, data: dict) -> None: ...
