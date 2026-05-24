@@ -52,9 +52,13 @@
                     {% endif %}
                 </th>
                 {% endfor %}
+<<<<<<< Updated upstream
                 {% if list.actions %}
                 <th class="px-3 py-2 border-b border-white/20 w-10"></th>
                 {% endif %}
+=======
+                {% if list.actions %}<th class="px-3 py-2 border-b border-white/20"></th>{% endif %}
+>>>>>>> Stashed changes
             </tr>
         </thead>
         <tbody>
@@ -64,6 +68,7 @@
                 <td class="px-3 py-2 border-b border-white/10">{{ row|cell:col.key }}</td>
                 {% endfor %}
                 {% if list.actions %}
+<<<<<<< Updated upstream
                 <td class="px-3 py-2 border-b border-white/10 text-right">
                     {% visible_actions list.actions request.session.user_role as acts %}
                     <div class="inline-flex items-center gap-2">
@@ -89,6 +94,12 @@
                             {% endif %}
                         {% endfor %}
                     </div>
+=======
+                <td class="px-3 py-2 border-b border-white/10">
+                    {% for action in list.actions %}
+                    <a href="{% url action.url_name row|cell:list.row_id_key %}" class="text-white/70 hover:text-white mr-2">{{ action.icon }} {{ action.label }}</a>
+                    {% endfor %}
+>>>>>>> Stashed changes
                 </td>
                 {% endif %}
             </tr>

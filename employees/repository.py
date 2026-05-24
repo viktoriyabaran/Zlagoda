@@ -1,4 +1,9 @@
-from core.db import execute_insert_returning, execute_query
+from core.db import (
+    execute_insert_returning,
+    execute_query,
+    execute_single,
+    execute_write,
+)
 
 EMPLOYEE_FILTERS = [
     {"key": "q", "label": "Search surname", "type": "search", "column": "empl_surname"},
@@ -63,5 +68,38 @@ def create_employee(data: dict) -> int:
             data["city"],
             data["street"],
             data["zip_code"],
+        ],
+    )
+
+
+def get_employee_by_id(employee_id: int):
+    return execute_single(
+        "SELECT * FROM employees_employee WHERE id_employee = %s", [employee_id]
+    )
+
+
+def update_employee(employee_id: int, data: dict):
+    execute_write(
+        """
+        UPDATE employees_employee SET
+            empl_surname = %s, empl_name = %s, empl_patronymic = %s,
+            empl_role = %s, salary = %s, date_of_birth = %s,
+            date_of_start = %s, phone_number = %s, city = %s,
+            street = %s, zip_code = %s
+        WHERE id = %s
+        """,
+        [
+            data["empl_surname"],
+            data["empl_name"],
+            data["empl_patronymic"],
+            data["empl_role"],
+            data["salary"],
+            data["date_of_birth"],
+            data["date_of_start"],
+            data["phone_number"],
+            data["city"],
+            data["street"],
+            data["zip_code"],
+            employee_id,
         ],
     )

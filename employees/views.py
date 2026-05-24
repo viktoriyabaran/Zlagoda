@@ -70,6 +70,48 @@ class GetEmployeesView(View):
                     "add_label": "Add employee",
                     "empty_message": "No employees yet.",
                     "filters": EMPLOYEE_FILTERS,
+                    "row_id_key": "id_employee",
+                    "actions": [
+                        {
+                            "label": "Edit",
+                            "url_name": "employees:edit-employee",
+                            "icon": "✎",
+                        },
+                    ],
                 },
+            },
+        )
+
+
+class EditEmployeeView(View):
+    employee_service = EmployeeService()
+
+    def get(self, request, pk):
+        employee = self.employee_service.get_by_id(pk)
+        if not employee:
+            return redirect("employees:employees")
+        form = EmployeeForm(initial=employee)
+        return render(
+            request,
+            "home.html",
+            {
+                "form": form,
+                "form_title": "Edit Employee",
+                "form_action": reverse("employees:edit-employee", args=[pk]),
+            },
+        )
+
+    def post(self, request, pk):
+        form = EmployeeForm(request.POST)
+        if form.is_valid():
+            self.employee_service.update_employee(pk, form.cleaned_data)
+            return redirect("employees:employees")
+        return render(
+            request,
+            "home.html",
+            {
+                "form": form,
+                "form_title": "Edit Employee",
+                "form_action": reverse("employees:edit-employee", args=[pk]),
             },
         )
