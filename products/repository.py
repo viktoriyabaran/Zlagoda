@@ -91,7 +91,7 @@ def get_all_store_products(where_sql="", where_params=(), order_by=""):
         SELECT sp."UPC", p.product_name, p.characteristics,
                sp.selling_price, sp.products_number, sp.promotional_product
         FROM products_storeproduct sp
-        JOIN products_product p ON sp.id_product_id = p.id_product
+        JOIN products_product p ON sp.product_id = p.id
         {where_sql}{order_by}
     """,
         list(where_params),
