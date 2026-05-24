@@ -1,4 +1,4 @@
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
@@ -84,9 +84,26 @@ class GetCategoriesView(View):
                     "add_url": reverse("products:add-category"),
                     "add_label": "Add category",
                     "empty_message": "No categories yet.",
+                    "actions": [
+                        {
+                            "label": "Delete",
+                            "url_name": "products:delete-category",
+                            "icon": "✕",
+                            "method": "post",
+                            "confirm": "Delete this category?",
+                        },
+                    ],
+                    "row_id_key": "id",
                 },
             },
         )
+
+class DeleteCategoryView(View):
+    category_service = CategoryService()
+
+    def post(self, request, category_id):
+        self.category_service.delete(category_id)
+        return HttpResponse("")
 
 class AddProductView(View):
     product_service = ProductService()

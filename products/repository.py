@@ -22,6 +22,10 @@ def create_category(category_name: str):
         [category_name],
     )
 
+def delete_category(category_id: int):
+    execute_write(
+        "DELETE FROM products_category WHERE id = %s", [category_id]
+    )
 
 def get_all_products(order_by: str = ""):
     return execute_query(f"""
