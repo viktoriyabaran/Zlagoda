@@ -1,5 +1,4 @@
-from xml.dom import NotFoundErr
-
+from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
@@ -155,7 +154,7 @@ class EditProductView(View):
     def get(self, request, product_id):
         product = self.product_service.get_by_id(product_id)
         if not product:
-            raise NotFoundErr(f"Product with id {product_id} was not found")
+            raise Http404(f"Product with id {product_id} was not found")
 
         form = EditProductForm(
             initial={

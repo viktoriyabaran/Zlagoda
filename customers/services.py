@@ -1,11 +1,20 @@
 from typing import Protocol
 
 from core.sorting import order_by_sql
-from .repository import get_all_customers, create_customer
+
+from .repository import (
+    create_customer,
+    get_all_customers,
+    get_customer_by_id,
+    update_customer,
+)
+
 
 class ICustomerService(Protocol):
     def get_all(self, sort_by: str, sort_dir: str) -> list: ...
     def create(self, data: dict) -> None: ...
+    def get_by_id(self, id: int) -> dict | None: ...
+    def update(self, id: int, data: dict) -> None: ...
 
 
 class CustomerService:
@@ -23,3 +32,9 @@ class CustomerService:
             data.get("zip_code"),
             data["percent"],
         )
+
+    def get_by_id(self, id: int) -> dict | None:
+        return get_customer_by_id(id)
+
+    def update(self, id: int, data: dict) -> None:
+        return update_customer(id, data)
