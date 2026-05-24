@@ -18,6 +18,21 @@ CATEGORY_COLUMNS = [
 ]
 CATEGORY_SORTABLE = {c["key"] for c in CATEGORY_COLUMNS if c["sortable"]}
 
+PRODUCT_COLUMNS = [
+    {"key": "product_name", "label": "Product Name", "sortable": True},
+    {"key": "characteristics", "label": "Characteristics", "sortable": False},
+    {"key": "category_name", "label": "Category", "sortable": True},
+]
+PRODUCT_SORTABLE = {c["key"] for c in PRODUCT_COLUMNS if c["sortable"]}
+
+STORE_PRODUCT_COLUMNS = [
+    {"key": "UPC", "label": "UPC", "sortable": False},
+    {"key": "product_name", "label": "Product Name", "sortable": True},
+    {"key": "selling_price", "label": "Price", "sortable": True},
+    {"key": "products_number", "label": "Quantity", "sortable": True},
+    {"key": "promotional_product", "label": "Promo", "sortable": False},
+]
+STORE_PRODUCT_SORTABLE = {c["key"] for c in STORE_PRODUCT_COLUMNS if c["sortable"]}
 
 class AddCategoryView(View):
     category_service = CategoryService()
@@ -48,7 +63,6 @@ class AddCategoryView(View):
             },
         )
 
-
 class GetCategoriesView(View):
     category_service = CategoryService()
 
@@ -73,15 +87,6 @@ class GetCategoriesView(View):
                 },
             },
         )
-
-
-PRODUCT_COLUMNS = [
-    {"key": "product_name", "label": "Product Name", "sortable": True},
-    {"key": "characteristics", "label": "Characteristics", "sortable": False},
-    {"key": "category_name", "label": "Category", "sortable": True},
-]
-PRODUCT_SORTABLE = {c["key"] for c in PRODUCT_COLUMNS if c["sortable"]}
-
 
 class AddProductView(View):
     product_service = ProductService()
@@ -219,17 +224,6 @@ class AddStoreProductView(View):
                 "form_action": reverse("products:add-store-product"),
             },
         )
-
-
-STORE_PRODUCT_COLUMNS = [
-    {"key": "UPC", "label": "UPC", "sortable": False},
-    {"key": "product_name", "label": "Product Name", "sortable": True},
-    {"key": "selling_price", "label": "Price", "sortable": True},
-    {"key": "products_number", "label": "Quantity", "sortable": True},
-    {"key": "promotional_product", "label": "Promo", "sortable": False},
-]
-STORE_PRODUCT_SORTABLE = {c["key"] for c in STORE_PRODUCT_COLUMNS if c["sortable"]}
-
 
 class GetStoreProductsView(View):
     store_product_list_service = StoreProductListService()
