@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
+from django.http import HttpResponse
 
 from core.sorting import resolve_sort
 
@@ -70,12 +71,19 @@ class GetEmployeesView(View):
                     "add_label": "Add employee",
                     "empty_message": "No employees yet.",
                     "filters": EMPLOYEE_FILTERS,
-                    "row_id_key": "id_employee",
+                    "row_id_key": "id",
                     "actions": [
                         {
                             "label": "Edit",
                             "url_name": "employees:edit-employee",
                             "icon": "✎",
+                        },
+                        {
+                            "label": "Delete",
+                            "url_name": "employees:delete-employee",
+                            "icon": "✕",
+                            "method": "post",
+                            "confirm": "Delete this employee?",
                         },
                     ],
                 },
@@ -115,3 +123,10 @@ class EditEmployeeView(View):
                 "form_action": reverse("employees:edit-employee", args=[pk]),
             },
         )
+
+class DeleteEmployeeView(View):
+    employee_service = EmployeeService()
+
+    def post(self, request, employee_id):
+        self.employee_service.delete(employee_id)
+        return HttpResponse("")

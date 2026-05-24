@@ -74,7 +74,7 @@ def create_employee(data: dict) -> int:
 
 def get_employee_by_id(employee_id: int):
     return execute_single(
-        "SELECT * FROM employees_employee WHERE id_employee = %s", [employee_id]
+        "SELECT * FROM employees_employee WHERE id = %s", [employee_id]
     )
 
 
@@ -102,4 +102,9 @@ def update_employee(employee_id: int, data: dict):
             data["zip_code"],
             employee_id,
         ],
+    )
+
+def delete_employee(employee_id: int):
+    execute_write(
+        "DELETE FROM employees_employee WHERE id = %s", [employee_id]
     )
