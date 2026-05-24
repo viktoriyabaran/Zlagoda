@@ -1,7 +1,7 @@
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 
 from core.sorting import resolve_sort
 
@@ -97,7 +97,7 @@ class EditEmployeeView(View):
     def get(self, request, pk):
         employee = self.employee_service.get_by_id(pk)
         if not employee:
-            return redirect("employees:employees")
+            raise Http404(f"Employee with id {pk} was not found")
         form = EmployeeForm(initial=employee)
         return render(
             request,
@@ -106,6 +106,7 @@ class EditEmployeeView(View):
                 "form": form,
                 "form_title": "Edit Employee",
                 "form_action": reverse("employees:edit-employee", args=[pk]),
+                "submit_label": "Save",
             },
         )
 
@@ -121,6 +122,7 @@ class EditEmployeeView(View):
                 "form": form,
                 "form_title": "Edit Employee",
                 "form_action": reverse("employees:edit-employee", args=[pk]),
+                "submit_label": "Save",
             },
         )
 
