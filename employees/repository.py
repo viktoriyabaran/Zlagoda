@@ -41,10 +41,9 @@ def resolve_filters(request, filters):
 
 def get_all_employees(where_sql="", where_params=(), order_by=""):
     return execute_query(
-        f"SELECT * FROM employees_employee{where_sql}{order_by}",
+        f"SELECT id, empl_surname, empl_name, empl_patronymic, empl_role, salary, date_of_birth, date_of_start, phone_number, city, street, zip_code FROM employees_employee{where_sql}{order_by}",
         list(where_params),
     )
-
 
 def create_employee(data: dict) -> int:
     return execute_insert_returning(
