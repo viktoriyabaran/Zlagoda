@@ -165,3 +165,10 @@ def get_non_promotional_store_products(order_by=""):
         {order_by}
         """,
     )
+
+def count_products_in_category(category_id: int) -> int:
+    result = execute_single(
+        "SELECT COUNT(*) as count FROM products_product WHERE category_id = %s",
+        [category_id]
+    )
+    return result["count"] if result else 0

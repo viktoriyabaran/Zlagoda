@@ -5,6 +5,40 @@
 <p class="text-white/80 text-[12px] font-normal tracking-[0.5px] mb-5 text-center">
     {{ list.subtitle|default:"" }}
 </p>
+
+<div id="error-modal" class="hidden fixed inset-0 z-[100] items-center justify-center bg-black/40 backdrop-blur-md transition-all">
+    <div style="
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: min(420px, 90vw);
+        padding: 36px 32px 32px;
+        border-radius: 32px;
+        border: 2px solid #EABFFF;
+        backdrop-filter: blur(40px);
+        background: radial-gradient(ellipse 127.02% 151.92% at 15.32% 21.04%, rgba(164.69, 238.74, 255, 0.20) 0%, rgba(109.97, 190.80, 244.37, 0.04) 77%, rgba(69.95, 144.07, 212.50, 0) 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+    ">
+        <svg style="width: 56px; height: 56px; flex-shrink: 0;" fill="none" stroke="white" stroke-width="1.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+
+        <div id="error-modal-title" style="text-align: center; color: white; font-size: 20px; font-family: Montserrat, sans-serif; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;"></div>
+
+        <div id="error-modal-message" style="text-align: center; color: rgba(255,255,255,0.80); font-size: 15px; font-family: Montserrat, sans-serif; font-weight: 500; line-height: 1.4;"></div>
+
+        <button type="button"
+                onclick="document.getElementById('error-modal').classList.add('hidden'); document.getElementById('error-modal').classList.remove('flex');"
+                style="margin-top: 10px; width: 100px; height: 44px; background: white; box-shadow: 0px 6px 10px rgba(255,255,255,0.25); border-radius: 12px; color: #385772; font-size: 20px; font-family: Montserrat, sans-serif; font-weight: 700; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; outline: none;">
+            OK
+        </button>
+    </div>
+</div>
+
 {% if list.filters %}
 <div class="flex gap-3 mb-4 flex-wrap">
     {% for f in list.filters %}
@@ -33,7 +67,25 @@
 </div>
 {% endif %}
 
-<div class="flex-1 overflow-y-auto pr-1 -mr-1">
+<div class="flex-1 overflow-y-auto pr-1 -mr-1"
+     hx-on::response-error="
+        if (event.detail.xhr.status === 400 || event.detail.xhr.status === 409) {
+            const modal = document.getElementById('error-modal');
+            const text = event.detail.xhr.responseText;
+            const parts = text.split(':');
+
+            if (parts.length > 1) {
+                document.getElementById('error-modal-title').innerText = parts[0].trim().toUpperCase();
+                document.getElementById('error-modal-message').innerText = parts[1].trim();
+            } else {
+                document.getElementById('error-modal-title').innerText = 'CANNOT DELETE';
+                document.getElementById('error-modal-message').innerText = text;
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+     ">
     <table class="w-full text-white text-sm border-separate border-spacing-0">
         <thead class="sticky top-0 backdrop-blur-md bg-white/[0.08]">
             <tr>
@@ -56,7 +108,6 @@
                 {% if list.actions %}
                 <th class="px-3 py-2 border-b border-white/20 w-10"></th>
                 {% endif %}
-
             </tr>
         </thead>
         <tbody>
@@ -66,17 +117,17 @@
                 <td class="px-3 py-2 border-b border-white/10">{{ row|cell:col.key }}</td>
                 {% endfor %}
                 {% if list.actions %}
-
                 <td class="px-3 py-2 border-b border-white/10 text-right">
                     {% visible_actions list.actions request.session.user_role as acts %}
                     <div class="inline-flex items-center gap-2">
                         {% for a in acts %}
+                            {% action_url a row list.row_id_key as url %}
                             {% if a.method == "post" %}
                             <button
                                 type="button"
                                 title="{{ a.label }}"
                                 aria-label="{{ a.label }}"
-                                hx-post="{% action_url a row list.row_id_key %}"
+                                hx-post="{{ url }}"
                                 {% if a.confirm %}hx-confirm="{{ a.confirm }}"{% endif %}
                                 hx-target="closest tr"
                                 hx-swap="outerHTML"
@@ -84,7 +135,7 @@
                             >{{ a.icon }}</button>
                             {% else %}
                             <a
-                                href="{% action_url a row list.row_id_key %}"
+                                href="{{ url }}"
                                 title="{{ a.label }}"
                                 aria-label="{{ a.label }}"
                                 class="text-white/70 hover:text-white text-base leading-none px-1"

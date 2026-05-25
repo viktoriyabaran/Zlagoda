@@ -22,6 +22,7 @@ from products.repository import (
     update_store_product,
     get_promotional_store_products,
     get_non_promotional_store_products,
+    count_products_in_category,
 )
 
 PROMO_DISCOUNT = Decimal("0.8")
@@ -67,6 +68,9 @@ class CategoryService:
         create_category(category_name)
 
     def delete(self, category_id: int) -> None:
+        count = count_products_in_category(category_id)
+        if count > 0:
+            raise ValueError(f"Cannot delete category: it has {count} product(s).")
         delete_category(category_id)
 
     def get_by_id(self, category_id: int) -> dict | None:

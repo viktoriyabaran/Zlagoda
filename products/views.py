@@ -132,9 +132,11 @@ class DeleteCategoryView(View):
     category_service = CategoryService()
 
     def post(self, request, category_id):
-        self.category_service.delete(category_id)
-        return HttpResponse("")
-
+        try:
+            self.category_service.delete(category_id)
+            return HttpResponse("")
+        except ValueError as e:
+            return HttpResponse(str(e), status=409)
 
 class AddProductView(View):
     product_service = ProductService()
