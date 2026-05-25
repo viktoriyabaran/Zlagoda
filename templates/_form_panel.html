@@ -5,6 +5,20 @@
     Fill in the details below
 </p>
 
+{% if product_details %}
+<div class="mb-4 flex flex-col gap-2 px-1">
+    <h3 class="text-white text-[22px] font-black tracking-[0.5px] leading-tight">
+        {{ product_details.code }}: {{ product_details.name }}
+    </h3>
+
+    {% if product_details.characteristics %}
+    <div class="bg-transparent border border-white/20 bg-white/[0.02] text-white/80 rounded-lg px-4 py-2 text-sm italic leading-relaxed max-h-[60px] overflow-y-auto custom-scrollbar cursor-not-allowed">
+        {{ product_details.characteristics }}
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
 <form action="{{ form_action }}" method="post" class="w-full flex-1 flex flex-col">
     {% csrf_token %}
     {% if form.non_field_errors %}

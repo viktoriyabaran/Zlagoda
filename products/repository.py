@@ -81,7 +81,7 @@ def delete_product(product_id: int):
 def get_store_product_by_upc(upc: str):
     return execute_single(
         """
-        SELECT sp.*, p.product_name
+        SELECT sp.*, p.product_name, p.characteristics, p.id as product_code
         FROM products_storeproduct sp
         JOIN products_product p ON sp.product_id = p.id
         WHERE sp."UPC" = %s

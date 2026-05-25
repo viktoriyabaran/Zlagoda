@@ -343,6 +343,7 @@ class EditStoreProductView(View):
 
         form = EditStoreProductForm(
             initial={
+                "upc": upc,
                 "selling_price": store_product["selling_price"],
                 "products_number": store_product["products_number"],
                 "promotional_product": store_product["promotional_product"],
@@ -353,7 +354,12 @@ class EditStoreProductView(View):
             "home.html",
             {
                 "form": form,
-                "form_title": f"Edit Store Product: {store_product['product_name']}",
+                "form_title": "Edit Store Product",
+                "product_details": {
+                    "name": store_product["product_name"],
+                    "code": store_product["product_code"],
+                    "characteristics": store_product["characteristics"],
+                },
                 "form_action": reverse("products:edit-store-product", args=[upc]),
                 "submit_label": "Save",
             },
