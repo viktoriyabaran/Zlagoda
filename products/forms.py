@@ -9,7 +9,7 @@ from .repository import (
     get_store_products_by_product,
 )
 
-TEXT_INPUT_CLASS = "bg-transparent border border-white/50 rounded-lg px-4 py-2 text-white outline-none focus:border-white transition-colors text-sm w-full disabled:border-white/20 disabled:bg-white/[0.02] disabled:text-white/60 cursor-not-allowed"
+TEXT_INPUT_CLASS = "bg-transparent border border-white/50 rounded-lg px-4 py-2 text-white outline-none focus:border-white transition-colors text-sm w-full disabled:border-white/20 disabled:bg-white/[0.02] disabled:text-white/80 cursor-not-allowed"
 
 
 class CategoryForm(LayoutForm):
@@ -238,7 +238,7 @@ class EditStoreProductForm(LayoutForm):
         label="UPC",
         required=False,
         disabled=True,
-        widget=forms.NumberInput(attrs={"class": TEXT_INPUT_CLASS }),
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS }),
     )
     selling_price = forms.DecimalField(
         max_digits=13,
