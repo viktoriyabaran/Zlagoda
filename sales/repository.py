@@ -4,10 +4,10 @@ from core.db import execute_query, execute_write
 def get_all_checks(where_sql="", where_params=(), order_by=" ORDER BY print_date DESC"):
     return execute_query(
         f"""
-        SELECT c.check_number, c.print_date, c.sum_total, c.vat,
+        SELECT c.id, c.print_date, c.sum_total, c.vat,
                e.empl_surname, e.empl_name
         FROM sales_check c
-        JOIN employees_employee e ON c.id_employee = e.id_employee
+        JOIN employees_employee e ON c.employee_id = e.id
         {where_sql}{order_by}
         """,
         list(where_params),
@@ -25,6 +25,7 @@ def get_check_items(check_id: int):
         """,
         [check_id],
     )
+
 
 def delete_check_by_id(check_id: str):
     execute_write("DELETE FROM sales_check WHERE id = %s", [check_id])

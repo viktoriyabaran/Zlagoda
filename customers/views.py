@@ -3,6 +3,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
 
+from core.decorators import login_required
 from core.sorting import resolve_sort
 
 from .forms import CustomerCardForm
@@ -18,6 +19,7 @@ CUSTOMER_COLUMNS = [
 CUSTOMER_SORTABLE = {c["key"] for c in CUSTOMER_COLUMNS if c["sortable"]}
 
 
+@login_required
 class AddCustomerView(View):
     customer_service: ICustomerService = CustomerService()
 
@@ -48,6 +50,7 @@ class AddCustomerView(View):
         )
 
 
+@login_required
 class GetCustomersView(View):
     customer_service: ICustomerService = CustomerService()
 
@@ -89,6 +92,7 @@ class GetCustomersView(View):
         )
 
 
+@login_required
 class EditCustomerView(View):
     customer_service: ICustomerService = CustomerService()
 
@@ -140,6 +144,8 @@ class EditCustomerView(View):
             },
         )
 
+
+@login_required
 class DeleteCustomerView(View):
     customer_service = CustomerService()
 

@@ -1,8 +1,9 @@
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
-from django.http import Http404, HttpResponse
 
+from core.decorators import login_required
 from core.sorting import resolve_sort
 
 from .forms import EmployeeForm
@@ -19,6 +20,7 @@ EMPLOYEE_COLUMNS = [
 EMPLOYEE_SORTABLE = {c["key"] for c in EMPLOYEE_COLUMNS if c["sortable"]}
 
 
+@login_required
 class AddEmployeeView(View):
     employee_service = EmployeeService()
 
@@ -49,6 +51,7 @@ class AddEmployeeView(View):
         )
 
 
+@login_required
 class GetEmployeesView(View):
     employee_service = EmployeeService()
 
@@ -91,6 +94,7 @@ class GetEmployeesView(View):
         )
 
 
+@login_required
 class EditEmployeeView(View):
     employee_service = EmployeeService()
 
@@ -126,6 +130,8 @@ class EditEmployeeView(View):
             },
         )
 
+
+@login_required
 class DeleteEmployeeView(View):
     employee_service = EmployeeService()
 

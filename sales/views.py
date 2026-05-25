@@ -1,12 +1,15 @@
 # Define sales views here
 
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import View
-from django.http import HttpResponse
+
+from core.decorators import login_required
 
 from .services import CheckService
 
 
+@login_required
 class GetChecksView(View):
     check_service = CheckService()
 
@@ -35,7 +38,7 @@ class GetChecksView(View):
                     "subtitle": "Sales history",
                     "rows": checks,
                     "columns": [
-                        {"key": "check_number", "label": "Check #", "sortable": False},
+                        {"key": "id", "label": "Check #", "sortable": False},
                         {"key": "print_date", "label": "Date", "sortable": False},
                         {"key": "empl_surname", "label": "Cashier", "sortable": False},
                         {"key": "sum_total", "label": "Total", "sortable": False},
@@ -44,6 +47,10 @@ class GetChecksView(View):
                     "sort": {"by": "print_date", "dir": "desc"},
                     "empty_message": "No checks found.",
                     "row_id_key": "id",
+                    "filters": [
+                        {"key": "date_from", "label": "From date", "type": "date"},
+                        {"key": "date_to", "label": "To date", "type": "date"},
+                    ],
                     "actions": [
                         {
                             "label": "Delete",
@@ -60,6 +67,7 @@ class GetChecksView(View):
                 "employee_id": employee_id or "",
             },
         )
+
 
 class DeleteCheckView(View):
     check_service = CheckService()

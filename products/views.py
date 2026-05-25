@@ -3,8 +3,8 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
 
+from core.decorators import login_required
 from core.sorting import resolve_sort
-
 from employees.repository import resolve_filters
 
 from .forms import (
@@ -55,6 +55,8 @@ STORE_PRODUCT_FILTERS = [
     },
 ]
 
+
+@login_required
 class AddCategoryView(View):
     category_service = CategoryService()
 
@@ -85,6 +87,7 @@ class AddCategoryView(View):
         )
 
 
+@login_required
 class GetCategoriesView(View):
     category_service = CategoryService()
 
@@ -126,6 +129,7 @@ class GetCategoriesView(View):
         )
 
 
+@login_required
 class DeleteCategoryView(View):
     category_service = CategoryService()
 
@@ -136,6 +140,8 @@ class DeleteCategoryView(View):
         except ValueError as e:
             return HttpResponse(str(e), status=409)
 
+
+@login_required
 class AddProductView(View):
     product_service = ProductService()
 
@@ -166,6 +172,7 @@ class AddProductView(View):
         )
 
 
+@login_required
 class GetProductsView(View):
     product_service = ProductService()
 
@@ -208,6 +215,7 @@ class GetProductsView(View):
         )
 
 
+@login_required
 class EditProductView(View):
     product_service = ProductService()
 
@@ -251,6 +259,7 @@ class EditProductView(View):
         )
 
 
+@login_required
 class DeleteProductView(View):
     product_service = ProductService()
 
@@ -259,6 +268,7 @@ class DeleteProductView(View):
         return HttpResponse("")
 
 
+@login_required
 class AddStoreProductView(View):
     store_product_service = StoreProductService()
 
@@ -289,6 +299,7 @@ class AddStoreProductView(View):
         )
 
 
+@login_required
 class GetStoreProductsView(View):
     store_product_list_service = StoreProductListService()
 
@@ -296,8 +307,12 @@ class GetStoreProductsView(View):
         sort_by, sort_dir = resolve_sort(
             request, STORE_PRODUCT_SORTABLE, default="products_number"
         )
-        applied, where_sql, where_params = resolve_filters(request, STORE_PRODUCT_FILTERS)
-        rows = self.store_product_list_service.get_all(where_sql, where_params, sort_by, sort_dir)
+        applied, where_sql, where_params = resolve_filters(
+            request, STORE_PRODUCT_FILTERS
+        )
+        rows = self.store_product_list_service.get_all(
+            where_sql, where_params, sort_by, sort_dir
+        )
 
         return render(
             request,
@@ -333,6 +348,7 @@ class GetStoreProductsView(View):
         )
 
 
+@login_required
 class EditStoreProductView(View):
     store_product_service = StoreProductService()
 
@@ -390,6 +406,7 @@ class EditStoreProductView(View):
         )
 
 
+@login_required
 class DeleteStoreProductView(View):
     store_product_service = StoreProductService()
 
@@ -398,6 +415,7 @@ class DeleteStoreProductView(View):
         return HttpResponse("")
 
 
+@login_required
 class EditCategoryView(View):
     category_service = CategoryService()
 

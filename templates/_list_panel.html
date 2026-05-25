@@ -62,6 +62,14 @@
                     <option value="{{ opt.value }}" {% if request.GET.role == opt.value or request.GET.promo == opt.value %}selected{% endif %}>{{ opt.label }}</option>
                 {% endfor %}
             </select>
+            {% elif f.type == "date" %}
+            <input
+                type="date"
+                name="{{ f.key }}"
+                value="{% if f.key == 'date_from' %}{{ request.GET.date_from }}{% elif f.key == 'date_to' %}{{ request.GET.date_to }}{% endif %}"
+                class="bg-transparent border border-white/50 rounded-lg px-4 py-2 text-white outline-none focus:border-white transition-colors text-sm"
+                onchange="this.form.submit()"
+            >
         {% endif %}
     {% endfor %}
 </div>
