@@ -1,4 +1,4 @@
-from core.db import execute_query
+from core.db import execute_query, execute_write
 
 
 def get_all_checks(where_sql="", where_params=(), order_by=" ORDER BY print_date DESC"):
@@ -25,3 +25,6 @@ def get_check_items(check_id: int):
         """,
         [check_id],
     )
+
+def delete_check_by_id(check_id: str):
+    execute_write("DELETE FROM sales_check WHERE id = %s", [check_id])

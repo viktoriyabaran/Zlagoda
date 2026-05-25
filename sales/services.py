@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from sales.repository import get_all_checks, get_check_items
+from sales.repository import get_all_checks, get_check_items, delete_check_by_id
 
 
 class ICheckService(Protocol):
@@ -25,3 +25,6 @@ class CheckService:
 
     def get_items(self, check_id: int) -> list:
         return get_check_items(check_id)
+
+    def delete_check(self, check_id: str):
+        delete_check_by_id(check_id)

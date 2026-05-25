@@ -2,6 +2,7 @@
 
 from django.shortcuts import render
 from django.views import View
+from django.http import HttpResponse
 
 from .services import CheckService
 
@@ -43,6 +44,15 @@ class GetChecksView(View):
                     "sort": {"by": "print_date", "dir": "desc"},
                     "empty_message": "No checks found.",
                     "row_id_key": "id",
+                    "actions": [
+                        {
+                            "label": "Delete",
+                            "url_name": "sales:delete-check",
+                            "icon": "✕",
+                            "method": "post",
+                            "confirm": "Are you sure you want to permanently delete this check? This action will also delete all related sale records.",
+                        },
+                    ],
                 },
                 "check_items": check_items,
                 "date_from": date_from or "",
@@ -50,3 +60,10 @@ class GetChecksView(View):
                 "employee_id": employee_id or "",
             },
         )
+
+class DeleteCheckView(View):
+    check_service = CheckService()
+
+    def post(self, request, check_id):
+        self.check_service.delete_check(check_id)
+        return HttpResponse("")
