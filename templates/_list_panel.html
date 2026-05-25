@@ -114,7 +114,13 @@
             {% for row in list.rows %}
             <tr class="hover:bg-white/[0.04]">
                 {% for col in list.columns %}
-                <td class="px-3 py-2 border-b border-white/10">{{ row|cell:col.key }}</td>
+                <td class="px-3 py-2 border-b border-white/10">
+                    {% if col.key == "promotional_product" %}
+                        {{ row|cell:col.key|yesno:"Yes,No" }}
+                    {% else %}
+                        {{ row|cell:col.key }}
+                    {% endif %}
+                </td>
                 {% endfor %}
                 {% if list.actions %}
                 <td class="px-3 py-2 border-b border-white/10 text-right">
