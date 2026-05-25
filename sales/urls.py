@@ -1,5 +1,9 @@
 from django.urls import path
 
-app_name = 'sales'
+from .views import GetChecksView
 
-urlpatterns = []
+app_name = "sales"
+
+urlpatterns = [
+    path("checks/", GetChecksView.as_view(), name="checks"),
+]
