@@ -20,8 +20,6 @@ from products.repository import (
     update_category,
     update_product,
     update_store_product,
-    get_promotional_store_products,
-    get_non_promotional_store_products,
     count_products_in_category,
 )
 
@@ -129,20 +127,13 @@ class StoreProductService:
 
 
 class IStoreProductListService(Protocol):
-    def get_all(self, sort_by: str, sort_dir: str) -> list: ...
+    def get_all(self, where_sql: str, where_params: tuple, sort_by: str, sort_dir: str) -> list: ...
 
 
 class StoreProductListService:
-    def get_all(self, sort_by: str, sort_dir: str) -> list:
-        return get_all_store_products(order_by=order_by_sql(sort_by, sort_dir))
-
-class IPromotionalProductService(Protocol):
-    def get_all(self, sort_by: str, sort_dir: str) -> list: ...
-
-class PromotionalProductService:
-    def get_all(self, sort_by: str, sort_dir: str) -> list:
-        return get_promotional_store_products(order_by_sql(sort_by, sort_dir))
-
-class NonPromotionalProductService:
-    def get_all(self, sort_by: str, sort_dir: str) -> list:
-        return get_non_promotional_store_products(order_by_sql(sort_by, sort_dir))
+    def get_all(self, where_sql: str, where_params: tuple, sort_by: str, sort_dir: str) -> list:
+        return get_all_store_products(
+            where_sql=where_sql,
+            where_params=where_params,
+            order_by=order_by_sql(sort_by, sort_dir)
+        )

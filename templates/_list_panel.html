@@ -59,7 +59,7 @@
             >
                 <option value="">{{ f.label }}</option>
                 {% for opt in f.options %}
-                    <option value="{{ opt.value }}" {% if request.GET.role == opt.value %}selected{% endif %}>{{ opt.label }}</option>
+                    <option value="{{ opt.value }}" {% if request.GET.role == opt.value or request.GET.promo == opt.value %}selected{% endif %}>{{ opt.label }}</option>
                 {% endfor %}
             </select>
         {% endif %}
@@ -93,11 +93,11 @@
                 <th class="text-left text-[10px] font-semibold tracking-widest uppercase text-white/80 px-3 py-2 border-b border-white/20">
                     {% if col.sortable %}
                         {% if list.sort.by == col.key and list.sort.dir == 'asc' %}
-                            <a href="?sort={{ col.key }}&dir=desc&q={{ request.GET.q }}&role={{ request.GET.role }}" class="inline-flex items-center gap-1 hover:text-white">{{ col.label }} ↑</a>
+                            <a href="?sort={{ col.key }}&dir=desc&q={{ request.GET.q }}&role={{ request.GET.role }}&promo={{ request.GET.promo }}" class="inline-flex items-center gap-1 hover:text-white">{{ col.label }} ↑</a>
                         {% elif list.sort.by == col.key %}
-                            <a href="?sort={{ col.key }}&dir=asc&q={{ request.GET.q }}&role={{ request.GET.role }}" class="inline-flex items-center gap-1 hover:text-white">{{ col.label }} ↓</a>
+                            <a href="?sort={{ col.key }}&dir=asc&q={{ request.GET.q }}&role={{ request.GET.role }}&promo={{ request.GET.promo }}" class="inline-flex items-center gap-1 hover:text-white">{{ col.label }} ↓</a>
                         {% else %}
-                            <a href="?sort={{ col.key }}&dir=asc&q={{ request.GET.q }}&role={{ request.GET.role }}" class="inline-flex items-center gap-1 opacity-70 hover:opacity-100 hover:text-white">{{ col.label }}</a>
+                            <a href="?sort={{ col.key }}&dir=asc&q={{ request.GET.q }}&role={{ request.GET.role }}&promo={{ request.GET.promo }}" class="inline-flex items-center gap-1 opacity-70 hover:opacity-100 hover:text-white">{{ col.label }}</a>
                         {% endif %}
                     {% else %}
                         {{ col.label }}

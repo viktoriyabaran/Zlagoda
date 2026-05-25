@@ -5,6 +5,8 @@ from django.views import View
 
 from core.sorting import resolve_sort
 
+from employees.repository import resolve_filters
+
 from .forms import (
     CategoryForm,
     EditProductForm,
@@ -17,8 +19,6 @@ from .services import (
     ProductService,
     StoreProductListService,
     StoreProductService,
-    PromotionalProductService,
-    NonPromotionalProductService,
 )
 
 CATEGORY_COLUMNS = [
@@ -42,20 +42,18 @@ STORE_PRODUCT_COLUMNS = [
 ]
 STORE_PRODUCT_SORTABLE = {c["key"] for c in STORE_PRODUCT_COLUMNS if c["sortable"]}
 
-PROMOTIONAL_COLUMNS = [
-    {"key": "product_name", "label": "Product Name", "sortable": True},
-    {"key": "selling_price", "label": "Price", "sortable": False},
-    {"key": "products_number", "label": "Quantity", "sortable": True},
+STORE_PRODUCT_FILTERS = [
+    {
+        "key": "promo",
+        "label": "Promo Status",
+        "type": "select",
+        "column": "sp.promotional_product",
+        "options": [
+            {"value": "true", "label": "Promotional"},
+            {"value": "false", "label": "Non-promotional"},
+        ],
+    },
 ]
-PROMOTIONAL_SORTABLE = {c["key"] for c in PROMOTIONAL_COLUMNS if c["sortable"]}
-
-NON_PROMOTIONAL_COLUMNS = [
-    {"key": "product_name", "label": "Product Name", "sortable": True},
-    {"key": "selling_price", "label": "Price", "sortable": False},
-    {"key": "products_number", "label": "Quantity", "sortable": True},
-]
-NON_PROMOTIONAL_SORTABLE = {c["key"] for c in NON_PROMOTIONAL_COLUMNS if c["sortable"]}
-
 
 class AddCategoryView(View):
     category_service = CategoryService()
@@ -298,7 +296,9 @@ class GetStoreProductsView(View):
         sort_by, sort_dir = resolve_sort(
             request, STORE_PRODUCT_SORTABLE, default="products_number"
         )
-        rows = self.store_product_list_service.get_all(sort_by, sort_dir)
+        applied, where_sql, where_params = resolve_filters(request, STORE_PRODUCT_FILTERS)
+        rows = self.store_product_list_service.get_all(where_sql, where_params, sort_by, sort_dir)
+
         return render(
             request,
             "home.html",
@@ -308,6 +308,7 @@ class GetStoreProductsView(View):
                     "subtitle": "All products in store",
                     "rows": rows,
                     "columns": STORE_PRODUCT_COLUMNS,
+                    "filters": STORE_PRODUCT_FILTERS,
                     "sort": {"by": sort_by, "dir": sort_dir},
                     "add_url": reverse("products:add-store-product"),
                     "add_label": "Add store product",
@@ -417,51 +418,5 @@ class EditCategoryView(View):
                 "form_title": "Edit Category",
                 "form_action": reverse("products:edit-category", args=[category_id]),
                 "submit_label": "Save",
-            },
-        )
-
-class GetPromotionalProductsView(View):
-    service = PromotionalProductService()
-
-    def get(self, request):
-        sort_by, sort_dir = resolve_sort(
-            request, PROMOTIONAL_SORTABLE, default="products_number"
-        )
-        rows = self.service.get_all(sort_by, sort_dir)
-        return render(
-            request,
-            "home.html",
-            {
-                "list": {
-                    "title": "PROMOTIONAL PRODUCTS",
-                    "subtitle": "All promotional products in store",
-                    "rows": rows,
-                    "columns": PROMOTIONAL_COLUMNS,
-                    "sort": {"by": sort_by, "dir": sort_dir},
-                    "empty_message": "No promotional products yet.",
-                },
-            },
-        )
-
-class GetNonPromotionalProductsView(View):
-    service = NonPromotionalProductService()
-
-    def get(self, request):
-        sort_by, sort_dir = resolve_sort(
-            request, NON_PROMOTIONAL_SORTABLE, default="products_number"
-        )
-        rows = self.service.get_all(sort_by, sort_dir)
-        return render(
-            request,
-            "home.html",
-            {
-                "list": {
-                    "title": "NON-PROMOTIONAL PRODUCTS",
-                    "subtitle": "All non-promotional products in store",
-                    "rows": rows,
-                    "columns": NON_PROMOTIONAL_COLUMNS,
-                    "sort": {"by": sort_by, "dir": sort_dir},
-                    "empty_message": "No non-promotional products yet.",
-                },
             },
         )
