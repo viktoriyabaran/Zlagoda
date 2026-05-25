@@ -368,8 +368,16 @@ class EditStoreProductView(View):
     def post(self, request, upc):
         form = EditStoreProductForm(request.POST)
         if form.is_valid():
+            update_data = {
+                "selling_price": form.cleaned_data["selling_price"],
+                "products_number": form.cleaned_data["products_number"],
+                "promotional_product": request.POST.get("promotional_product") is not None
+                                       if "promotional_product" in request.POST
+                                       else self.store_product_service.get_by_upc(upc)["promotional_product"]
+            }
             self.store_product_service.update(upc, form.cleaned_data)
             return redirect("products:store-products")
+
         return render(
             request,
             "home.html",

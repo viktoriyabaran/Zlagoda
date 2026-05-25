@@ -252,5 +252,6 @@ class EditStoreProductForm(LayoutForm):
     )
     promotional_product = forms.BooleanField(
         required=False,
+        disabled=True,
         widget=forms.CheckboxInput(attrs={"class": CHECKBOX_CLASS}),
     )
