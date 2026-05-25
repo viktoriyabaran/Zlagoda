@@ -339,6 +339,7 @@ class EditStoreProductView(View):
         store_product = self.store_product_service.get_by_upc(upc)
         if not store_product:
             raise Http404(f"Store product with UPC {upc} was not found")
+
         form = EditStoreProductForm(
             initial={
                 "selling_price": store_product["selling_price"],
@@ -351,7 +352,7 @@ class EditStoreProductView(View):
             "home.html",
             {
                 "form": form,
-                "form_title": "Edit Store Product",
+                "form_title": f"Edit Store Product: {store_product['product_name']}",
                 "form_action": reverse("products:edit-store-product", args=[upc]),
                 "submit_label": "Save",
             },
