@@ -44,6 +44,12 @@ STORE_PRODUCT_SORTABLE = {c["key"] for c in STORE_PRODUCT_COLUMNS if c["sortable
 
 STORE_PRODUCT_FILTERS = [
     {
+        "key": "upc",
+        "label": "Search by UPC",
+        "type": "search",
+        "column": 'sp."UPC"',
+    },
+    {
         "key": "promo",
         "label": "Promo Status",
         "type": "select",
@@ -387,9 +393,10 @@ class EditStoreProductView(View):
             update_data = {
                 "selling_price": form.cleaned_data["selling_price"],
                 "products_number": form.cleaned_data["products_number"],
-                "promotional_product": request.POST.get("promotional_product") is not None
-                                       if "promotional_product" in request.POST
-                                       else self.store_product_service.get_by_upc(upc)["promotional_product"]
+                "promotional_product": request.POST.get("promotional_product")
+                is not None
+                if "promotional_product" in request.POST
+                else self.store_product_service.get_by_upc(upc)["promotional_product"],
             }
             self.store_product_service.update(upc, form.cleaned_data)
             return redirect("products:store-products")
