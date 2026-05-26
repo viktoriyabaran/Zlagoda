@@ -86,7 +86,7 @@ def get_store_product_by_upc(upc: str):
         JOIN products_product p ON sp.product_id = p.id
         WHERE sp."UPC" = %s
         """,
-        [upc]
+        [upc],
     )
 
 
@@ -150,6 +150,7 @@ def update_category(category_id: int, category_name: str):
         [category_name, category_id],
     )
 
+
 def get_promotional_store_products(order_by=""):
     return execute_query(
         f"""
@@ -161,6 +162,7 @@ def get_promotional_store_products(order_by=""):
         {order_by}
         """,
     )
+
 
 def get_non_promotional_store_products(order_by=""):
     return execute_query(
@@ -174,9 +176,10 @@ def get_non_promotional_store_products(order_by=""):
         """,
     )
 
+
 def count_products_in_category(category_id: int) -> int:
     result = execute_single(
         "SELECT COUNT(*) as count FROM products_product WHERE category_id = %s",
-        [category_id]
+        [category_id],
     )
     return result["count"] if result else 0

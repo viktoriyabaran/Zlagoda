@@ -1,4 +1,4 @@
-from core.db import execute_query, execute_write
+from core.db import execute_insert_returning, execute_query, execute_write
 
 
 def get_all_checks(where_sql="", where_params=(), order_by=" ORDER BY print_date DESC"):
@@ -29,3 +29,31 @@ def get_check_items(check_id: int):
 
 def delete_check_by_id(check_id: str):
     execute_write("DELETE FROM sales_check WHERE id = %s", [check_id])
+
+
+def create_check(employee_id: int, card_id=None) -> int:
+    return execute_insert_returning(
+        """
+        INSERT INTO sales_check (employee_id, card_id, print_date, sum_total, vat)
+        VALUES (%s, %s, NOW(), 0, 0)
+        RETURNING id
+        """,
+        [employee_id, card_id],
+    )
+
+
+def add_sale_to_check(check_id: int, upc: str, product_number: int, selling_price):
+    execute_write(
+        """
+        INSERT INTO sales_sale ("UPC", check_number_id, product_number, selling_price)
+        VALUES (%s, %s, %s, %s)
+        """,
+        [upc, check_id, product_number, selling_price],
+    )
+
+
+def update_check_totals(check_id: int, sum_total, vat):
+    execute_write(
+        "UPDATE sales_check SET sum_total = %s, vat = %s WHERE id = %s",
+        [sum_total, vat, check_id],
+    )

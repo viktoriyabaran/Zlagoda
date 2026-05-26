@@ -45,6 +45,7 @@ def get_all_employees(where_sql="", where_params=(), order_by=""):
         list(where_params),
     )
 
+
 def create_employee(data: dict) -> int:
     return execute_insert_returning(
         """
@@ -103,7 +104,12 @@ def update_employee(employee_id: int, data: dict):
         ],
     )
 
+
 def delete_employee(employee_id: int):
-    execute_write(
-        "DELETE FROM employees_employee WHERE id = %s", [employee_id]
+    execute_write("DELETE FROM employees_employee WHERE id = %s", [employee_id])
+
+
+def get_all_cashiers():
+    return execute_query(
+        "SELECT id, empl_surname, empl_name FROM employees_employee WHERE empl_role = 'Cashier' ORDER BY empl_surname"
     )

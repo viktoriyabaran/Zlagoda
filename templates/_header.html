@@ -11,7 +11,23 @@
     </a>
 
     <nav class="flex gap-7 text-[11px] font-semibold tracking-widest uppercase items-center h-full">
-        <a href="#" class="hover:opacity-80">Checks</a>
+        <div class="relative group h-full flex items-center">
+            <button type="button" class="hover:opacity-80 tracking-widest uppercase bg-transparent border-0 p-0 cursor-pointer text-white font-[Montserrat] text-[11px] font-semibold">
+                Checks
+            </button>
+            <div class="absolute left-1/2 -translate-x-1/2 top-full pt-2 hidden group-hover:block z-30">
+                <div class="isolate rounded-xl backdrop-blur-md bg-white/[0.08] border-2 border-white/35 shadow-[0_8px_32px_rgba(0,0,0,0.25)] py-2 min-w-[200px]">
+                    <a href="{% url 'sales:create-check' %}"
+                        class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
+                            Create Check
+                    </a>
+                    <a href="{% url 'sales:checks' %}"
+                        class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
+                            View Checks
+                    </a>
+                </div>
+            </div>
+        </div>
 
         <div class="relative group h-full flex items-center">
             <button type="button" class="hover:opacity-80 tracking-widest uppercase bg-transparent border-0 p-0 cursor-pointer text-white font-[Montserrat] text-[11px] font-semibold">
