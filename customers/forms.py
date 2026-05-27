@@ -7,35 +7,44 @@ TEXT_INPUT_CLASS = "bg-transparent border border-white/50 rounded-lg px-3 py-2 w
 
 class CustomerCardForm(LayoutForm):
     cust_surname = forms.CharField(
-        max_length=50, required=True,
+        max_length=50,
+        required=True,
         widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
     cust_name = forms.CharField(
-        max_length=50, required=True,
+        max_length=50,
+        required=True,
         widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
     cust_patronymic = forms.CharField(
-        max_length=50, required=False,
+        max_length=50,
+        required=False,
         widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
     phone_number = forms.CharField(
-        max_length=13, required=True,
+        max_length=13,
+        required=True,
         widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
     city = forms.CharField(
-        max_length=50, required=False,
+        max_length=50,
+        required=False,
         widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
     street = forms.CharField(
-        max_length=50, required=False,
+        max_length=50,
+        required=False,
         widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
     zip_code = forms.CharField(
-        max_length=9, required=False,
+        max_length=9,
+        required=False,
         widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
     percent = forms.IntegerField(
-        min_value=0, required=True,
+        min_value=0,
+        max_value=5,
+        required=True,
         widget=forms.NumberInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
 

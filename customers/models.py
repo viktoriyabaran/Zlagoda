@@ -1,4 +1,4 @@
-from django.core.validators import MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
@@ -10,7 +10,9 @@ class CustomerCard(models.Model):
     city = models.CharField(max_length=50, null=True, blank=True)
     street = models.CharField(max_length=50, null=True, blank=True)
     zip_code = models.CharField(max_length=9, null=True, blank=True)
-    percent = models.IntegerField(validators=[MinValueValidator(0)])
+    percent = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(5)]
+    )
 
     def __str__(self):
         return f"Customer #{self.pk}: {self.cust_surname} {self.cust_name}"
