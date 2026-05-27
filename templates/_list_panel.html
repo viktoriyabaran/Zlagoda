@@ -59,7 +59,7 @@
             >
                 <option value="">{{ f.label }}</option>
                 {% for opt in f.options %}
-                    <option value="{{ opt.value }}" {% if request.GET.role == opt.value or request.GET.promo == opt.value %}selected{% endif %}>{{ opt.label }}</option>
+                    <option value="{{ opt.value }}" {% if request.GET.role == opt.value or request.GET.promo == opt.value or request.GET.employee_id == opt.value %}selected{% endif %}>{{ opt.label }}</option>
                 {% endfor %}
             </select>
             {% elif f.type == "date" %}
