@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from core.sorting import order_by_sql
+from core.query_helpers import order_by_sql
 
 from .repository import (
     create_customer,

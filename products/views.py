@@ -4,8 +4,7 @@ from django.urls import reverse
 from django.views import View
 
 from core.decorators import login_required
-from core.sorting import resolve_sort
-from employees.repository import resolve_filters
+from core.query_helpers import resolve_sort
 
 from .forms import (
     CategoryForm,
@@ -14,6 +13,7 @@ from .forms import (
     ProductForm,
     StoreProductForm,
 )
+from .repository import PRODUCT_FILTERS, STORE_PRODUCT_FILTERS
 from .services import (
     CategoryService,
     ProductService,
@@ -42,25 +42,6 @@ STORE_PRODUCT_COLUMNS = [
     {"key": "promotional_product", "label": "Promo", "sortable": False},
 ]
 STORE_PRODUCT_SORTABLE = {c["key"] for c in STORE_PRODUCT_COLUMNS if c["sortable"]}
-
-STORE_PRODUCT_FILTERS = [
-    {
-        "key": "upc",
-        "label": "Search by UPC",
-        "type": "search",
-        "column": 'sp."UPC"',
-    },
-    {
-        "key": "promo",
-        "label": "Promo Status",
-        "type": "select",
-        "column": "sp.promotional_product",
-        "options": [
-            {"value": "true", "label": "Promotional"},
-            {"value": "false", "label": "Non-promotional"},
-        ],
-    },
-]
 
 
 @login_required
@@ -187,7 +168,7 @@ class GetProductsView(View):
         sort_by, sort_dir = resolve_sort(
             request, PRODUCT_SORTABLE, default="product_name"
         )
-        rows = self.product_service.get_all(sort_by, sort_dir)
+        rows = self.product_service.get_all(request, sort_by, sort_dir)
 
         return render(
             request,
@@ -202,6 +183,7 @@ class GetProductsView(View):
                     "add_url": reverse("products:add-product"),
                     "add_label": "Add product",
                     "empty_message": "No products yet.",
+                    "filters": PRODUCT_FILTERS,
                     "row_id_key": "id",
                     "actions": [
                         {
@@ -314,12 +296,7 @@ class GetStoreProductsView(View):
         sort_by, sort_dir = resolve_sort(
             request, STORE_PRODUCT_SORTABLE, default="products_number"
         )
-        applied, where_sql, where_params = resolve_filters(
-            request, STORE_PRODUCT_FILTERS
-        )
-        rows = self.store_product_list_service.get_all(
-            where_sql, where_params, sort_by, sort_dir
-        )
+        rows = self.store_product_list_service.get_all(request, sort_by, sort_dir)
 
         return render(
             request,

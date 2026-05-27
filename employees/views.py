@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.views import View
 
 from core.decorators import login_required
-from core.sorting import resolve_sort
+from core.query_helpers import resolve_sort
 
 from .forms import EmployeeForm
 from .repository import EMPLOYEE_FILTERS

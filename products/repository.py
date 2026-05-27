@@ -5,6 +5,34 @@ from core.db import (
     execute_write,
 )
 
+PRODUCT_FILTERS = [
+    {
+        "key": "category_name",
+        "label": "Search by category",
+        "type": "search",
+        "column": "category_name",
+    },
+]
+
+STORE_PRODUCT_FILTERS = [
+    {
+        "key": "upc",
+        "label": "Search by UPC",
+        "type": "search",
+        "column": 'sp."UPC"',
+    },
+    {
+        "key": "promo",
+        "label": "Promo Status",
+        "type": "select",
+        "column": "sp.promotional_product",
+        "options": [
+            {"value": "true", "label": "Promotional"},
+            {"value": "false", "label": "Non-promotional"},
+        ],
+    },
+]
+
 
 def get_category_by_id(category_id: int):
     return execute_single(
@@ -27,13 +55,16 @@ def delete_category(category_id: int):
     execute_write("DELETE FROM products_category WHERE id = %s", [category_id])
 
 
-def get_all_products(order_by: str = ""):
-    return execute_query(f"""
+def get_all_products(where_sql="", where_params=(), order_by=""):
+    return execute_query(
+        f"""
         SELECT p.id, p.product_name, p.manufacturer, p.characteristics, c.category_name
         FROM products_product p
         JOIN products_category c ON p.category_id = c.id
-        {order_by}
-    """)
+        {where_sql}{order_by}
+    """,
+        list(where_params),
+    )
 
 
 def create_product(data: dict) -> int:

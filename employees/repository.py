@@ -20,25 +20,6 @@ EMPLOYEE_FILTERS = [
 ]
 
 
-def resolve_filters(request, filters):
-    applied, clauses, params = {}, [], []
-    for f in filters:
-        raw = (request.GET.get(f["key"]) or "").strip()
-        if not raw:
-            continue
-        if f["type"] == "select":
-            if raw not in {o["value"] for o in f["options"]}:
-                continue
-            clauses.append(f"{f['column']} = %s")
-            params.append(raw)
-        elif f["type"] == "search":
-            clauses.append(f"{f['column']} ILIKE %s")
-            params.append(f"%{raw}%")
-        applied[f["key"]] = raw
-    where_sql = (" WHERE " + " AND ".join(clauses)) if clauses else ""
-    return applied, where_sql, params
-
-
 def get_all_employees(where_sql="", where_params=(), order_by=""):
     return execute_query(
         f"SELECT id, empl_surname, empl_name, empl_patronymic, empl_role, salary, date_of_birth, date_of_start, phone_number, city, street, zip_code FROM employees_employee{where_sql}{order_by}",

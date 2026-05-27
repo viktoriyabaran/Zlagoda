@@ -2,9 +2,13 @@ from decimal import Decimal
 from typing import Protocol
 
 from django.db import transaction
+from django.http import HttpRequest
 
-from core.sorting import order_by_sql
+from core.query_helpers import order_by_sql, resolve_filters
 from products.repository import (
+    PRODUCT_FILTERS,
+    STORE_PRODUCT_FILTERS,
+    count_products_in_category,
     create_category,
     create_product,
     create_store_product,
@@ -20,7 +24,6 @@ from products.repository import (
     update_category,
     update_product,
     update_store_product,
-    count_products_in_category,
 )
 
 PROMO_DISCOUNT = Decimal("0.8")
@@ -80,14 +83,17 @@ class CategoryService:
 
 class IProductService(Protocol):
     def create(self, data: dict) -> None: ...
-    def get_all(self, sort_by: str, sort_dir: str) -> list: ...
+    def get_all(self, request: HttpRequest, sort_by: str, sort_dir: str) -> list: ...
     def get_by_id(self, product_id: int) -> dict | None: ...
     def update(self, product_id: int, data: dict) -> None: ...
 
 
 class ProductService:
-    def get_all(self, sort_by: str, sort_dir: str) -> list:
-        return get_all_products(order_by_sql(sort_by, sort_dir))
+    def get_all(self, request: HttpRequest, sort_by: str, sort_dir: str) -> list:
+        _, where_sql, where_params = resolve_filters(request, PRODUCT_FILTERS)
+        return get_all_products(
+            where_sql, where_params, order_by_sql(sort_by, sort_dir)
+        )
 
     def create(self, data: dict) -> None:
         with transaction.atomic():
@@ -127,13 +133,18 @@ class StoreProductService:
 
 
 class IStoreProductListService(Protocol):
-    def get_all(self, where_sql: str, where_params: tuple, sort_by: str, sort_dir: str) -> list: ...
+    def get_all(
+        self, request: HttpRequest, sort_by: str, sort_dir: str
+    ) -> list: ...
 
 
 class StoreProductListService:
-    def get_all(self, where_sql: str, where_params: tuple, sort_by: str, sort_dir: str) -> list:
+    def get_all(
+        self, request: HttpRequest, sort_by: str, sort_dir: str
+    ) -> list:
+        _, where_sql, where_params = resolve_filters(request, STORE_PRODUCT_FILTERS)
         return get_all_store_products(
             where_sql=where_sql,
             where_params=where_params,
-            order_by=order_by_sql(sort_by, sort_dir)
+            order_by=order_by_sql(sort_by, sort_dir),
         )
