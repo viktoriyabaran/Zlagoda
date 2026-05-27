@@ -28,6 +28,7 @@ CATEGORY_SORTABLE = {c["key"] for c in CATEGORY_COLUMNS if c["sortable"]}
 
 PRODUCT_COLUMNS = [
     {"key": "product_name", "label": "Product Name", "sortable": True},
+    {"key": "manufacturer", "label": "Manufacturer", "sortable": True},
     {"key": "characteristics", "label": "Characteristics", "sortable": False},
     {"key": "category_name", "label": "Category", "sortable": True},
 ]

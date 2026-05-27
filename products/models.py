@@ -12,6 +12,7 @@ class Category(models.Model):
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.DO_NOTHING)
     product_name = models.CharField(max_length=50)
+    manufacturer = models.CharField(max_length=50)
     characteristics = models.CharField(max_length=100)
 
     def __str__(self):
