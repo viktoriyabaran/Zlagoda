@@ -9,6 +9,7 @@ from sales.repository import (
     get_all_checks,
     get_check_items,
     update_check_totals,
+    get_total_units_sold,
 )
 
 
@@ -55,3 +56,7 @@ class CheckService:
         )
         vat = (sum_total * Decimal("0.2")).quantize(Decimal("0.0001"))
         update_check_totals(check_id, sum_total, vat)
+
+    def get_total_units_sold(self, product_id: int, date_from: str, date_to: str) -> int:
+        result = get_total_units_sold(product_id, date_from, date_to)
+        return result["total_units"] or 0 if result else 0

@@ -5,6 +5,7 @@ from django.views import View
 
 from core.decorators import login_required
 from core.query_helpers import resolve_sort
+from sales.services import CheckService
 
 from .forms import (
     CategoryForm,
@@ -163,12 +164,26 @@ class AddProductView(View):
 @login_required
 class GetProductsView(View):
     product_service = ProductService()
+    check_service = CheckService()
 
     def get(self, request):
         sort_by, sort_dir = resolve_sort(
             request, PRODUCT_SORTABLE, default="product_name"
         )
         rows = self.product_service.get_all(request, sort_by, sort_dir)
+
+        date_from = request.GET.get("date_from")
+        date_to = request.GET.get("date_to")
+
+        for row in rows:
+            if date_from and date_to:
+                row["units_sold"] = self.check_service.get_total_units_sold(row["id"], date_from, date_to)
+            else:
+                row["units_sold"] = "-"
+
+        columns = PRODUCT_COLUMNS + [
+            {"key": "units_sold", "label": "Sold in Period", "sortable": False}
+        ]
 
         return render(
             request,
@@ -178,7 +193,7 @@ class GetProductsView(View):
                     "title": "PRODUCTS",
                     "subtitle": "All products available in database",
                     "rows": rows,
-                    "columns": PRODUCT_COLUMNS,
+                    "columns": columns,
                     "sort": {"by": sort_by, "dir": sort_dir},
                     "add_url": reverse("products:add-product"),
                     "add_label": "Add product",

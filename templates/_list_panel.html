@@ -26,11 +26,8 @@
         <svg style="width: 56px; height: 56px; flex-shrink: 0;" fill="none" stroke="white" stroke-width="1.2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
         </svg>
-
         <div id="error-modal-title" style="text-align: center; color: white; font-size: 20px; font-family: Montserrat, sans-serif; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;"></div>
-
         <div id="error-modal-message" style="text-align: center; color: rgba(255,255,255,0.80); font-size: 15px; font-family: Montserrat, sans-serif; font-weight: 500; line-height: 1.4;"></div>
-
         <button type="button"
                 onclick="document.getElementById('error-modal').classList.add('hidden'); document.getElementById('error-modal').classList.remove('flex');"
                 style="margin-top: 10px; width: 100px; height: 44px; background: white; box-shadow: 0px 6px 10px rgba(255,255,255,0.25); border-radius: 12px; color: #385772; font-size: 20px; font-family: Montserrat, sans-serif; font-weight: 700; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; outline: none;">
@@ -39,39 +36,98 @@
     </div>
 </div>
 
+<div id="confirm-modal" class="hidden fixed inset-0 z-[100] items-center justify-center bg-black/40 backdrop-blur-md transition-all">
+    <div style="
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: min(420px, 90vw);
+        padding: 36px 32px 32px;
+        border-radius: 32px;
+        border: 2px solid #EABFFF;
+        backdrop-filter: blur(40px);
+        background: radial-gradient(ellipse 127.02% 151.92% at 15.32% 21.04%, rgba(164.69, 238.74, 255, 0.20) 0%, rgba(109.97, 190.80, 244.37, 0.04) 77%, rgba(69.95, 144.07, 212.50, 0) 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+    ">
+        <svg style="width: 56px; height: 56px; flex-shrink: 0;" fill="none" stroke="white" stroke-width="1.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <div style="text-align: center; color: white; font-size: 20px; font-family: Montserrat, sans-serif; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">
+            Confirmation
+        </div>
+        <div id="confirm-modal-message" style="text-align: center; color: rgba(255,255,255,0.80); font-size: 15px; font-family: Montserrat, sans-serif; font-weight: 500; line-height: 1.4; margin-bottom: 10px;"></div>
+        <div class="flex gap-4 w-full justify-center">
+            <button type="button" id="confirm-modal-cancel"
+                    style="width: 120px; height: 44px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: white; font-size: 16px; font-family: Montserrat, sans-serif; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; outline: none;">
+                Cancel
+            </button>
+            <button type="button" id="confirm-modal-ok"
+                    style="width: 120px; height: 44px; background: white; box-shadow: 0px 6px 10px rgba(255,255,255,0.25); border-radius: 12px; color: #385772; font-size: 16px; font-family: Montserrat, sans-serif; font-weight: 700; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; outline: none;">
+                OK
+            </button>
+        </div>
+    </div>
+</div>
+
 {% if list.filters %}
-<div class="flex gap-3 mb-4 flex-wrap">
-    {% for f in list.filters %}
-        {% if f.type == "search" %}
-            <input
-                type="text"
-                name="{{ f.key }}"
-                placeholder="{{ f.label }}"
-                value="{{ request.GET.q|default:'' }}"
-                class="bg-transparent border border-white/50 rounded-lg px-4 py-2 text-white outline-none focus:border-white transition-colors text-sm"
-                onchange="this.form.submit()"
-            >
-        {% elif f.type == "select" %}
-            <select
-                name="{{ f.key }}"
-                class="bg-transparent border border-white/50 rounded-lg px-4 py-2 text-white outline-none focus:border-white transition-colors text-sm"
-                onchange="this.form.submit()"
-            >
-                <option value="">{{ f.label }}</option>
-                {% for opt in f.options %}
-                    <option value="{{ opt.value }}" {% if request.GET.role == opt.value or request.GET.promo == opt.value or request.GET.employee_id == opt.value %}selected{% endif %}>{{ opt.label }}</option>
-                {% endfor %}
-            </select>
-            {% elif f.type == "date" %}
+<div class="flex max-[900px]:flex-col gap-6 mb-5 w-full items-end justify-start">
+    <div class="flex gap-3 items-center">
+        {% for f in list.filters %}
+            {% if f.type == "search" %}
+                <input
+                    type="text"
+                    name="{{ f.key }}"
+                    placeholder="{{ f.label }}"
+                    value="{{ request.GET.q|default:'' }}"
+                    class="bg-transparent border border-white/50 rounded-lg px-4 py-2 text-white outline-none focus:border-white transition-colors text-sm"
+                    onchange="this.form.submit()"
+                >
+            {% elif f.type == "select" %}
+                <select
+                    name="{{ f.key }}"
+                    class="bg-transparent border border-white/50 rounded-lg px-4 py-2 text-white outline-none focus:border-white transition-colors text-sm"
+                    onchange="this.form.submit()"
+                >
+                    <option value="">{{ f.label }}</option>
+                    {% for opt in f.options %}
+                        <option value="{{ opt.value }}" {% if request.GET.role == opt.value or request.GET.promo == opt.value or request.GET.employee_id == opt.value %}selected{% endif %}>{{ opt.label }}</option>
+                    {% endfor %}
+                </select>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="flex gap-4 items-end flex-wrap">
+        <div class="flex flex-col gap-1.5">
+            <label class="text-white text-[10px] font-semibold tracking-widest uppercase px-1">From</label>
             <input
                 type="date"
-                name="{{ f.key }}"
-                value="{% if f.key == 'date_from' %}{{ request.GET.date_from }}{% elif f.key == 'date_to' %}{{ request.GET.date_to }}{% endif %}"
-                class="bg-transparent border border-white/50 rounded-lg px-4 py-2 text-white outline-none focus:border-white transition-colors text-sm"
-                onchange="this.form.submit()"
+                name="date_from"
+                id="filter-date_from"
+                value="{{ request.GET.date_from|default:'' }}"
+                class="bg-transparent border border-white/50 rounded-lg px-3 py-1.5 text-white outline-none focus:border-white transition-colors text-sm h-[38px]"
             >
-        {% endif %}
-    {% endfor %}
+        </div>
+        <div class="flex flex-col gap-1.5">
+            <label class="text-white text-[10px] font-semibold tracking-widest uppercase px-1">To</label>
+            <input
+                type="date"
+                name="date_to"
+                id="filter-date_to"
+                value="{{ request.GET.date_to|default:'' }}"
+                class="bg-transparent border border-white/50 rounded-lg px-3 py-1.5 text-white outline-none focus:border-white transition-colors text-sm h-[38px]"
+            >
+        </div>
+        <button type="button"
+                onclick="if(document.getElementById('filter-date_from').value && document.getElementById('filter-date_to').value) { this.form.submit(); }"
+                class="btn w-auto px-6 h-[38px] flex items-center justify-center text-xs tracking-wider uppercase font-bold">
+            Calculate
+        </button>
+    </div>
 </div>
 {% endif %}
 
@@ -101,11 +157,11 @@
                 <th class="text-left text-[10px] font-semibold tracking-widest uppercase text-white/80 px-3 py-2 border-b border-white/20">
                     {% if col.sortable %}
                         {% if list.sort.by == col.key and list.sort.dir == 'asc' %}
-                            <a href="?sort={{ col.key }}&dir=desc&q={{ request.GET.q }}&role={{ request.GET.role }}&promo={{ request.GET.promo }}" class="inline-flex items-center gap-1 hover:text-white">{{ col.label }} ↑</a>
+                            <a href="?sort={{ col.key }}&dir=desc&q={{ request.GET.q }}&role={{ request.GET.role }}&promo={{ request.GET.promo }}&date_from={{ request.GET.date_from }}&date_to={{ request.GET.date_to }}" class="inline-flex items-center gap-1 hover:text-white">{{ col.label }} ↑</a>
                         {% elif list.sort.by == col.key %}
-                            <a href="?sort={{ col.key }}&dir=asc&q={{ request.GET.q }}&role={{ request.GET.role }}&promo={{ request.GET.promo }}" class="inline-flex items-center gap-1 hover:text-white">{{ col.label }} ↓</a>
+                            <a href="?sort={{ col.key }}&dir=asc&q={{ request.GET.q }}&role={{ request.GET.role }}&promo={{ request.GET.promo }}&date_from={{ request.GET.date_from }}&date_to={{ request.GET.date_to }}" class="inline-flex items-center gap-1 hover:text-white">{{ col.label }} ↓</a>
                         {% else %}
-                            <a href="?sort={{ col.key }}&dir=asc&q={{ request.GET.q }}&role={{ request.GET.role }}&promo={{ request.GET.promo }}" class="inline-flex items-center gap-1 opacity-70 hover:opacity-100 hover:text-white">{{ col.label }}</a>
+                            <a href="?sort={{ col.key }}&dir=asc&q={{ request.GET.q }}&role={{ request.GET.role }}&promo={{ request.GET.promo }}&date_from={{ request.GET.date_from }}&date_to={{ request.GET.date_to }}" class="inline-flex items-center gap-1 opacity-70 hover:opacity-100 hover:text-white">{{ col.label }}</a>
                         {% endif %}
                     {% else %}
                         {{ col.label }}
@@ -176,3 +232,38 @@
     <a href="{{ list.add_url }}" class="btn w-auto px-10">{{ list.add_label|default:"Add" }}</a>
 </div>
 {% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.body.addEventListener("htmx:confirm", function(evt) {
+        if (!evt.detail.question) return;
+        evt.preventDefault();
+
+        const modal = document.getElementById('confirm-modal');
+        const messageZone = document.getElementById('confirm-modal-message');
+        const okBtn = document.getElementById('confirm-modal-ok');
+        const cancelBtn = document.getElementById('confirm-modal-cancel');
+
+        messageZone.innerText = evt.detail.question;
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        const newOkBtn = okBtn.cloneNode(true);
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+        newOkBtn.addEventListener('click', function() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            evt.detail.issueRequest();
+        });
+
+        newCancelBtn.addEventListener('click', function() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        });
+    });
+});
+</script>

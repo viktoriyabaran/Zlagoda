@@ -1,4 +1,4 @@
-from core.db import execute_insert_returning, execute_query, execute_write
+from core.db import execute_insert_returning, execute_query, execute_write, execute_single
 
 
 def get_all_checks(where_sql="", where_params=(), order_by=" ORDER BY print_date DESC"):
@@ -56,4 +56,19 @@ def update_check_totals(check_id: int, sum_total, vat):
     execute_write(
         "UPDATE sales_check SET sum_total = %s, vat = %s WHERE id = %s",
         [sum_total, vat, check_id],
+    )
+
+def get_total_units_sold(product_id: int, date_from: str, date_to: str):
+    return execute_single(
+        """
+        SELECT SUM(s.product_number) as total_units
+        FROM sales_sale s
+        JOIN products_storeproduct sp ON s."UPC" = sp."UPC"
+        WHERE sp.product_id = %s
+          AND s.check_number_id IN (
+              SELECT id FROM sales_check
+              WHERE print_date >= %s AND print_date <= %s
+          )
+        """,
+        [product_id, date_from, date_to],
     )
