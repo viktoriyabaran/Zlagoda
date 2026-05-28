@@ -26,8 +26,11 @@
         <svg style="width: 56px; height: 56px; flex-shrink: 0;" fill="none" stroke="white" stroke-width="1.2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
         </svg>
+
         <div id="error-modal-title" style="text-align: center; color: white; font-size: 20px; font-family: Montserrat, sans-serif; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;"></div>
+
         <div id="error-modal-message" style="text-align: center; color: rgba(255,255,255,0.80); font-size: 15px; font-family: Montserrat, sans-serif; font-weight: 500; line-height: 1.4;"></div>
+
         <button type="button"
                 onclick="document.getElementById('error-modal').classList.add('hidden'); document.getElementById('error-modal').classList.remove('flex');"
                 style="margin-top: 10px; width: 100px; height: 44px; background: white; box-shadow: 0px 6px 10px rgba(255,255,255,0.25); border-radius: 12px; color: #385772; font-size: 20px; font-family: Montserrat, sans-serif; font-weight: 700; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; outline: none;">
@@ -56,11 +59,10 @@
             >
                 <option value="">{{ f.label }}</option>
                 {% for opt in f.options %}
-                    <option value="{{ opt.value }}" {% if request.GET.role == opt.value or request.GET.promo == opt.value %}selected{% endif %}>{{ opt.label }}</option>
                     <option value="{{ opt.value }}" {% if request.GET.role == opt.value or request.GET.promo == opt.value or request.GET.employee_id == opt.value %}selected{% endif %}>{{ opt.label }}</option>
                 {% endfor %}
             </select>
-        {% elif f.type == "date" %}
+            {% elif f.type == "date" %}
             <input
                 type="date"
                 name="{{ f.key }}"
