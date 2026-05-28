@@ -37,7 +37,11 @@
             {% include "_form_panel.html" %}
         {% elif list %}
     <form method="get">
-        {% include "_list_panel.html" %}
+        {% if list.title == "PRODUCTS" %}
+            {% include "_product_list_panel.html" %}
+        {% else %}
+            {% include "_list_panel.html" %}
+{% endif %}
     </form>
         {% else %}
             <div class="flex flex-col items-center justify-center text-center m-auto max-w-md">

@@ -37,7 +37,8 @@
 </div>
 
 {% if list.filters %}
-<div class="flex gap-3 mb-4 flex-wrap">
+<div class="flex flex-nowrap gap-4 mb-5 w-full items-end justify-start">
+
     {% for f in list.filters %}
         {% if f.type == "search" %}
             <input
@@ -45,31 +46,51 @@
                 name="{{ f.key }}"
                 placeholder="{{ f.label }}"
                 value="{{ request.GET.q|default:'' }}"
-                class="bg-transparent border border-white/50 rounded-lg px-4 py-2 text-white outline-none focus:border-white transition-colors text-sm"
+                class="bg-transparent border border-white/50 rounded-lg px-4 py-2 text-white outline-none focus:border-white transition-colors text-sm h-[38px]"
                 onchange="this.form.submit()"
             >
         {% elif f.type == "select" %}
             <select
                 name="{{ f.key }}"
-                class="bg-transparent border border-white/50 rounded-lg px-4 py-2 text-white outline-none focus:border-white transition-colors text-sm"
+                class="bg-transparent border border-white/50 rounded-lg px-4 py-2 text-white outline-none focus:border-white transition-colors text-sm h-[38px]"
                 onchange="this.form.submit()"
             >
                 <option value="">{{ f.label }}</option>
                 {% for opt in f.options %}
                     <option value="{{ opt.value }}" {% if request.GET.role == opt.value or request.GET.promo == opt.value %}selected{% endif %}>{{ opt.label }}</option>
-                    <option value="{{ opt.value }}" {% if request.GET.role == opt.value or request.GET.promo == opt.value or request.GET.employee_id == opt.value %}selected{% endif %}>{{ opt.label }}</option>
                 {% endfor %}
             </select>
-        {% elif f.type == "date" %}
-            <input
-                type="date"
-                name="{{ f.key }}"
-                value="{% if f.key == 'date_from' %}{{ request.GET.date_from }}{% elif f.key == 'date_to' %}{{ request.GET.date_to }}{% endif %}"
-                class="bg-transparent border border-white/50 rounded-lg px-4 py-2 text-white outline-none focus:border-white transition-colors text-sm"
-                onchange="this.form.submit()"
-            >
         {% endif %}
     {% endfor %}
+
+    <div class="flex flex-col gap-1.5">
+        <label class="text-white text-[10px] font-semibold tracking-widest uppercase px-1">From</label>
+        <input
+            type="date"
+            name="date_from"
+            id="filter-date_from"
+            value="{{ request.GET.date_from|default:'' }}"
+            class="bg-transparent border border-white/50 rounded-lg px-3 py-1.5 text-white outline-none focus:border-white transition-colors text-sm h-[38px]"
+        >
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+        <label class="text-white text-[10px] font-semibold tracking-widest uppercase px-1">To</label>
+        <input
+            type="date"
+            name="date_to"
+            id="filter-date_to"
+            value="{{ request.GET.date_to|default:'' }}"
+            class="bg-transparent border border-white/50 rounded-lg px-3 py-1.5 text-white outline-none focus:border-white transition-colors text-sm h-[38px]"
+        >
+    </div>
+
+    <button type="button"
+            onclick="if(document.getElementById('filter-date_from').value && document.getElementById('filter-date_to').value) { this.form.submit(); }"
+            class="btn h-[38px] flex items-center justify-center text-xs tracking-wider uppercase font-bold px-6"
+            style="width: 140px; flex-shrink: 0;">
+        Calculate
+    </button>
 </div>
 {% endif %}
 
@@ -99,11 +120,11 @@
                 <th class="text-left text-[10px] font-semibold tracking-widest uppercase text-white/80 px-3 py-2 border-b border-white/20">
                     {% if col.sortable %}
                         {% if list.sort.by == col.key and list.sort.dir == 'asc' %}
-                            <a href="?sort={{ col.key }}&dir=desc&q={{ request.GET.q }}&role={{ request.GET.role }}&promo={{ request.GET.promo }}" class="inline-flex items-center gap-1 hover:text-white">{{ col.label }} ↑</a>
+                            <a href="?sort={{ col.key }}&dir=desc&q={{ request.GET.q }}&date_from={{ request.GET.date_from }}&date_to={{ request.GET.date_to }}" class="inline-flex items-center gap-1 hover:text-white">{{ col.label }} ↑</a>
                         {% elif list.sort.by == col.key %}
-                            <a href="?sort={{ col.key }}&dir=asc&q={{ request.GET.q }}&role={{ request.GET.role }}&promo={{ request.GET.promo }}" class="inline-flex items-center gap-1 hover:text-white">{{ col.label }} ↓</a>
+                            <a href="?sort={{ col.key }}&dir=asc&q={{ request.GET.q }}&date_from={{ request.GET.date_from }}&date_to={{ request.GET.date_to }}" class="inline-flex items-center gap-1 hover:text-white">{{ col.label }} ↓</a>
                         {% else %}
-                            <a href="?sort={{ col.key }}&dir=asc&q={{ request.GET.q }}&role={{ request.GET.role }}&promo={{ request.GET.promo }}" class="inline-flex items-center gap-1 opacity-70 hover:opacity-100 hover:text-white">{{ col.label }}</a>
+                            <a href="?sort={{ col.key }}&dir=asc&q={{ request.GET.q }}&date_from={{ request.GET.date_from }}&date_to={{ request.GET.date_to }}" class="inline-flex items-center gap-1 opacity-70 hover:opacity-100 hover:text-white">{{ col.label }}</a>
                         {% endif %}
                     {% else %}
                         {{ col.label }}
