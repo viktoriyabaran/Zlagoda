@@ -28,6 +28,8 @@ class GetChecksView(View):
             employee_id=employee_id or None,
         )
 
+        total_sum = sum(float(c["sum_total"]) for c in checks) if checks else 0
+
         selected_check_id = request.GET.get("check_id")
         check_items = []
         if selected_check_id:
@@ -83,11 +85,13 @@ class GetChecksView(View):
                             "confirm": "Are you sure you want to permanently delete this check? This action will also delete all related sale records.",
                         },
                     ],
+                    "total_sum": total_sum,
                 },
                 "check_items": check_items,
                 "date_from": date_from or "",
                 "date_to": date_to or "",
                 "employee_id": employee_id or "",
+                "total_sum": total_sum,
             },
         )
 
