@@ -50,10 +50,9 @@ class GetChecksView(View):
                     ],
                     "sort": {"by": "print_date", "dir": "desc"},
                     "empty_message": "No checks found.",
+                    "has_date_filter": True,
                     "row_id_key": "id",
                     "filters": [
-                        {"key": "date_from", "label": "From date", "type": "date"},
-                        {"key": "date_to", "label": "To date", "type": "date"},
                         {
                             "key": "employee_id",
                             "label": "Cashier",
@@ -67,6 +66,8 @@ class GetChecksView(View):
                                 for c in cashiers
                             ],
                         },
+                        {"key": "date_from", "label": "From date", "type": "date"},
+                        {"key": "date_to", "label": "To date", "type": "date"},
                     ],
                     "actions": [
                         {
