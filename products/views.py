@@ -199,6 +199,7 @@ class GetProductsView(View):
                     "add_label": "Add product",
                     "empty_message": "No products yet.",
                     "filters": PRODUCT_FILTERS,
+                    "date_filters": True,
                     "row_id_key": "id",
                     "actions": [
                         {
