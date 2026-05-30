@@ -7,6 +7,7 @@ from sales.repository import (
     create_check,
     delete_check_by_id,
     get_all_checks,
+    get_check_by_id,
     get_check_items,
     update_check_totals,
     get_total_units_sold,
@@ -16,6 +17,7 @@ from sales.repository import (
 class ICheckService(Protocol):
     def get_all(self, date_from=None, date_to=None, employee_id=None) -> list: ...
     def get_items(self, check_id: int) -> list: ...
+    def get_by_id(self, check_id: int) -> dict | None: ...
 
 
 class CheckService:
@@ -35,6 +37,9 @@ class CheckService:
 
     def get_items(self, check_id: int) -> list:
         return get_check_items(check_id)
+
+    def get_by_id(self, check_id: int) -> dict | None:
+        return get_check_by_id(check_id)
 
     def delete_check(self, check_id: str):
         delete_check_by_id(check_id)

@@ -1,10 +1,11 @@
 # Define sales views here
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
 from django.views import View
 
 from core.decorators import role_required
+from core.repository import get_user_by_id
 from core.roles import Role
 from employees.repository import get_all_cashiers
 from products.repository import get_all_store_products, get_store_product_by_upc
@@ -19,9 +20,13 @@ class GetChecksView(View):
     def get(self, request):
         date_from = request.GET.get("date_from")
         date_to = request.GET.get("date_to")
-        employee_id = request.GET.get("employee_id")
 
-        cashiers = get_all_cashiers()
+        is_cashier = request.session.get("user_role") == Role.CASHIER
+        if is_cashier:
+            # Cashiers only ever see their own checks, regardless of any filter.
+            employee_id = get_user_by_id(request.session["user_id"])["employee_id"]
+        else:
+            employee_id = request.GET.get("employee_id")
 
         checks = self.check_service.get_all(
             date_from=date_from,
@@ -34,7 +39,48 @@ class GetChecksView(View):
         selected_check_id = request.GET.get("check_id")
         check_items = []
         if selected_check_id:
-            check_items = self.check_service.get_items(int(selected_check_id))
+            if is_cashier:
+                check = self.check_service.get_by_id(int(selected_check_id))
+                owns_check = check and check["employee_id"] == employee_id
+            else:
+                owns_check = True
+            if owns_check:
+                check_items = self.check_service.get_items(int(selected_check_id))
+
+        filters = [
+            {"key": "date_from", "label": "From date", "type": "date"},
+            {"key": "date_to", "label": "To date", "type": "date"},
+        ]
+        actions = [
+            {"label": "View", "url_name": "sales:check-detail", "icon": "👁"},
+        ]
+        if not is_cashier:
+            cashiers = get_all_cashiers()
+            filters.insert(
+                0,
+                {
+                    "key": "employee_id",
+                    "label": "Cashier",
+                    "type": "select",
+                    "column": "employee_id",
+                    "options": [
+                        {
+                            "value": str(c["id"]),
+                            "label": f"{c['empl_surname']} {c['empl_name']}",
+                        }
+                        for c in cashiers
+                    ],
+                },
+            )
+            actions.append(
+                {
+                    "label": "Delete",
+                    "url_name": "sales:delete-check",
+                    "icon": "✕",
+                    "method": "post",
+                    "confirm": "Are you sure you want to permanently delete this check? This action will also delete all related sale records.",
+                }
+            )
 
         return render(
             request,
@@ -42,7 +88,7 @@ class GetChecksView(View):
             {
                 "list": {
                     "title": "CHECKS",
-                    "subtitle": "Sales history",
+                    "subtitle": "My sales" if is_cashier else "Sales history",
                     "rows": checks,
                     "columns": [
                         {"key": "id", "label": "Check #", "sortable": False},
@@ -55,37 +101,8 @@ class GetChecksView(View):
                     "empty_message": "No checks found.",
                     "has_date_filter": True,
                     "row_id_key": "id",
-                    "filters": [
-                        {
-                            "key": "employee_id",
-                            "label": "Cashier",
-                            "type": "select",
-                            "column": "employee_id",
-                            "options": [
-                                {
-                                    "value": str(c["id"]),
-                                    "label": f"{c['empl_surname']} {c['empl_name']}",
-                                }
-                                for c in cashiers
-                            ],
-                        },
-                        {"key": "date_from", "label": "From date", "type": "date"},
-                        {"key": "date_to", "label": "To date", "type": "date"},
-                    ],
-                    "actions": [
-                        {
-                            "label": "View",
-                            "url_name": "sales:check-detail",
-                            "icon": "👁",
-                        },
-                        {
-                            "label": "Delete",
-                            "url_name": "sales:delete-check",
-                            "icon": "✕",
-                            "method": "post",
-                            "confirm": "Are you sure you want to permanently delete this check? This action will also delete all related sale records.",
-                        },
-                    ],
+                    "filters": filters,
+                    "actions": actions,
                     "total_sum": total_sum,
                 },
                 "check_items": check_items,
@@ -190,6 +207,13 @@ class GetCheckDetailView(View):
     check_service = CheckService()
 
     def get(self, request, check_id):
+        if request.session.get("user_role") == Role.CASHIER:
+            check = self.check_service.get_by_id(check_id)
+            employee_id = get_user_by_id(request.session["user_id"])["employee_id"]
+            if not check or check["employee_id"] != employee_id:
+                return HttpResponseForbidden(
+                    "Viewing this resource is not allowed for you."
+                )
         items = self.check_service.get_items(check_id)
         return render(
             request,

@@ -14,6 +14,10 @@ def get_all_checks(where_sql="", where_params=(), order_by=" ORDER BY print_date
     )
 
 
+def get_check_by_id(check_id: int):
+    return execute_single("SELECT * FROM sales_check WHERE id = %s", [check_id])
+
+
 def get_check_items(check_id: int):
     return execute_query(
         """
