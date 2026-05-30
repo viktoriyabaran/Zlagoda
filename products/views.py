@@ -3,8 +3,9 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
 
-from core.decorators import login_required
+from core.decorators import role_required
 from core.query_helpers import resolve_sort
+from core.roles import Role
 from sales.services import CheckService
 
 from .forms import (
@@ -45,7 +46,7 @@ STORE_PRODUCT_COLUMNS = [
 STORE_PRODUCT_SORTABLE = {c["key"] for c in STORE_PRODUCT_COLUMNS if c["sortable"]}
 
 
-@login_required
+@role_required(Role.MANAGER)
 class AddCategoryView(View):
     category_service = CategoryService()
 
@@ -76,7 +77,7 @@ class AddCategoryView(View):
         )
 
 
-@login_required
+@role_required(Role.MANAGER, Role.CASHIER)
 class GetCategoriesView(View):
     category_service = CategoryService()
 
@@ -118,7 +119,7 @@ class GetCategoriesView(View):
         )
 
 
-@login_required
+@role_required(Role.MANAGER)
 class DeleteCategoryView(View):
     category_service = CategoryService()
 
@@ -130,7 +131,7 @@ class DeleteCategoryView(View):
             return HttpResponse(str(e), status=409)
 
 
-@login_required
+@role_required(Role.MANAGER)
 class AddProductView(View):
     product_service = ProductService()
 
@@ -161,7 +162,7 @@ class AddProductView(View):
         )
 
 
-@login_required
+@role_required(Role.MANAGER, Role.CASHIER)
 class GetProductsView(View):
     product_service = ProductService()
     check_service = CheckService()
@@ -220,7 +221,7 @@ class GetProductsView(View):
         )
 
 
-@login_required
+@role_required(Role.MANAGER)
 class EditProductView(View):
     product_service = ProductService()
 
@@ -264,7 +265,7 @@ class EditProductView(View):
         )
 
 
-@login_required
+@role_required(Role.MANAGER)
 class DeleteProductView(View):
     product_service = ProductService()
 
@@ -273,7 +274,7 @@ class DeleteProductView(View):
         return HttpResponse("")
 
 
-@login_required
+@role_required(Role.MANAGER)
 class AddStoreProductView(View):
     store_product_service = StoreProductService()
 
@@ -304,7 +305,7 @@ class AddStoreProductView(View):
         )
 
 
-@login_required
+@role_required(Role.MANAGER, Role.CASHIER)
 class GetStoreProductsView(View):
     store_product_list_service = StoreProductListService()
 
@@ -348,7 +349,7 @@ class GetStoreProductsView(View):
         )
 
 
-@login_required
+@role_required(Role.MANAGER)
 class EditStoreProductView(View):
     store_product_service = StoreProductService()
 
@@ -407,7 +408,7 @@ class EditStoreProductView(View):
         )
 
 
-@login_required
+@role_required(Role.MANAGER)
 class DeleteStoreProductView(View):
     store_product_service = StoreProductService()
 
@@ -416,7 +417,7 @@ class DeleteStoreProductView(View):
         return HttpResponse("")
 
 
-@login_required
+@role_required(Role.MANAGER)
 class EditCategoryView(View):
     category_service = CategoryService()
 

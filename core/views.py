@@ -1,9 +1,10 @@
 from django.shortcuts import redirect, render
 from django.views import View
 
+from core.roles import Role
 from core.services import AuthService, IAuthService
 
-from .decorators import login_required
+from .decorators import role_required
 from .forms import UserLoginForm
 
 
@@ -38,6 +39,6 @@ class LogoutView(View):
         return redirect("core:login")
 
 
-@login_required
+@role_required(Role.MANAGER, Role.CASHIER)
 def home(request):
     return render(request, "home.html")

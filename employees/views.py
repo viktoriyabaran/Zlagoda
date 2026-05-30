@@ -3,8 +3,9 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
 
-from core.decorators import login_required
+from core.decorators import role_required
 from core.query_helpers import resolve_sort
+from core.roles import Role
 
 from .forms import EmployeeForm
 from .repository import EMPLOYEE_FILTERS
@@ -20,7 +21,7 @@ EMPLOYEE_COLUMNS = [
 EMPLOYEE_SORTABLE = {c["key"] for c in EMPLOYEE_COLUMNS if c["sortable"]}
 
 
-@login_required
+@role_required(Role.MANAGER)
 class AddEmployeeView(View):
     employee_service = EmployeeService()
 
@@ -51,7 +52,7 @@ class AddEmployeeView(View):
         )
 
 
-@login_required
+@role_required(Role.MANAGER)
 class GetEmployeesView(View):
     employee_service = EmployeeService()
 
@@ -94,7 +95,7 @@ class GetEmployeesView(View):
         )
 
 
-@login_required
+@role_required(Role.MANAGER)
 class EditEmployeeView(View):
     employee_service = EmployeeService()
 
@@ -131,7 +132,7 @@ class EditEmployeeView(View):
         )
 
 
-@login_required
+@role_required(Role.MANAGER)
 class DeleteEmployeeView(View):
     employee_service = EmployeeService()
 

@@ -3,8 +3,9 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
 
-from core.decorators import login_required
+from core.decorators import role_required
 from core.query_helpers import resolve_sort
+from core.roles import Role
 
 from .forms import CustomerCardForm
 from .services import CustomerService, ICustomerService
@@ -19,7 +20,7 @@ CUSTOMER_COLUMNS = [
 CUSTOMER_SORTABLE = {c["key"] for c in CUSTOMER_COLUMNS if c["sortable"]}
 
 
-@login_required
+@role_required(Role.MANAGER, Role.CASHIER)
 class AddCustomerView(View):
     customer_service: ICustomerService = CustomerService()
 
@@ -50,7 +51,7 @@ class AddCustomerView(View):
         )
 
 
-@login_required
+@role_required(Role.MANAGER, Role.CASHIER)
 class GetCustomersView(View):
     customer_service: ICustomerService = CustomerService()
 
@@ -92,7 +93,7 @@ class GetCustomersView(View):
         )
 
 
-@login_required
+@role_required(Role.MANAGER, Role.CASHIER)
 class EditCustomerView(View):
     customer_service: ICustomerService = CustomerService()
 
@@ -145,7 +146,7 @@ class EditCustomerView(View):
         )
 
 
-@login_required
+@role_required(Role.MANAGER)
 class DeleteCustomerView(View):
     customer_service = CustomerService()
 

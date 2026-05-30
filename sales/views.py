@@ -4,14 +4,15 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.views import View
 
-from core.decorators import login_required
+from core.decorators import role_required
+from core.roles import Role
 from employees.repository import get_all_cashiers
 from products.repository import get_all_store_products, get_store_product_by_upc
 
 from .services import CheckService
 
 
-@login_required
+@role_required(Role.MANAGER, Role.CASHIER)
 class GetChecksView(View):
     check_service = CheckService()
 
@@ -96,6 +97,7 @@ class GetChecksView(View):
         )
 
 
+@role_required(Role.MANAGER)
 class DeleteCheckView(View):
     check_service = CheckService()
 
@@ -104,6 +106,7 @@ class DeleteCheckView(View):
         return HttpResponse("")
 
 
+@role_required(Role.CASHIER)
 class CreateCheckView(View):
     check_service = CheckService()
 
@@ -113,6 +116,7 @@ class CreateCheckView(View):
         return redirect("sales:add-item")
 
 
+@role_required(Role.CASHIER)
 class AddItemToCheckView(View):
     check_service = CheckService()
 
@@ -156,6 +160,7 @@ class AddItemToCheckView(View):
         return redirect("sales:add-item")
 
 
+@role_required(Role.CASHIER)
 class FinalizeCheckView(View):
     check_service = CheckService()
 
@@ -180,6 +185,7 @@ class FinalizeCheckView(View):
         return redirect("sales:checks")
 
 
+@role_required(Role.MANAGER, Role.CASHIER)
 class GetCheckDetailView(View):
     check_service = CheckService()
 
