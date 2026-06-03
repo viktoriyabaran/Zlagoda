@@ -52,7 +52,7 @@ class GetChecksView(View):
             {"key": "date_to", "label": "To date", "type": "date"},
         ]
         actions = [
-            {"label": "View", "url_name": "sales:check-detail", "icon": "👁"},
+            {"label": "View", "url_name": "sales:check-detail", "icon": "fa-solid fa-eye"},
         ]
         if not is_cashier:
             cashiers = get_all_cashiers()
@@ -76,7 +76,7 @@ class GetChecksView(View):
                 {
                     "label": "Delete",
                     "url_name": "sales:delete-check",
-                    "icon": "✕",
+                    "icon": "fa-solid fa-trash",
                     "method": "post",
                     "confirm": "Are you sure you want to permanently delete this check? This action will also delete all related sale records.",
                 }

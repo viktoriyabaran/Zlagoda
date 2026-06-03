@@ -96,21 +96,25 @@ class GetCategoriesView(View):
                     "rows": rows,
                     "columns": CATEGORY_COLUMNS,
                     "sort": {"by": sort_by, "dir": sort_dir},
-                    "add_url": reverse("products:add-category"),
+                    "add_url": reverse("products:add-category")
+                    if request.session.get("user_role") == Role.MANAGER
+                    else None,
                     "add_label": "Add category",
                     "empty_message": "No categories yet.",
                     "actions": [
                         {
                             "label": "Edit",
                             "url_name": "products:edit-category",
-                            "icon": "✎",
+                            "icon": "fa-solid fa-pen",
+                            "roles": [Role.MANAGER],
                         },
                         {
                             "label": "Delete",
                             "url_name": "products:delete-category",
-                            "icon": "✕",
+                            "icon": "fa-solid fa-trash",
                             "method": "post",
                             "confirm": "Delete this category?",
+                            "roles": [Role.MANAGER],
                         },
                     ],
                     "row_id_key": "id",
@@ -196,7 +200,9 @@ class GetProductsView(View):
                     "rows": rows,
                     "columns": columns,
                     "sort": {"by": sort_by, "dir": sort_dir},
-                    "add_url": reverse("products:add-product"),
+                    "add_url": reverse("products:add-product")
+                    if request.session.get("user_role") == Role.MANAGER
+                    else None,
                     "add_label": "Add product",
                     "empty_message": "No products yet.",
                     "filters": PRODUCT_FILTERS,
@@ -206,14 +212,16 @@ class GetProductsView(View):
                         {
                             "label": "Edit",
                             "url_name": "products:edit-product",
-                            "icon": "✎",
+                            "icon": "fa-solid fa-pen",
+                            "roles": [Role.MANAGER],
                         },
                         {
                             "label": "Delete",
                             "url_name": "products:delete-product",
-                            "icon": "✕",
+                            "icon": "fa-solid fa-trash",
                             "method": "post",
                             "confirm": "Delete this product?",
+                            "roles": [Role.MANAGER],
                         },
                     ],
                 },
@@ -326,7 +334,9 @@ class GetStoreProductsView(View):
                     "columns": STORE_PRODUCT_COLUMNS,
                     "filters": STORE_PRODUCT_FILTERS,
                     "sort": {"by": sort_by, "dir": sort_dir},
-                    "add_url": reverse("products:add-store-product"),
+                    "add_url": reverse("products:add-store-product")
+                    if request.session.get("user_role") == Role.MANAGER
+                    else None,
                     "add_label": "Add store product",
                     "empty_message": "No store products yet.",
                     "row_id_key": "UPC",
@@ -334,14 +344,16 @@ class GetStoreProductsView(View):
                         {
                             "label": "Edit",
                             "url_name": "products:edit-store-product",
-                            "icon": "✎",
+                            "icon": "fa-solid fa-pen",
+                            "roles": [Role.MANAGER],
                         },
                         {
                             "label": "Delete",
                             "url_name": "products:delete-store-product",
-                            "icon": "✕",
+                            "icon": "fa-solid fa-trash",
                             "method": "post",
                             "confirm": "Delete this store product?",
+                            "roles": [Role.MANAGER],
                         },
                     ],
                 },

@@ -78,14 +78,15 @@ class GetCustomersView(View):
                         {
                             "label": "Edit",
                             "url_name": "customers:edit-customer",
-                            "icon": "✎",
+                            "icon": "fa-solid fa-pen",
                         },
                         {
                             "label": "Delete",
                             "url_name": "customers:delete-customer",
-                            "icon": "✕",
+                            "icon": "fa-solid fa-trash",
                             "method": "post",
                             "confirm": "Delete this customer?",
+                            "roles": [Role.MANAGER],
                         },
                     ],
                 },
