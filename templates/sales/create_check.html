@@ -3,14 +3,9 @@
 {% block title %}Create Check{% endblock %}
 
 {% block layout %}
-<div class="relative z-10 flex items-stretch gap-4 w-[calc(100%-1.5rem)] mx-3 mt-[60px]
-            max-[900px]:flex-col max-[900px]:items-center">
+<main class="app-layout">
 
-    <div class="isolate w-[340px] flex-shrink-0 min-h-[520px] rounded-2xl overflow-hidden
-                flex flex-col pt-8 pb-6 px-6
-                backdrop-blur-md bg-white/[0.08]
-                shadow-[0_8px_32px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.12)]
-                max-[480px]:w-[92vw] max-[480px]:min-h-[80vh] max-[480px]:px-5">
+    <aside class="sidebar glass flex flex-col pt-8 pb-6 px-6 max-[480px]:px-5">
 
         <h2 class="text-white text-[24px] font-black tracking-[2px] mb-1 text-center">ADD ITEM</h2>
         <p class="text-white/80 text-[12px] mb-5 text-center">Select product and quantity</p>
@@ -45,17 +40,13 @@
             >
             <button type="submit" class="btn">Add to Check</button>
         </form>
-    </div>
+    </aside>
 
-    <div class="isolate flex-1 min-w-0 min-h-[520px] rounded-2xl overflow-hidden
-                flex flex-col pt-8 pb-6 px-8
-                backdrop-blur-md bg-white/[0.08]
-                shadow-[0_8px_32px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.12)]
-                max-[480px]:w-[92vw] max-[480px]:px-5">
+    <section class="panel glass pt-8 pb-6 px-8 max-[480px]:px-5">
 
         <h2 class="text-white text-[24px] font-black tracking-[2px] mb-1 text-center">CURRENT CHECK</h2>
 
-        <div class="flex-1 overflow-y-auto">
+        <div class="flex-1 min-h-0 overflow-y-auto">
             <table class="w-full text-white text-sm border-separate border-spacing-0">
                 <thead>
                     <tr>
@@ -93,8 +84,8 @@
             {% csrf_token %}
             <button type="submit" class="btn w-auto px-10">Finalize Check</button>
         </form>
-    </div>
-</div>
+    </section>
+</main>
 
 <script>
 function filterProducts(query) {

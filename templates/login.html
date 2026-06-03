@@ -4,7 +4,10 @@
 
 {% block header %}{% include "_header_guest.html" %}{% endblock %}
 
-{% block content %}
+{% block layout %}
+<main class="auth-layout">
+  <div class="glass w-[340px] min-h-[520px] flex flex-col items-center pt-8 pb-6 px-6 text-center
+              max-[480px]:w-[92vw] max-[480px]:min-h-[80vh] max-[480px]:px-5">
     <h1 class="text-white text-[42px] max-[480px]:text-[32px] font-black tracking-[3px] mb-2">ZLAGODA</h1>
     <p class="text-white/80 text-[15px] font-normal tracking-[0.5px]">Log into your account!</p>
 
@@ -15,7 +18,7 @@
             <div class="text-red-400 text-sm mb-4">{{ form.non_field_errors }}</div>
             {% endif %}
             {% for field in form %}
-            <div class="mb-7">
+            <div class="mb-7 text-left">
                 {% if field.errors %}
                 <div class="text-red-400 text-xs mb-1">{{ field.errors }}</div>
                 {% endif %}
@@ -26,4 +29,6 @@
             <button type="submit" class="btn mt-10">Log in</button>
         </form>
     </nav>
+  </div>
+</main>
 {% endblock %}

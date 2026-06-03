@@ -3,15 +3,12 @@
 {% block title %}Check #{{ check_id }}{% endblock %}
 
 {% block layout %}
-<div class="relative z-10 flex items-stretch gap-4 w-[calc(100%-1.5rem)] mx-3 mt-[60px]">
-    <div class="isolate flex-1 min-h-[520px] rounded-2xl overflow-hidden
-                flex flex-col pt-8 pb-6 px-8
-                backdrop-blur-md bg-white/[0.08]
-                shadow-[0_8px_32px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.12)]">
+<main class="app-layout">
+    <section class="panel glass pt-8 pb-6 px-8">
 
         <h2 class="text-white text-[24px] font-black tracking-[2px] mb-1 text-center">CHECK #{{ check_id }}</h2>
 
-        <div class="flex-1 overflow-y-auto">
+        <div class="flex-1 min-h-0 overflow-y-auto">
             <table class="w-full text-white text-sm border-separate border-spacing-0">
                 <thead>
                     <tr>
@@ -39,6 +36,6 @@
         <div class="mt-5">
             <a href="{% url 'sales:checks' %}" class="btn w-auto px-10">Back to Checks</a>
         </div>
-    </div>
-</div>
+    </section>
+</main>
 {% endblock %}
