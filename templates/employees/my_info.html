@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}My Info{% endblock %}
+
+{% block layout %}
+<main class="app-layout">
+    <section class="panel glass pt-8 pb-6 px-8">
+
+        <h2 class="text-white text-[24px] font-black tracking-[2px] mb-1 text-center">
+            {{ employee.empl_surname }} {{ employee.empl_name }} {{ employee.empl_patronymic }}
+        </h2>
+        <p class="text-white/80 text-[13px] font-semibold tracking-widest uppercase mb-6 text-center">
+            {{ employee.empl_role }} · ID {{ employee.id }}
+        </p>
+
+        <div class="flex-1 min-h-0 overflow-y-auto">
+            <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr gap-x-8 gap-y-5 h-full">
+                {% for label, value in fields %}
+                <div class="flex flex-col justify-center border-b border-white/10 pb-2">
+                    <dt class="text-[10px] font-semibold tracking-widest uppercase text-white/70 mb-1">{{ label }}</dt>
+                    <dd class="text-white text-sm">{{ value|default:"—" }}</dd>
+                </div>
+                {% endfor %}
+            </dl>
+        </div>
+
+        <div class="mt-5">
+            <a href="{% url 'core:home' %}" class="btn w-auto px-10">Back to Home</a>
+        </div>
+    </section>
+</main>
+{% endblock %}

@@ -59,6 +59,16 @@ def get_employee_by_id(employee_id: int):
     )
 
 
+def get_employee_by_user_id(user_id: int):
+    return execute_single(
+        "SELECT e.* "
+        "FROM employees_employee e "
+        "JOIN core_user u ON u.employee_id = e.id "
+        "WHERE u.id = %s",
+        [user_id],
+    )
+
+
 def update_employee(employee_id: int, data: dict):
     execute_write(
         """

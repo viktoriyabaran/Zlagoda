@@ -12,6 +12,7 @@ from employees.repository import (
     delete_employee,
     get_all_employees,
     get_employee_by_id,
+    get_employee_by_user_id,
     update_employee,
 )
 
@@ -20,6 +21,7 @@ class IEmployeeService(Protocol):
     def create_employee(self, data: dict) -> None: ...
     def get_all(self, request: HttpRequest, sort_by: str, sort_dir: str) -> list: ...
     def get_by_id(self, employee_id: int) -> dict | None: ...
+    def get_by_user_id(self, user_id: int) -> dict | None: ...
     def update_employee(self, employee_id: int, data: dict) -> None: ...
 
 
@@ -32,6 +34,9 @@ class EmployeeService:
 
     def get_by_id(self, employee_id: int) -> dict | None:
         return get_employee_by_id(employee_id)
+
+    def get_by_user_id(self, user_id: int) -> dict | None:
+        return get_employee_by_user_id(user_id)
 
     def create_employee(self, data: dict) -> None:
         with transaction.atomic():

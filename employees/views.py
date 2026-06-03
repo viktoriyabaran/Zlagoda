@@ -21,6 +21,34 @@ EMPLOYEE_COLUMNS = [
 EMPLOYEE_SORTABLE = {c["key"] for c in EMPLOYEE_COLUMNS if c["sortable"]}
 
 
+@role_required(Role.MANAGER, Role.CASHIER)
+class MyInfoView(View):
+    employee_service = EmployeeService()
+
+    def get(self, request):
+        employee = self.employee_service.get_by_user_id(request.session["user_id"])
+        if not employee:
+            raise Http404("No employee profile is linked to your account.")
+        fields = [
+            ("Surname", employee["empl_surname"]),
+            ("Name", employee["empl_name"]),
+            ("Patronymic", employee["empl_patronymic"]),
+            ("Role", employee["empl_role"]),
+            ("Salary", employee["salary"]),
+            ("Date of birth", employee["date_of_birth"]),
+            ("Date of start", employee["date_of_start"]),
+            ("Phone", employee["phone_number"]),
+            ("City", employee["city"]),
+            ("Street", employee["street"]),
+            ("Zip code", employee["zip_code"]),
+        ]
+        return render(
+            request,
+            "employees/my_info.html",
+            {"employee": employee, "fields": fields},
+        )
+
+
 @role_required(Role.MANAGER)
 class AddEmployeeView(View):
     employee_service = EmployeeService()
@@ -80,12 +108,12 @@ class GetEmployeesView(View):
                         {
                             "label": "Edit",
                             "url_name": "employees:edit-employee",
-                            "icon": "✎",
+                            "icon": "fa-solid fa-pen",
                         },
                         {
                             "label": "Delete",
                             "url_name": "employees:delete-employee",
-                            "icon": "✕",
+                            "icon": "fa-solid fa-trash",
                             "method": "post",
                             "confirm": "Delete this employee?",
                         },
