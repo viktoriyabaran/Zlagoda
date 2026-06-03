@@ -1,10 +1,57 @@
 {% load list_extras %}
-<h2 class="text-white text-[24px] max-[480px]:text-[20px] font-black tracking-[2px] mb-1 text-center">
-    {{ list.title }}
-</h2>
-<p class="text-white/80 text-[12px] font-normal tracking-[0.5px] mb-5 text-center">
-    {{ list.subtitle|default:"" }}
-</p>
+{% filters_of list.filters "search" as search_filters %}
+{% filters_of list.filters "field" as field_filters %}
+{% any_filter_value search_filters as search_open %}
+{% any_filter_value field_filters as filters_open %}
+
+<style>
+    /* Smoothly collapse/expand the search & filter rows without a fixed max-height. */
+    .z-collapse { display: grid; grid-template-rows: 0fr; opacity: 0;
+                  transition: grid-template-rows .28s ease, opacity .2s ease; }
+    .z-collapse.open { grid-template-rows: 1fr; opacity: 1; }
+    .z-collapse > .z-collapse-inner { overflow: hidden; min-height: 0; }
+</style>
+
+<div class="flex items-start justify-between gap-3 border-b border-white/15 pb-2 mb-3">
+    <div class="min-w-0">
+        <h2 class="text-white text-[15px] max-[480px]:text-[14px] font-black tracking-[1.5px] leading-tight truncate">
+            {{ list.title }}
+        </h2>
+        {% if list.subtitle %}
+        <p class="text-white/60 text-[10px] tracking-[0.5px] mt-0.5 truncate">{{ list.subtitle }}</p>
+        {% endif %}
+    </div>
+    {% if search_filters or field_filters or list.add_url %}
+    <div class="flex items-center gap-2 flex-shrink-0">
+        {% if search_filters %}
+        <button type="button" title="Search" aria-label="Toggle search"
+                onclick="this.classList.toggle('bg-white/10'); document.getElementById('list-search-row').classList.toggle('open');"
+                class="w-8 h-8 flex items-center justify-center rounded-xl border-2 border-white/35 text-white/80 hover:border-white/60 hover:text-white transition-colors {% if search_open %}bg-white/10{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
+                <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3" stroke-linecap="round"/>
+            </svg>
+        </button>
+        {% endif %}
+        {% if field_filters %}
+        <button type="button" title="Filters" aria-label="Toggle filters"
+                onclick="this.classList.toggle('bg-white/10'); document.getElementById('list-filter-row').classList.toggle('open');"
+                class="w-8 h-8 flex items-center justify-center rounded-xl border-2 border-white/35 text-white/80 hover:border-white/60 hover:text-white transition-colors {% if filters_open %}bg-white/10{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
+                <path d="M3 5h18l-7 8v6l-4 2v-8z" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+        {% endif %}
+        {% if list.add_url %}
+        <a href="{{ list.add_url }}" title="{{ list.add_label|default:'Add' }}" aria-label="{{ list.add_label|default:'Add' }}"
+           class="w-8 h-8 flex items-center justify-center rounded-xl border-2 border-white/35 bg-white/10 text-white hover:border-white/60 transition-colors">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
+                <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
+            </svg>
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
 
 <div id="error-modal" class="hidden fixed inset-0 z-[100] items-center justify-center bg-black/40 backdrop-blur-md transition-all">
     <div style="
@@ -39,150 +86,187 @@
     </div>
 </div>
 
-{% if list.filters %}
-<div class="flex gap-3 mb-4 flex-wrap">
-    {% for f in list.filters %}
-        {% if f.type == "search" %}
-            <input
-                type="text"
-                name="{{ f.key }}"
-                placeholder="{{ f.label }}"
-                value="{{ request.GET.q|default:'' }}"
-                class="bg-transparent border border-white/50 rounded-lg px-4 py-2 text-white outline-none focus:border-white transition-colors text-sm"
-                onchange="this.form.submit()"
-            >
-        {% elif f.type == "select" %}
-            <select
-                name="{{ f.key }}"
-                class="bg-transparent border border-white/50 rounded-lg px-4 py-2 text-white outline-none focus:border-white transition-colors text-sm"
-                onchange="this.form.submit()"
-            >
-                <option value="">{{ f.label }}</option>
-                {% for opt in f.options %}
-                    <option value="{{ opt.value }}" {% if request.GET.role == opt.value or request.GET.promo == opt.value or request.GET.employee_id == opt.value %}selected{% endif %}>{{ opt.label }}</option>
-                {% endfor %}
-            </select>
-            {% elif f.type == "date" %}
+{# Preserve the active sort across search and Apply (both htmx) and full reloads. #}
+<input type="hidden" name="sort" value="{{ list.sort.by }}">
+<input type="hidden" name="dir" value="{{ list.sort.dir }}">
+
+{% if search_filters %}
+<div id="list-search-row" class="z-collapse {% if search_open %}open{% endif %}">
+    <div class="z-collapse-inner">
+        <div class="pb-3 space-y-2">
+            {% for f in search_filters %}
+            <div class="relative">
                 <input
-                type="date"
-                name="{{ f.key }}"
-                value="{% if f.key == 'date_from' %}{{ request.GET.date_from }}{% elif f.key == 'date_to' %}{{ request.GET.date_to }}{% endif %}"
-                class="bg-transparent border border-white/50 rounded-lg px-4 py-2 text-white outline-none focus:border-white transition-colors text-sm"
+                    type="search"
+                    id="search-{{ f.key }}"
+                    name="{{ f.key }}"
+                    placeholder="{{ f.label }}"
+                    value="{{ request.GET|query_value:f.key }}"
+                    autocomplete="off"
+                    hx-get="{{ request.path }}"
+                    hx-trigger="input changed delay:300ms, search"
+                    hx-target="#list-region"
+                    hx-select="#list-region"
+                    hx-swap="outerHTML"
+                    hx-include="closest form"
+                    hx-push-url="true"
+                    onkeydown="if (event.key === 'Enter') event.preventDefault();"
+                    class="w-full bg-transparent border-2 border-white/35 rounded-xl pl-3 pr-9 py-1.5 text-white text-sm outline-none focus:border-white/60 transition-colors"
                 >
-        {% endif %}
-    {% endfor %}
-    {% if list.has_date_filter %}
-        <button type="submit" class="btn w-auto px-6 text-xs tracking-wider uppercase font-bold">
-        Apply
-        </button>
+                <button type="button" title="Clear search" aria-label="Clear search"
+                        onclick="var i = document.getElementById('search-{{ f.key }}'); i.value = ''; htmx.trigger(i, 'search'); i.focus();"
+                        class="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/45 hover:text-white text-sm leading-none">✕</button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if field_filters %}
+<div id="list-filter-row" class="z-collapse {% if filters_open %}open{% endif %}">
+    <div class="z-collapse-inner">
+        <div class="pb-3 flex flex-wrap items-end gap-2">
+            {% for f in field_filters %}
+                {% if f.type == "select" %}
+                    <select
+                        name="{{ f.key }}"
+                        class="flex-1 min-w-[140px] bg-transparent border-2 border-white/35 rounded-xl px-3 py-1.5 text-white text-sm outline-none focus:border-white/60 transition-colors"
+                    >
+                        <option value="">Any {{ f.label }}</option>
+                        {% for opt in f.options %}
+                            <option value="{{ opt.value }}" {% if request.GET|query_value:f.key == opt.value %}selected{% endif %}>{{ opt.label }}</option>
+                        {% endfor %}
+                    </select>
+                {% elif f.type == "date" %}
+                    <input
+                        type="date"
+                        name="{{ f.key }}"
+                        value="{{ request.GET|query_value:f.key }}"
+                        class="flex-1 min-w-[140px] bg-transparent border-2 border-white/35 rounded-xl px-3 py-1.5 text-white text-sm outline-none focus:border-white/60 transition-colors"
+                    >
+                {% endif %}
+            {% endfor %}
+            <button type="button"
+                    hx-get="{{ request.path }}"
+                    hx-include="closest form"
+                    hx-target="#list-region"
+                    hx-select="#list-region"
+                    hx-swap="outerHTML"
+                    hx-push-url="true"
+                    class="btn w-auto px-6 py-1.5 text-xs tracking-wider uppercase font-bold">
+                Apply
+            </button>
+            <button type="button" title="Clear filters"
+                    onclick="var f = this.closest('form'); document.getElementById('list-filter-row').querySelectorAll('select, input[type=date]').forEach(function (e) { e.value = ''; }); htmx.ajax('GET', '{{ request.path }}', {source: f, target: '#list-region', select: '#list-region', swap: 'outerHTML'});"
+                    class="w-auto px-4 py-1.5 text-xs tracking-wider uppercase font-bold text-white/70 hover:text-white border-2 border-white/35 hover:border-white/60 rounded-xl transition-colors">
+                Clear
+            </button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div id="list-region" class="flex-1 min-h-0 flex flex-col">
+    <div class="flex-1 min-h-0 overflow-y-auto pr-1 -mr-1"
+         hx-on::response-error="
+            if (event.detail.xhr.status === 400 || event.detail.xhr.status === 409) {
+                const modal = document.getElementById('error-modal');
+                const text = event.detail.xhr.responseText;
+                const parts = text.split(':');
+
+                if (parts.length > 1) {
+                    document.getElementById('error-modal-title').innerText = parts[0].trim().toUpperCase();
+                    document.getElementById('error-modal-message').innerText = parts[1].trim();
+                } else {
+                    document.getElementById('error-modal-title').innerText = 'CANNOT DELETE';
+                    document.getElementById('error-modal-message').innerText = text;
+                }
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+         ">
+        <table class="w-full text-white text-sm border-separate border-spacing-0">
+            <thead class="sticky top-0 backdrop-blur-md bg-white/[0.08]">
+                <tr>
+                    {% for col in list.columns %}
+                    <th class="text-left text-[10px] font-semibold tracking-widest uppercase text-white/80 px-3 py-1.5 border-b border-white/20">
+                        {% if col.sortable %}
+                            {% if list.sort.by == col.key and list.sort.dir == 'asc' %}
+                                <a href="?sort={{ col.key }}&dir=desc&{% query_without 'sort' 'dir' %}" class="inline-flex items-center gap-1 hover:text-white">{{ col.label }} ↑</a>
+                            {% elif list.sort.by == col.key %}
+                                <a href="?sort={{ col.key }}&dir=asc&{% query_without 'sort' 'dir' %}" class="inline-flex items-center gap-1 hover:text-white">{{ col.label }} ↓</a>
+                            {% else %}
+                                <a href="?sort={{ col.key }}&dir=asc&{% query_without 'sort' 'dir' %}" class="inline-flex items-center gap-1 opacity-70 hover:opacity-100 hover:text-white">{{ col.label }}</a>
+                            {% endif %}
+                        {% else %}
+                            {{ col.label }}
+                        {% endif %}
+                    </th>
+                    {% endfor %}
+
+                    {% if list.actions %}
+                    <th class="px-3 py-1.5 border-b border-white/20 w-10"></th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in list.rows %}
+                <tr class="hover:bg-white/[0.04]">
+                    {% for col in list.columns %}
+                    <td class="px-3 py-1.5 border-b border-white/10">
+                        {% if col.key == "promotional_product" %}
+                            {{ row|cell:col.key|yesno:"Yes,No" }}
+                        {% else %}
+                            {{ row|cell:col.key }}
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                    {% if list.actions %}
+                    <td class="px-3 py-1.5 border-b border-white/10 text-right">
+                        {% visible_actions list.actions request.session.user_role as acts %}
+                        <div class="inline-flex items-center gap-2">
+                            {% for a in acts %}
+                                {% action_url a row list.row_id_key as url %}
+                                {% if a.method == "post" %}
+                                <button
+                                    type="button"
+                                    title="{{ a.label }}"
+                                    aria-label="{{ a.label }}"
+                                    hx-post="{{ url }}"
+                                    {% if a.confirm %}hx-confirm="{{ a.confirm }}"{% endif %}
+                                    hx-target="closest tr"
+                                    hx-swap="outerHTML"
+                                    class="text-white/70 hover:text-white text-base leading-none px-1"
+                                >{{ a.icon }}</button>
+                                {% else %}
+                                <a
+                                    href="{{ url }}"
+                                    title="{{ a.label }}"
+                                    aria-label="{{ a.label }}"
+                                    class="text-white/70 hover:text-white text-base leading-none px-1"
+                                >{{ a.icon }}</a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{% if list.actions %}{{ list.columns|length|add:1 }}{% else %}{{ list.columns|length }}{% endif %}" class="text-white/70 text-sm text-center py-6">
+                        {{ list.empty_message|default:"No records yet." }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if list.total_sum is not None %}
+    <div class="mt-2 flex justify-end text-white font-bold text-sm px-3">
+        <span>Total sales: {{ list.total_sum }}</span>
+    </div>
     {% endif %}
 </div>
-{% endif %}
-
-<div class="flex-1 overflow-y-auto pr-1 -mr-1"
-     hx-on::response-error="
-        if (event.detail.xhr.status === 400 || event.detail.xhr.status === 409) {
-            const modal = document.getElementById('error-modal');
-            const text = event.detail.xhr.responseText;
-            const parts = text.split(':');
-
-            if (parts.length > 1) {
-                document.getElementById('error-modal-title').innerText = parts[0].trim().toUpperCase();
-                document.getElementById('error-modal-message').innerText = parts[1].trim();
-            } else {
-                document.getElementById('error-modal-title').innerText = 'CANNOT DELETE';
-                document.getElementById('error-modal-message').innerText = text;
-            }
-
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-     ">
-    <table class="w-full text-white text-sm border-separate border-spacing-0">
-        <thead class="sticky top-0 backdrop-blur-md bg-white/[0.08]">
-            <tr>
-                {% for col in list.columns %}
-                <th class="text-left text-[10px] font-semibold tracking-widest uppercase text-white/80 px-3 py-2 border-b border-white/20">
-                    {% if col.sortable %}
-                        {% if list.sort.by == col.key and list.sort.dir == 'asc' %}
-                            <a href="?sort={{ col.key }}&dir=desc&q={{ request.GET.q }}&role={{ request.GET.role }}&promo={{ request.GET.promo }}" class="inline-flex items-center gap-1 hover:text-white">{{ col.label }} ↑</a>
-                        {% elif list.sort.by == col.key %}
-                            <a href="?sort={{ col.key }}&dir=asc&q={{ request.GET.q }}&role={{ request.GET.role }}&promo={{ request.GET.promo }}" class="inline-flex items-center gap-1 hover:text-white">{{ col.label }} ↓</a>
-                        {% else %}
-                            <a href="?sort={{ col.key }}&dir=asc&q={{ request.GET.q }}&role={{ request.GET.role }}&promo={{ request.GET.promo }}" class="inline-flex items-center gap-1 opacity-70 hover:opacity-100 hover:text-white">{{ col.label }}</a>
-                        {% endif %}
-                    {% else %}
-                        {{ col.label }}
-                    {% endif %}
-                </th>
-                {% endfor %}
-
-                {% if list.actions %}
-                <th class="px-3 py-2 border-b border-white/20 w-10"></th>
-                {% endif %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in list.rows %}
-            <tr class="hover:bg-white/[0.04]">
-                {% for col in list.columns %}
-                <td class="px-3 py-2 border-b border-white/10">
-                    {% if col.key == "promotional_product" %}
-                        {{ row|cell:col.key|yesno:"Yes,No" }}
-                    {% else %}
-                        {{ row|cell:col.key }}
-                    {% endif %}
-                </td>
-                {% endfor %}
-                {% if list.actions %}
-                <td class="px-3 py-2 border-b border-white/10 text-right">
-                    {% visible_actions list.actions request.session.user_role as acts %}
-                    <div class="inline-flex items-center gap-2">
-                        {% for a in acts %}
-                            {% action_url a row list.row_id_key as url %}
-                            {% if a.method == "post" %}
-                            <button
-                                type="button"
-                                title="{{ a.label }}"
-                                aria-label="{{ a.label }}"
-                                hx-post="{{ url }}"
-                                {% if a.confirm %}hx-confirm="{{ a.confirm }}"{% endif %}
-                                hx-target="closest tr"
-                                hx-swap="outerHTML"
-                                class="text-white/70 hover:text-white text-base leading-none px-1"
-                            >{{ a.icon }}</button>
-                            {% else %}
-                            <a
-                                href="{{ url }}"
-                                title="{{ a.label }}"
-                                aria-label="{{ a.label }}"
-                                class="text-white/70 hover:text-white text-base leading-none px-1"
-                            >{{ a.icon }}</a>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </td>
-                {% endif %}
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="{% if list.actions %}{{ list.columns|length|add:1 }}{% else %}{{ list.columns|length }}{% endif %}" class="text-white/70 text-sm text-center py-8">
-                    {{ list.empty_message|default:"No records yet." }}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-{% if list.total_sum is not None %}
-<div class="mt-4 flex justify-end text-white font-bold text-sm px-3">
-    <span>Total sales: {{ list.total_sum }}</span>
-</div>
-{% endif %}
-
-{% if list.add_url %}
-<div class="mt-5 flex justify-end">
-    <a href="{{ list.add_url }}" class="btn w-auto px-10">{{ list.add_label|default:"Add" }}</a>
-</div>
-{% endif %}
