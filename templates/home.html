@@ -3,54 +3,29 @@
 {% block title %}Zlagoda{% endblock %}
 
 {% block layout %}
-<div class="relative z-10 flex items-stretch gap-4 w-[calc(100%-1.5rem)] mx-3 mt-[60px]
-            max-[900px]:flex-col max-[900px]:items-center">
+<main class="app-layout">
 
-    <div class="isolate w-[340px] flex-shrink-0 min-h-[520px] rounded-2xl overflow-hidden
-                flex flex-col items-center pt-8 pb-6 px-6
-                backdrop-blur-md bg-white/[0.08]
-                shadow-[0_8px_32px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.12)]
-                max-[480px]:w-[92vw] max-[480px]:min-h-[80vh] max-[480px]:px-5">
-        <h1 class="text-white text-[34px] max-[480px]:text-[28px] font-black tracking-[3px] mb-1">ZLAGODA</h1>
-        <p class="text-white/80 text-[13px] font-normal tracking-[0.5px] mb-auto">Groceries and Essential Goods</p>
+    {% include "_sidebar.html" %}
 
-        <nav class="flex flex-col gap-3 w-full my-auto">
-            <a href="#checks" class="btn">Checks</a>
-            <a href="#fair-land-use" class="btn">Fair Land Use</a>
-            <a href="#plastic-pollution" class="btn">Plastic Pollution</a>
-        </nav>
-
-        <a href="#action"
-           class="mt-auto pt-6 text-white text-base font-black tracking-[2px] no-underline
-                  cursor-pointer hover:opacity-80">
-            LETS DO IT!
-        </a>
-    </div>
-
-    <div id="form-panel"
-         class="isolate flex-1 min-w-0 min-h-[520px] rounded-2xl overflow-hidden
-                flex flex-col pt-8 pb-6 px-8
-                backdrop-blur-md bg-white/[0.08]
-                shadow-[0_8px_32px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.12)]
-                max-[480px]:w-[92vw] max-[480px]:px-5">
+    <section id="form-panel" class="panel glass pt-8 pb-6 px-8 max-[480px]:px-5">
         {% if form %}
             {% include "_form_panel.html" %}
         {% elif list %}
-    <form method="get">
-        {% if list.date_filters %}
-            {% include "_product_list_panel.html" %}
-        {% else %}
-            {% include "_list_panel.html" %}
-        {% endif %}
-    </form>
+        <form method="get" class="flex flex-col flex-1 min-h-0">
+            {% if list.date_filters %}
+                {% include "_product_list_panel.html" %}
+            {% else %}
+                {% include "_list_panel.html" %}
+            {% endif %}
+        </form>
         {% else %}
             <div class="flex flex-col items-center justify-center text-center m-auto max-w-md">
                 <p class="text-white/70 text-xs font-semibold tracking-widest uppercase mb-3">Quick Actions</p>
                 <p class="text-white/90 text-[15px] tracking-[0.5px] leading-relaxed px-2">
-                    Hover the menu above to add a product, customer, or employee. The form will appear here.
+                    Use the menu on the left to view or add products, customers, checks, and more. The page will load here.
                 </p>
             </div>
         {% endif %}
-    </div>
-</div>
+    </section>
+</main>
 {% endblock %}

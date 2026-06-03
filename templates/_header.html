@@ -10,102 +10,14 @@
         ZLAGODA
     </a>
 
-    <nav class="flex gap-7 text-[11px] font-semibold tracking-widest uppercase items-center h-full">
-        <div class="relative group h-full flex items-center">
-            <button type="button" class="hover:opacity-80 tracking-widest uppercase bg-transparent border-0 p-0 cursor-pointer text-white font-[Montserrat] text-[11px] font-semibold">
-                Checks
-            </button>
-            <div class="absolute left-1/2 -translate-x-1/2 top-full pt-2 hidden group-hover:block z-30">
-                <div class="isolate rounded-xl backdrop-blur-md bg-white/[0.08] border-2 border-white/35 shadow-[0_8px_32px_rgba(0,0,0,0.25)] py-2 min-w-[200px]">
-                    <a href="{% url 'sales:create-check' %}"
-                        class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
-                            Create Check
-                    </a>
-                    <a href="{% url 'sales:checks' %}"
-                        class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
-                            View Checks
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="relative group h-full flex items-center">
-            <button type="button" class="hover:opacity-80 tracking-widest uppercase bg-transparent border-0 p-0 cursor-pointer text-white font-[Montserrat] text-[11px] font-semibold">
-                Products
-            </button>
-            <div class="absolute left-1/2 -translate-x-1/2 top-full pt-2 hidden group-hover:block z-30">
-                <div class="isolate rounded-xl backdrop-blur-md bg-white/[0.08] border-2 border-white/35 shadow-[0_8px_32px_rgba(0,0,0,0.25)] py-2 min-w-[200px]">
-                    <a href="{% url 'products:add-product' %}"
-                       class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
-                        Add Product
-                    </a>
-                    <a href="{% url 'products:add-store-product' %}"
-                       class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
-                        Add Store Product
-                    </a>
-                    <a href="{% url 'products:add-category' %}"
-                       class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
-                        Add Category
-                    </a>
-                    <a href="{% url 'products:categories' %}"
-                       class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
-                        View Categories
-                    </a>
-                    <a href="{% url 'products:products' %}"
-                        class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
-                        View Products
-                     </a>
-                     <a href="{% url 'products:store-products' %}"
-                        class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
-                        View Store Products
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="relative group h-full flex items-center">
-            <button type="button" class="hover:opacity-80 tracking-widest uppercase bg-transparent border-0 p-0 cursor-pointer text-white font-[Montserrat] text-[11px] font-semibold">
-                Customers
-            </button>
-            <div class="absolute left-1/2 -translate-x-1/2 top-full pt-2 hidden group-hover:block z-30">
-                <div class="isolate rounded-xl backdrop-blur-md bg-white/[0.08] border-2 border-white/35 shadow-[0_8px_32px_rgba(0,0,0,0.25)] py-2 min-w-[200px]">
-                    <a href="{% url 'customers:add-customer' %}"
-                       class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
-                        Add Customer
-                    </a>
-                    <a href="{% url 'customers:customers' %}"
-                       class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
-                        View Customers
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="relative group h-full flex items-center">
-            <button type="button" class="hover:opacity-80 tracking-widest uppercase bg-transparent border-0 p-0 cursor-pointer text-white font-[Montserrat] text-[11px] font-semibold">
-                Employees
-            </button>
-            <div class="absolute left-1/2 -translate-x-1/2 top-full pt-2 hidden group-hover:block z-30">
-                <div class="isolate rounded-xl backdrop-blur-md bg-white/[0.08] border-2 border-white/35 shadow-[0_8px_32px_rgba(0,0,0,0.25)] py-2 min-w-[200px]">
-                    <a href="{% url 'employees:add-employee' %}"
-                       class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
-                        Add Employee
-                    </a>
-                    <a href="{% url 'employees:employees' %}"
-                       class="block px-4 py-2 text-[11px] font-semibold tracking-widest uppercase hover:bg-white/15">
-                        View Employees
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <form action="{% url 'core:logout' %}" method="post" class="m-0">
-      {% csrf_token %}
-      <button type="submit"
-              class="text-[11px] font-semibold tracking-widest uppercase hover:opacity-80
-                     bg-transparent border-0 p-0 cursor-pointer text-white font-[Montserrat]">
-          Log out
-      </button>
-    </form>
+    <div class="flex items-center gap-5">
+        <form action="{% url 'core:logout' %}" method="post" class="m-0">
+          {% csrf_token %}
+          <button type="submit"
+                  class="text-[11px] font-semibold tracking-widest uppercase hover:opacity-80
+                         bg-transparent border-0 p-0 cursor-pointer text-white font-[Montserrat] leading-none">
+              Log out
+          </button>
+        </form>
+    </div>
 </header>
