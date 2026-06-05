@@ -24,5 +24,8 @@ media/
 # Tailwind build output
 theme/static/css/dist/
 
+# Django collected static
+staticfiles/
+
 # Docker
 *.log
