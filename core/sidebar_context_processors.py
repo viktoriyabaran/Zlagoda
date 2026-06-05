@@ -16,14 +16,26 @@ _NAV = [
         "box",
         [
             ("View Products", "products:products", (Role.MANAGER, Role.CASHIER)),
+            ("Add Product", "products:add-product", (Role.MANAGER,)),
+        ],
+    ),
+    (
+        "Store Products",
+        "box",
+        [
             (
                 "View Store Products",
                 "products:store-products",
                 (Role.MANAGER, Role.CASHIER),
             ),
-            ("View Categories", "products:categories", (Role.MANAGER, Role.CASHIER)),
-            ("Add Product", "products:add-product", (Role.MANAGER,)),
             ("Add Store Product", "products:add-store-product", (Role.MANAGER,)),
+        ],
+    ),
+    (
+        "Categories",
+        "box",
+        [
+            ("View Categories", "products:categories", (Role.MANAGER, Role.CASHIER)),
             ("Add Category", "products:add-category", (Role.MANAGER,)),
         ],
     ),
