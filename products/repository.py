@@ -5,14 +5,22 @@ from core.db import (
     execute_write,
 )
 
-PRODUCT_FILTERS = [
-    {
-        "key": "category_name",
-        "label": "Search by category",
-        "type": "search",
-        "column": "category_name",
-    },
-]
+def get_product_filters():
+    categories = get_all_categories(order_by=" ORDER BY category_name")
+    return [
+        {
+            "key": "category_name",
+            "label": "Category",
+            "type": "select",
+            "column": "c.category_name",
+            "options": [
+                {"value": c["category_name"], "label": c["category_name"]}
+                for c in categories
+            ],
+        },
+        {"key": "date_from", "label": "From", "type": "date"},
+        {"key": "date_to", "label": "To", "type": "date"},
+    ]
 
 STORE_PRODUCT_FILTERS = [
     {

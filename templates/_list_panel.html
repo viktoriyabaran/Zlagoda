@@ -139,12 +139,15 @@
                         {% endfor %}
                     </select>
                 {% elif f.type == "date" %}
-                    <input
-                        type="date"
-                        name="{{ f.key }}"
-                        value="{{ request.GET|query_value:f.key }}"
-                        class="flex-1 min-w-[140px] bg-transparent border-2 border-white/35 rounded-xl px-3 py-1.5 text-white text-sm outline-none focus:border-white/60 transition-colors"
-                    >
+                    <label class="flex flex-col gap-1 flex-1 min-w-[140px]">
+                        <span class="text-white/70 text-[10px] font-semibold tracking-widest uppercase px-1">{{ f.label }}</span>
+                        <input
+                            type="date"
+                            name="{{ f.key }}"
+                            value="{{ request.GET|query_value:f.key }}"
+                            class="bg-transparent border-2 border-white/35 rounded-xl px-3 py-1.5 text-white text-sm outline-none focus:border-white/60 transition-colors"
+                        >
+                    </label>
                 {% endif %}
             {% endfor %}
             <button type="button"

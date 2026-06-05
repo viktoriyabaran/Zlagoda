@@ -15,7 +15,7 @@ from .forms import (
     ProductForm,
     StoreProductForm,
 )
-from .repository import PRODUCT_FILTERS, STORE_PRODUCT_FILTERS
+from .repository import STORE_PRODUCT_FILTERS, get_product_filters
 from .services import (
     CategoryService,
     ProductService,
@@ -205,8 +205,7 @@ class GetProductsView(View):
                     else None,
                     "add_label": "Add product",
                     "empty_message": "No products yet.",
-                    "filters": PRODUCT_FILTERS,
-                    "date_filters": True,
+                    "filters": get_product_filters(),
                     "row_id_key": "id",
                     "actions": [
                         {

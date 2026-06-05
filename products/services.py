@@ -6,8 +6,8 @@ from django.http import HttpRequest
 
 from core.query_helpers import order_by_sql, resolve_filters
 from products.repository import (
-    PRODUCT_FILTERS,
     STORE_PRODUCT_FILTERS,
+    get_product_filters,
     count_products_in_category,
     create_category,
     create_product,
@@ -90,7 +90,7 @@ class IProductService(Protocol):
 
 class ProductService:
     def get_all(self, request: HttpRequest, sort_by: str, sort_dir: str) -> list:
-        _, where_sql, where_params = resolve_filters(request, PRODUCT_FILTERS)
+        _, where_sql, where_params = resolve_filters(request, get_product_filters())
         return get_all_products(
             where_sql, where_params, order_by_sql(sort_by, sort_dir)
         )
