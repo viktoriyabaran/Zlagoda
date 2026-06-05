@@ -18,4 +18,4 @@ RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "gunicorn zlagoda.wsgi:application --bind 0.0.0.0:${PORT:-8000}"]
+CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn zlagoda.wsgi:application --bind 0.0.0.0:${PORT:-8000}"]
