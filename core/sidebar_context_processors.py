@@ -41,7 +41,6 @@ _NAV = [
         [
             ("View Employees", "employees:employees", (Role.MANAGER,)),
             ("Add Employee", "employees:add-employee", (Role.MANAGER,)),
-            ("My Info", "employees:my-info", (Role.MANAGER, Role.CASHIER)),
         ],
     ),
 ]
