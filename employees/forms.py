@@ -11,43 +11,60 @@ TEXT_INPUT_CLASS = "bg-transparent border border-white/50 rounded-lg px-3 py-2 w
 
 class EmployeeForm(LayoutForm):
     empl_surname = forms.CharField(
-        max_length=50, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+        label="Surname",
+        max_length=50,
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
     empl_name = forms.CharField(
-        max_length=50, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+        label="Name",
+        max_length=50,
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
     empl_patronymic = forms.CharField(
+        label="Patronymic",
         max_length=50,
         required=False,
         widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
     empl_role = forms.ChoiceField(
+        label="Role",
         choices=EmployeeRole.choices,
         widget=forms.Select(attrs={"class": TEXT_INPUT_CLASS}),
     )
     salary = forms.DecimalField(
+        label="Salary",
         max_digits=13,
         decimal_places=4,
         min_value=0,
         widget=forms.NumberInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
     date_of_birth = forms.DateField(
-        widget=forms.DateInput(attrs={"class": TEXT_INPUT_CLASS, "type": "date"})
+        label="Date of Birth",
+        widget=forms.DateInput(attrs={"class": TEXT_INPUT_CLASS, "type": "date"}),
     )
     date_of_start = forms.DateField(
-        widget=forms.DateInput(attrs={"class": TEXT_INPUT_CLASS, "type": "date"})
+        label="Start of Work Date",
+        widget=forms.DateInput(attrs={"class": TEXT_INPUT_CLASS, "type": "date"}),
     )
     phone_number = forms.CharField(
-        max_length=13, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+        label="Phone Number",
+        max_length=13,
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
     city = forms.CharField(
-        max_length=50, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+        label="City",
+        max_length=50,
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
     street = forms.CharField(
-        max_length=50, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+        label="Street",
+        max_length=50,
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
     zip_code = forms.CharField(
-        max_length=9, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+        label="Zip Code",
+        max_length=9,
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
 
     has_user_account = forms.BooleanField(
@@ -61,11 +78,13 @@ class EmployeeForm(LayoutForm):
         ),
     )
     username = forms.CharField(
+        label="Username",
         max_length=50,
         required=False,
         widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
     password = forms.CharField(
+        label="Password",
         max_length=128,
         required=False,
         widget=forms.PasswordInput(attrs={"class": TEXT_INPUT_CLASS}),
