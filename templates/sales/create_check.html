@@ -12,6 +12,17 @@
 
         <form action="{% url 'sales:add-item' %}" method="post" class="flex flex-col gap-3 flex-1">
             {% csrf_token %}
+            <div class="flex flex-col gap-1">
+                <label class="text-white/80 text-[10px] font-semibold tracking-widest uppercase px-1">Customer Card</label>
+                <select name="card_id" onchange="this.form.submit()" class="bg-transparent border border-white/50 rounded-lg px-4 py-2.5 w-full text-white outline-none focus:border-white transition-colors text-sm">
+                    <option value="" {% if not selected_card or selected_card == 'None' %}selected{% endif %} class="text-black bg-white">No Card</option>
+                    {% for card in customer_cards %}
+                    <option value="{{ card.id }}" {% if selected_card|stringformat:"s" == card.id|stringformat:"s" %}selected{% endif %} class="text-black bg-white">
+                        [{{ card.percent }}%] — {{ card.cust_surname }} {{ card.cust_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
             <input
                 type="text"
                 id="product-search"

@@ -45,8 +45,7 @@ class CheckService:
         delete_check_by_id(check_id)
 
     def start_check(self, user_id: int, card_id=None) -> int:
-        user = get_user_by_id(user_id)
-        employee_id = user["employee_id"]
+        employee_id = get_user_by_id(user_id)["employee_id"]
         return create_check(employee_id, card_id)
 
     def add_item(
