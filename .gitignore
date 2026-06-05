@@ -21,10 +21,8 @@ media/
 *.swp
 *.swo
 
-# Tailwind build output
-theme/static/css/dist/
 
-# Django collected static
+# Django collected static (generated at build)
 staticfiles/
 
 # Docker
