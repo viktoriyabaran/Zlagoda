@@ -10,52 +10,74 @@
         <h2 class="text-white text-[24px] font-black tracking-[2px] mb-1 text-center">ADD ITEM</h2>
         <p class="text-white/80 text-[12px] mb-5 text-center">Select product and quantity</p>
 
-        <form action="{% url 'sales:add-item' %}" method="post" class="flex flex-col gap-3 flex-1">
+        <form action="{% url 'sales:add-item' %}" method="post" class="flex flex-col gap-3 flex-1 min-h-0">
             {% csrf_token %}
-            <div class="flex flex-col gap-1">
-                <label class="text-white/80 text-[10px] font-semibold tracking-widest uppercase px-1">Customer Card</label>
-                <select name="card_id" onchange="this.form.submit()" class="bg-transparent border border-white/50 rounded-lg px-4 py-2.5 w-full text-white outline-none focus:border-white transition-colors text-sm">
-                    <option value="" {% if not selected_card or selected_card == 'None' %}selected{% endif %} class="text-black bg-white">No Card</option>
-                    {% for card in customer_cards %}
-                    <option value="{{ card.id }}" {% if selected_card|stringformat:"s" == card.id|stringformat:"s" %}selected{% endif %} class="text-black bg-white">
-                        [{{ card.percent }}%] — {{ card.cust_surname }} {{ card.cust_name }}
-                    </option>
-                    {% endfor %}
-                </select>
+            <div class="relative">
+                <input
+                    type="text"
+                    id="product-search"
+                    placeholder="Search product..."
+                    autocomplete="off"
+                    class="bg-transparent border border-white/50 rounded-lg pl-9 pr-4 py-2.5 w-full text-white outline-none focus:border-white transition-colors text-sm"
+                    oninput="filterProducts(this.value)"
+                >
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-white/45 text-sm"></i>
             </div>
-            <input
-                type="text"
-                id="product-search"
-                placeholder="Search product..."
-                class="bg-transparent border border-white/50 rounded-lg px-4 py-2.5 w-full text-white outline-none focus:border-white transition-colors text-sm"
-                oninput="filterProducts(this.value)"
-            >
-            <select
-                name="upc"
-                id="product-select"
-                class="bg-transparent border border-white/50 rounded-lg px-4 py-2.5 w-full text-white outline-none focus:border-white transition-colors text-sm"
-                size="8"
-            >
+
+            <input type="hidden" name="upc" id="selected-upc">
+            <div id="product-list" class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-1 pr-1 -mr-1 border border-white/25 rounded-lg p-1.5">
                 {% for p in store_products %}
-                <option value="{{ p.UPC }}" data-name="{{ p.product_name|lower }}">
-                    {{ p.product_name }} — {{ p.selling_price }}{% if p.promotional_product %} 🏷{% endif %}
-                </option>
+                <button
+                    type="button"
+                    data-upc="{{ p.UPC }}"
+                    data-name="{{ p.product_name|lower }}"
+                    onclick="selectProduct(this)"
+                    class="product-option text-left px-3 py-2 rounded-lg text-white text-sm flex items-center justify-between gap-2"
+                >
+                    <span class="truncate">{{ p.product_name }}</span>
+                    <span class="flex items-center gap-2 flex-shrink-0 text-white/80">
+                        {% if p.promotional_product %}<i class="fa-solid fa-tag text-[#EABFFF]" title="Promotional"></i>{% endif %}
+                        {{ p.selling_price }}
+                    </span>
+                </button>
+                {% empty %}
+                <p id="product-empty" class="text-white/60 text-sm text-center py-6">No products available.</p>
                 {% endfor %}
-            </select>
-            <input
-                type="number"
-                name="product_number"
-                min="1"
-                value="1"
-                class="bg-transparent border border-white/50 rounded-lg px-4 py-2.5 w-full text-white outline-none focus:border-white transition-colors text-sm"
-            >
+                <p id="product-no-match" class="hidden text-white/60 text-sm text-center py-6">No matching products.</p>
+            </div>
+            <div class="flex flex-col gap-1">
+                <label class="text-white/80 text-[10px] font-semibold tracking-widest uppercase px-1">Quantity</label>
+                <input
+                    type="number"
+                    name="product_number"
+                    min="1"
+                    value="1"
+                    class="bg-transparent border border-white/50 rounded-lg px-4 py-2.5 w-full text-white outline-none focus:border-white transition-colors text-sm"
+                >
+            </div>
             <button type="submit" class="btn">Add to Check</button>
         </form>
     </aside>
 
     <section class="panel glass pt-8 pb-6 px-8 max-[480px]:px-5">
 
-        <h2 class="text-white text-[24px] font-black tracking-[2px] mb-1 text-center">CURRENT CHECK</h2>
+        <h2 class="text-white text-[24px] font-black tracking-[2px] mb-4 text-center">CURRENT CHECK</h2>
+
+        <div class="flex flex-col gap-1 mb-4 px-3">
+            <label class="text-white/80 text-[10px] font-semibold tracking-widest uppercase px-1">Customer Card</label>
+            <select name="card_id"
+                    hx-post="{% url 'sales:apply-card' %}"
+                    hx-target="#check-summary"
+                    hx-swap="outerHTML"
+                    hx-trigger="change"
+                    class="bg-transparent border border-white/50 rounded-lg px-4 py-2.5 w-full text-white outline-none focus:border-white transition-colors text-sm">
+                <option value="" {% if not selected_card or selected_card == 'None' %}selected{% endif %} class="text-black bg-white">No Card</option>
+                {% for card in customer_cards %}
+                <option value="{{ card.id }}" {% if selected_card|stringformat:"s" == card.id|stringformat:"s" %}selected{% endif %} class="text-black bg-white">
+                    {{ card.cust_surname }} {{ card.cust_name }}: {{ card.percent }}%
+                {% endfor %}
+            </select>
+        </div>
 
         <div class="flex-1 min-h-0 overflow-y-auto">
             <table class="w-full text-white text-sm border-separate border-spacing-0">
@@ -75,7 +97,7 @@
                         <td class="px-3 py-2 border-b border-white/10">{{ item.product_number }}</td>
                         <td class="px-3 py-2 border-b border-white/10">{{ item.selling_price }}</td>
                         <td class="px-3 py-2 border-b border-white/10">{{ item.total }}</td>
-                        <td class="px-3 py-2 border-b border-white/10">{% if item.promotional_product %}🏷{% endif %}</td>
+                        <td class="px-3 py-2 border-b border-white/10">{% if item.promotional_product %}<i class="fa-solid fa-tag text-[#EABFFF]" title="Promotional"></i>{% endif %}</td>
                     </tr>
                     {% empty %}
                     <tr>
@@ -86,25 +108,46 @@
             </table>
         </div>
 
-        <div class="mt-4 flex flex-col gap-1 text-white/80 text-sm px-3">
-            <div class="flex justify-between"><span>VAT (20%):</span><span>{{ vat }}</span></div>
-            <div class="flex justify-between font-bold text-white"><span>Total:</span><span>{{ sum_total }}</span></div>
-        </div>
+        {% include "sales/_check_summary.html" %}
 
-        <form action="{% url 'sales:finalize-check' %}" method="post" class="mt-5 flex justify-end">
+        <form action="{% url 'sales:finalize-check' %}" method="post" class="mt-5 flex justify-end gap-3">
             {% csrf_token %}
-            <button type="submit" class="btn w-auto px-10">Finalize Check</button>
+            <button type="submit" name="action" value="new"
+                    class="w-auto px-8 py-2.5 rounded-xl border-2 border-white/40 text-white font-bold text-sm tracking-wider uppercase hover:border-white/70 transition-colors">
+                Finalize &amp; New
+            </button>
+            <button type="submit" name="action" value="list" class="btn w-auto px-10">Finalize Check</button>
         </form>
     </section>
 </main>
 
+<style>
+    .product-option { transition: background 0.15s, box-shadow 0.15s; cursor: pointer; }
+    .product-option:hover { background: rgba(255, 255, 255, 0.10); }
+    .product-option.is-selected {
+        background: rgba(255, 255, 255, 0.20);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+    }
+</style>
 <script>
-function filterProducts(query) {
-    const select = document.getElementById('product-select');
-    const q = query.toLowerCase();
-    Array.from(select.options).forEach(opt => {
-        opt.hidden = q && !opt.dataset.name.includes(q);
+function selectProduct(btn) {
+    document.querySelectorAll('#product-list .product-option').forEach(function (o) {
+        o.classList.remove('is-selected');
     });
+    btn.classList.add('is-selected');
+    document.getElementById('selected-upc').value = btn.dataset.upc;
+}
+
+function filterProducts(query) {
+    const q = query.trim().toLowerCase();
+    let visible = 0;
+    document.querySelectorAll('#product-list .product-option').forEach(function (opt) {
+        const match = !q || opt.dataset.name.includes(q);
+        opt.style.display = match ? '' : 'none';
+        if (match) visible++;
+    });
+    const noMatch = document.getElementById('product-no-match');
+    if (noMatch) noMatch.classList.toggle('hidden', visible > 0);
 }
 </script>
 {% endblock %}

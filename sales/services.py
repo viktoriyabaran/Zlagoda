@@ -2,6 +2,7 @@ from decimal import Decimal
 from typing import Protocol
 
 from core.repository import get_user_by_id
+from customers.repository import get_all_customers
 from sales.repository import (
     add_sale_to_check,
     create_check,
@@ -53,13 +54,36 @@ class CheckService:
     ) -> None:
         add_sale_to_check(check_id, upc, product_number, selling_price)
 
-    def finalize_check(self, check_id: int, items: list) -> None:
-        sum_total = sum(
-            Decimal(str(item["selling_price"])) * item["product_number"]
-            for item in items
+    def resolve_discount_percent(self, card_id) -> int:
+        clean = str(card_id).strip() if card_id else ""
+        if not clean or clean == "None":
+            return 0
+        card = next(
+            (c for c in get_all_customers() if str(c["id"]) == clean), None
         )
-        vat = (sum_total * Decimal("0.2")).quantize(Decimal("0.0001"))
-        update_check_totals(check_id, sum_total, vat)
+        return int(card["percent"] or 0) if card else 0
+
+    def compute_totals(self, items: list, discount_percent: int) -> dict:
+        cents = Decimal("0.0001")
+        raw_total = sum(
+            (
+                Decimal(str(i["selling_price"])) * i["product_number"]
+                for i in items
+            ),
+            Decimal("0"),
+        ).quantize(cents)
+        discount_amount = (
+            raw_total * Decimal(discount_percent) / Decimal("100")
+        ).quantize(cents)
+        sum_total = raw_total - discount_amount
+        vat = (sum_total * Decimal("0.2")).quantize(cents)
+        return {
+            "raw_total": raw_total,
+            "discount_percent": discount_percent,
+            "discount_amount": discount_amount,
+            "sum_total": sum_total,
+            "vat": vat,
+        }
 
     def get_total_units_sold(self, product_id: int, date_from: str, date_to: str) -> int:
         result = get_total_units_sold(product_id, date_from, date_to)

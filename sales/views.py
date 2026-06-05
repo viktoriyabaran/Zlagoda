@@ -11,6 +11,7 @@ from employees.repository import get_all_cashiers
 from products.repository import get_all_store_products, get_store_product_by_upc
 from customers.repository import get_all_customers
 
+from .repository import update_check_totals
 from .services import CheckService
 
 
@@ -142,34 +143,22 @@ class AddItemToCheckView(View):
         items = request.session.get("current_check_items", [])
         for item in items:
             item["total"] = float(item["selling_price"]) * item["product_number"]
-        store_products = get_all_store_products()
-        customer_cards = get_all_customers()
 
         session_card = request.session.get("current_check_card")
         selected_card = str(session_card).strip() if session_card else None
 
-        raw_total = sum(float(i["selling_price"]) * i["product_number"] for i in items)
-        discount_percent = 0
-        if selected_card and selected_card != "None":
-            for c in customer_cards:
-                db_card_id = str(c.get("id") or "").strip()
+        discount_percent = self.check_service.resolve_discount_percent(selected_card)
+        totals = self.check_service.compute_totals(items, discount_percent)
 
-                if db_card_id == selected_card:
-                    discount_percent = int(c.get("percent") or 0)
-                    break
-
-        sum_total = raw_total * (1 - discount_percent / 100)
-        vat = round(sum_total * 0.2, 4)
         return render(
             request,
             "sales/create_check.html",
             {
                 "items": items,
-                "store_products": store_products,
-                "customer_cards": customer_cards,
-                "sum_total": sum_total,
-                "vat": vat,
+                "store_products": get_all_store_products(),
+                "customer_cards": get_all_customers(),
                 "selected_card": selected_card,
+                **totals,
             },
         )
 
@@ -178,7 +167,8 @@ class AddItemToCheckView(View):
         product_number = int(request.POST.get("product_number", 1))
 
         card_id = request.POST.get("card_id")
-        request.session["current_check_card"] = card_id if card_id else None
+        if card_id is not None:
+            request.session["current_check_card"] = card_id if card_id else None
 
         product = get_store_product_by_upc(upc)
         if not product:
@@ -199,6 +189,23 @@ class AddItemToCheckView(View):
 
 
 @role_required(Role.CASHIER)
+class ApplyCardView(View):
+    """Apply / clear the customer card for the in-progress check and return the
+    refreshed totals (htmx partial) — no full-page reload."""
+
+    check_service = CheckService()
+
+    def post(self, request):
+        card_id = request.POST.get("card_id")
+        request.session["current_check_card"] = card_id if card_id else None
+
+        items = request.session.get("current_check_items", [])
+        discount_percent = self.check_service.resolve_discount_percent(card_id)
+        totals = self.check_service.compute_totals(items, discount_percent)
+        return render(request, "sales/_check_summary.html", totals)
+
+
+@role_required(Role.CASHIER)
 class FinalizeCheckView(View):
     check_service = CheckService()
 
@@ -216,27 +223,16 @@ class FinalizeCheckView(View):
                 check_id, item["upc"], item["product_number"], item["selling_price"]
             )
 
-        raw_total = sum(float(i["selling_price"]) * i["product_number"] for i in items)
-        discount_percent = 0
-        clean_card_id = str(card_id).strip() if card_id else None
-
-        if clean_card_id and clean_card_id != "None" and clean_card_id != "":
-            customer_cards = get_all_customers()
-            current_card = next((c for c in customer_cards if str(c["id"]) == str(card_id)), None)
-
-            if current_card and "percent" in current_card:
-                discount_percent = int(current_card["percent"] or 0)
-
-        sum_total = raw_total * (1 - discount_percent / 100)
-        vat = round(sum_total * 0.2, 4)
-
-        from .repository import update_check_totals
-        update_check_totals(check_id, sum_total, vat)
+        discount_percent = self.check_service.resolve_discount_percent(card_id)
+        totals = self.check_service.compute_totals(items, discount_percent)
+        update_check_totals(check_id, totals["sum_total"], totals["vat"])
 
         request.session.pop("current_check_id", None)
         request.session.pop("current_check_items", None)
         request.session.pop("current_check_card", None)
 
+        if request.POST.get("action") == "new":
+            return redirect("sales:add-item")
         return redirect("sales:checks")
 
 

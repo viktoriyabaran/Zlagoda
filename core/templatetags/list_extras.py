@@ -44,3 +44,13 @@ def visible_actions(actions, role):
 @register.simple_tag
 def action_url(action, row, row_id_key):
     return reverse(action["url_name"], args=[row[row_id_key]])
+
+
+@register.simple_tag
+def block_reason(action, row):
+    """Pre-computed reason a row's delete is blocked, or "" if deletable / the
+    action declares no block_key."""
+    key = action.get("block_key")
+    if not key:
+        return ""
+    return row.get(key) or ""

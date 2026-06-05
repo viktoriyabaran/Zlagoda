@@ -1,0 +1,16 @@
+<div id="check-summary" class="mt-4 flex flex-col gap-1 text-white/80 text-sm px-3">
+    <div class="flex justify-between">
+        <span>Subtotal (no discount):</span><span>{{ raw_total }}</span>
+    </div>
+    {% if discount_percent %}
+    <div class="flex justify-between text-[#EABFFF]">
+        <span>Discount ({{ discount_percent }}%):</span><span>−{{ discount_amount }}</span>
+    </div>
+    {% endif %}
+    <div class="flex justify-between">
+        <span>incl. VAT (20%):</span><span>{{ vat }}</span>
+    </div>
+    <div class="flex justify-between font-bold text-white text-base border-t border-white/15 pt-1.5 mt-1.5">
+        <span>Total:</span><span>{{ sum_total }}</span>
+    </div>
+</div>
