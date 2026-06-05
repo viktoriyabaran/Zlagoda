@@ -92,7 +92,7 @@ def get_product_by_id(product_id: int) -> dict | None:
 
 def update_product(product_id: int, data: dict):
     execute_write(
-        "UPDATE products_product SET category_id = %s, product_name = %s, anufacturer = %s, characteristics = %s WHERE id = %s",
+        "UPDATE products_product SET category_id = %s, product_name = %s, manufacturer = %s, characteristics = %s WHERE id = %s",
         [data["category"], data["product_name"], data["manufacturer"], data["characteristics"], product_id],
     )
 
