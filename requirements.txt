@@ -4,5 +4,10 @@ python-dotenv>=1.0
 django-htmx>=1.17
 django-tailwind[reload]>=4.0
 
+# Railway deploy
+gunicorn>=21.0
+whitenoise>=6.0
+dj-database-url>=2.0
+
 # Dev tools
 ruff>=0.4
