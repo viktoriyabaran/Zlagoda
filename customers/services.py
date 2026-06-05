@@ -3,12 +3,22 @@ from typing import Protocol
 from core.query_helpers import order_by_sql
 
 from .repository import (
+    count_checks_for_customer,
     create_customer,
     get_all_customers,
+    get_check_counts_by_customer,
     get_customer_by_id,
     update_customer,
     delete_customer,
 )
+
+
+def customer_block_reason(count: int) -> str:
+    return (
+        f"Cannot delete customer: their card is used on {count} check(s)."
+        if count
+        else ""
+    )
 
 
 class ICustomerService(Protocol):
@@ -41,4 +51,15 @@ class CustomerService:
         return update_customer(id, data)
 
     def delete(self, customer_id: int) -> None:
+        reason = customer_block_reason(count_checks_for_customer(customer_id))
+        if reason:
+            raise ValueError(reason)
         delete_customer(customer_id)
+
+    def annotate_deletable(self, rows: list) -> list:
+        counts = get_check_counts_by_customer()
+        for row in rows:
+            row["delete_block_reason"] = customer_block_reason(
+                counts.get(row["id"], 0)
+            )
+        return rows

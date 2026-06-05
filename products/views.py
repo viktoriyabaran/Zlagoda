@@ -86,6 +86,7 @@ class GetCategoriesView(View):
             request, CATEGORY_SORTABLE, default="category_name"
         )
         rows = self.category_service.get_all(sort_by, sort_dir)
+        self.category_service.annotate_deletable(rows)
         return render(
             request,
             "home.html",
@@ -115,6 +116,7 @@ class GetCategoriesView(View):
                             "method": "post",
                             "confirm": "Delete this category?",
                             "roles": [Role.MANAGER],
+                            "block_key": "delete_block_reason",
                         },
                     ],
                     "row_id_key": "id",
@@ -186,6 +188,8 @@ class GetProductsView(View):
             else:
                 row["units_sold"] = "-"
 
+        self.product_service.annotate_deletable(rows)
+
         columns = PRODUCT_COLUMNS + [
             {"key": "units_sold", "label": "Sold in Period", "sortable": False}
         ]
@@ -221,6 +225,7 @@ class GetProductsView(View):
                             "method": "post",
                             "confirm": "Delete this product?",
                             "roles": [Role.MANAGER],
+                            "block_key": "delete_block_reason",
                         },
                     ],
                 },
@@ -278,8 +283,11 @@ class DeleteProductView(View):
     product_service = ProductService()
 
     def post(self, request, product_id):
-        self.product_service.delete(product_id)
-        return HttpResponse("")
+        try:
+            self.product_service.delete(product_id)
+            return HttpResponse("")
+        except ValueError as e:
+            return HttpResponse(str(e), status=409)
 
 
 @role_required(Role.MANAGER)
@@ -322,6 +330,7 @@ class GetStoreProductsView(View):
             request, STORE_PRODUCT_SORTABLE, default="products_number"
         )
         rows = self.store_product_list_service.get_all(request, sort_by, sort_dir)
+        self.store_product_list_service.annotate_deletable(rows)
 
         return render(
             request,
@@ -354,6 +363,7 @@ class GetStoreProductsView(View):
                             "method": "post",
                             "confirm": "Delete this store product?",
                             "roles": [Role.MANAGER],
+                            "block_key": "delete_block_reason",
                         },
                     ],
                 },
@@ -425,8 +435,11 @@ class DeleteStoreProductView(View):
     store_product_service = StoreProductService()
 
     def post(self, request, upc):
-        self.store_product_service.delete(upc)
-        return HttpResponse("")
+        try:
+            self.store_product_service.delete(upc)
+            return HttpResponse("")
+        except ValueError as e:
+            return HttpResponse(str(e), status=409)
 
 
 @role_required(Role.MANAGER)

@@ -57,6 +57,22 @@ def update_customer(customer_card_id: int, data: dict):
         ],
     )
 
+def count_checks_for_customer(customer_id: int) -> int:
+    result = execute_single(
+        "SELECT COUNT(*) as count FROM sales_check WHERE card_id = %s",
+        [customer_id],
+    )
+    return result["count"] if result else 0
+
+
+def get_check_counts_by_customer() -> dict:
+    rows = execute_query(
+        "SELECT card_id, COUNT(*) AS count FROM sales_check "
+        "WHERE card_id IS NOT NULL GROUP BY card_id"
+    )
+    return {r["card_id"]: r["count"] for r in rows}
+
+
 def delete_customer(customer_id: int):
     execute_write(
         "DELETE FROM customers_customercard WHERE id = %s", [customer_id]

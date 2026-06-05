@@ -8,13 +8,23 @@ from core.query_helpers import order_by_sql, resolve_filters
 from core.repository import create_user
 from employees.repository import (
     EMPLOYEE_FILTERS,
+    count_checks_for_employee,
     create_employee,
     delete_employee,
     get_all_employees,
+    get_check_counts_by_employee,
     get_employee_by_id,
     get_employee_by_user_id,
     update_employee,
 )
+
+
+def employee_block_reason(count: int) -> str:
+    return (
+        f"Cannot delete employee: they are linked to {count} check(s)."
+        if count
+        else ""
+    )
 
 
 class IEmployeeService(Protocol):
@@ -52,4 +62,15 @@ class EmployeeService:
         update_employee(employee_id, data)
 
     def delete(self, employee_id: int) -> None:
+        reason = employee_block_reason(count_checks_for_employee(employee_id))
+        if reason:
+            raise ValueError(reason)
         delete_employee(employee_id)
+
+    def annotate_deletable(self, rows: list) -> list:
+        counts = get_check_counts_by_employee()
+        for row in rows:
+            row["delete_block_reason"] = employee_block_reason(
+                counts.get(row["id"], 0)
+            )
+        return rows

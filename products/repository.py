@@ -105,16 +105,22 @@ def update_product(product_id: int, data: dict):
     )
 
 
-def delete_product(product_id: int):
-    execute_write(
-        """DELETE FROM sales_sale WHERE "UPC" IN (
-            SELECT "UPC" FROM products_storeproduct WHERE product_id = %s
-        )""",
+def count_store_products_for_product(product_id: int) -> int:
+    result = execute_single(
+        "SELECT COUNT(*) as count FROM products_storeproduct WHERE product_id = %s",
         [product_id],
     )
-    execute_write(
-        "DELETE FROM products_storeproduct WHERE product_id = %s", [product_id]
+    return result["count"] if result else 0
+
+
+def get_store_product_counts_by_product() -> dict:
+    rows = execute_query(
+        "SELECT product_id, COUNT(*) AS count FROM products_storeproduct GROUP BY product_id"
     )
+    return {r["product_id"]: r["count"] for r in rows}
+
+
+def delete_product(product_id: int):
     execute_write("DELETE FROM products_product WHERE id = %s", [product_id])
 
 
@@ -179,8 +185,22 @@ def update_store_product(upc: str, data: dict):
     )
 
 
+def count_sales_for_store_product(upc: str) -> int:
+    result = execute_single(
+        'SELECT COUNT(*) as count FROM sales_sale WHERE "UPC" = %s',
+        [upc],
+    )
+    return result["count"] if result else 0
+
+
+def get_sale_counts_by_store_product() -> dict:
+    rows = execute_query(
+        'SELECT "UPC", COUNT(*) AS count FROM sales_sale GROUP BY "UPC"'
+    )
+    return {r["UPC"]: r["count"] for r in rows}
+
+
 def delete_store_product(upc: str):
-    execute_write('DELETE FROM sales_sale WHERE "UPC" = %s', [upc])
     execute_write('DELETE FROM products_storeproduct WHERE "UPC" = %s', [upc])
 
 
@@ -223,3 +243,10 @@ def count_products_in_category(category_id: int) -> int:
         [category_id],
     )
     return result["count"] if result else 0
+
+
+def get_product_counts_by_category() -> dict:
+    rows = execute_query(
+        "SELECT category_id, COUNT(*) AS count FROM products_product GROUP BY category_id"
+    )
+    return {r["category_id"]: r["count"] for r in rows}

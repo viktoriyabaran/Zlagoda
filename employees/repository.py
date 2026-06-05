@@ -96,6 +96,21 @@ def update_employee(employee_id: int, data: dict):
     )
 
 
+def count_checks_for_employee(employee_id: int) -> int:
+    result = execute_single(
+        "SELECT COUNT(*) as count FROM sales_check WHERE employee_id = %s",
+        [employee_id],
+    )
+    return result["count"] if result else 0
+
+
+def get_check_counts_by_employee() -> dict:
+    rows = execute_query(
+        "SELECT employee_id, COUNT(*) AS count FROM sales_check GROUP BY employee_id"
+    )
+    return {r["employee_id"]: r["count"] for r in rows}
+
+
 def delete_employee(employee_id: int):
     execute_write("DELETE FROM employees_employee WHERE id = %s", [employee_id])
 

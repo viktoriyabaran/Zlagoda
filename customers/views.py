@@ -60,6 +60,7 @@ class GetCustomersView(View):
             request, CUSTOMER_SORTABLE, default="cust_surname"
         )
         rows = self.customer_service.get_all(sort_by, sort_dir)
+        self.customer_service.annotate_deletable(rows)
         return render(
             request,
             "home.html",
@@ -87,6 +88,7 @@ class GetCustomersView(View):
                             "method": "post",
                             "confirm": "Delete this customer?",
                             "roles": [Role.MANAGER],
+                            "block_key": "delete_block_reason",
                         },
                     ],
                 },
@@ -152,5 +154,8 @@ class DeleteCustomerView(View):
     customer_service = CustomerService()
 
     def post(self, request, customer_id):
-        self.customer_service.delete(customer_id)
-        return HttpResponse("")
+        try:
+            self.customer_service.delete(customer_id)
+            return HttpResponse("")
+        except ValueError as e:
+            return HttpResponse(str(e), status=409)

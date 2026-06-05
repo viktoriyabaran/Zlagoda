@@ -9,6 +9,8 @@ from products.repository import (
     STORE_PRODUCT_FILTERS,
     get_product_filters,
     count_products_in_category,
+    count_sales_for_store_product,
+    count_store_products_for_product,
     create_category,
     create_product,
     create_store_product,
@@ -20,13 +22,36 @@ from products.repository import (
     get_all_store_products,
     get_category_by_id,
     get_product_by_id,
+    get_product_counts_by_category,
+    get_sale_counts_by_store_product,
     get_store_product_by_upc,
+    get_store_product_counts_by_product,
     update_category,
     update_product,
     update_store_product,
 )
 
 PROMO_DISCOUNT = Decimal("0.8")
+
+
+def category_block_reason(count: int) -> str:
+    return f"Cannot delete category: it has {count} product(s)." if count else ""
+
+
+def product_block_reason(count: int) -> str:
+    return (
+        f"Cannot delete product: it still has {count} store product(s)."
+        if count
+        else ""
+    )
+
+
+def store_product_block_reason(count: int) -> str:
+    return (
+        f"Cannot delete store product: it appears in {count} sale(s)."
+        if count
+        else ""
+    )
 
 
 def _create_store_product_with_optional_promo(data: dict) -> None:
@@ -69,10 +94,18 @@ class CategoryService:
         create_category(category_name)
 
     def delete(self, category_id: int) -> None:
-        count = count_products_in_category(category_id)
-        if count > 0:
-            raise ValueError(f"Cannot delete category: it has {count} product(s).")
+        reason = category_block_reason(count_products_in_category(category_id))
+        if reason:
+            raise ValueError(reason)
         delete_category(category_id)
+
+    def annotate_deletable(self, rows: list) -> list:
+        counts = get_product_counts_by_category()
+        for row in rows:
+            row["delete_block_reason"] = category_block_reason(
+                counts.get(row["id"], 0)
+            )
+        return rows
 
     def get_by_id(self, category_id: int) -> dict | None:
         return get_category_by_id(category_id)
@@ -110,7 +143,18 @@ class ProductService:
         update_product(product_id, data)
 
     def delete(self, product_id: int) -> None:
+        reason = product_block_reason(count_store_products_for_product(product_id))
+        if reason:
+            raise ValueError(reason)
         delete_product(product_id)
+
+    def annotate_deletable(self, rows: list) -> list:
+        counts = get_store_product_counts_by_product()
+        for row in rows:
+            row["delete_block_reason"] = product_block_reason(
+                counts.get(row["id"], 0)
+            )
+        return rows
 
 
 class IStoreProductService(Protocol):
@@ -129,6 +173,9 @@ class StoreProductService:
         update_store_product(upc, data)
 
     def delete(self, upc: str) -> None:
+        reason = store_product_block_reason(count_sales_for_store_product(upc))
+        if reason:
+            raise ValueError(reason)
         delete_store_product(upc)
 
 
@@ -148,3 +195,11 @@ class StoreProductListService:
             where_params=where_params,
             order_by=order_by_sql(sort_by, sort_dir),
         )
+
+    def annotate_deletable(self, rows: list) -> list:
+        counts = get_sale_counts_by_store_product()
+        for row in rows:
+            row["delete_block_reason"] = store_product_block_reason(
+                counts.get(row["UPC"], 0)
+            )
+        return rows

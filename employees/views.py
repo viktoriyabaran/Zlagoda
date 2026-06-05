@@ -89,6 +89,7 @@ class GetEmployeesView(View):
             request, EMPLOYEE_SORTABLE, default="empl_surname"
         )
         rows = self.employee_service.get_all(request, sort_by, sort_dir)
+        self.employee_service.annotate_deletable(rows)
         return render(
             request,
             "home.html",
@@ -116,6 +117,7 @@ class GetEmployeesView(View):
                             "icon": "fa-solid fa-trash",
                             "method": "post",
                             "confirm": "Delete this employee?",
+                            "block_key": "delete_block_reason",
                         },
                     ],
                 },
@@ -165,5 +167,8 @@ class DeleteEmployeeView(View):
     employee_service = EmployeeService()
 
     def post(self, request, employee_id):
-        self.employee_service.delete(employee_id)
-        return HttpResponse("")
+        try:
+            self.employee_service.delete(employee_id)
+            return HttpResponse("")
+        except ValueError as e:
+            return HttpResponse(str(e), status=409)
