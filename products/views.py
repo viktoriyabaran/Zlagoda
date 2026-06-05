@@ -242,6 +242,7 @@ class EditProductView(View):
             initial={
                 "category": product["category_id"],
                 "product_name": product["product_name"],
+                "manufacturer": product["manufacturer"],
                 "characteristics": product["characteristics"],
             }
         )

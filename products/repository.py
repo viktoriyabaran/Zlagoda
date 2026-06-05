@@ -69,10 +69,11 @@ def get_all_products(where_sql="", where_params=(), order_by=""):
 
 def create_product(data: dict) -> int:
     product_id = execute_insert_returning(
-        "INSERT INTO products_product (category_id, product_name, characteristics) VALUES (%s, %s, %s) RETURNING id",
+        "INSERT INTO products_product (category_id, product_name, manufacturer, characteristics) VALUES (%s, %s, %s, %s) RETURNING id",
         [
             data["category"],
             data["product_name"],
+            data["manufacturer"],
             data["characteristics"],
         ],
     )
@@ -91,8 +92,8 @@ def get_product_by_id(product_id: int) -> dict | None:
 
 def update_product(product_id: int, data: dict):
     execute_write(
-        "UPDATE products_product SET category_id = %s, product_name = %s, characteristics = %s WHERE id = %s",
-        [data["category"], data["product_name"], data["characteristics"], product_id],
+        "UPDATE products_product SET category_id = %s, product_name = %s, anufacturer = %s, characteristics = %s WHERE id = %s",
+        [data["category"], data["product_name"], data["manufacturer"], data["characteristics"], product_id],
     )
 
 

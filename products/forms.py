@@ -25,6 +25,9 @@ class ProductForm(LayoutForm):
     product_name = forms.CharField(
         max_length=50, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
     )
+    manufacturer = forms.CharField(
+        max_length=50, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+    )
     characteristics = forms.CharField(
         max_length=100, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
     )
@@ -132,6 +135,9 @@ class EditProductForm(LayoutForm):
         choices=[], widget=forms.Select(attrs={"class": TEXT_INPUT_CLASS})
     )
     product_name = forms.CharField(
+        max_length=50, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
+    )
+    manufacturer = forms.CharField(
         max_length=50, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
     )
     characteristics = forms.CharField(
