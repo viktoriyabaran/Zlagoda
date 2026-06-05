@@ -43,6 +43,7 @@ INTERNAL_IPS = ["127.0.0.1"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "django.middleware.gzip.GZipMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -56,11 +57,14 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "zlagoda.urls"
 
+_template_loaders = [
+    "django.template.loaders.filesystem.Loader",
+    "django.template.loaders.app_directories.Loader",
+]
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [BASE_DIR / "templates"],
-        "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -69,14 +73,19 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "core.sidebar_context_processors.sidebar_nav",
             ],
+            # In production, cache parsed templates instead of re-reading them
+            # on every request. In dev, use plain loaders so edits hot-reload.
+            "loaders": (
+                _template_loaders
+                if DEBUG
+                else [("django.template.loaders.cached.Loader", _template_loaders)]
+            ),
         },
     },
 ]
 
 WSGI_APPLICATION = "zlagoda.wsgi.application"
 
-# In production (Railway) a single DATABASE_URL is provided; locally we fall
-# back to the discrete POSTGRES_* vars used by docker-compose.
 DATABASE_URL = os.getenv("DATABASE_URL")
 if DATABASE_URL:
     import dj_database_url
