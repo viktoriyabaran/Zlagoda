@@ -317,6 +317,10 @@ class GetCheckDetailView(View):
                     "Viewing this resource is not allowed for you."
                 )
         items = self.check_service.get_items(check_id)
+
+        for item in items:
+            item["subtotal"] = "{:.4f}".format(float(item["selling_price"]) * item["product_number"])
+
         return render(
             request,
             "sales/check_detail.html",
