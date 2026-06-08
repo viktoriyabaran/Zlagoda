@@ -10,7 +10,6 @@ from sales.repository import (
     get_all_checks,
     get_check_by_id,
     get_check_items,
-    update_check_totals,
     get_total_units_sold,
 )
 
@@ -58,18 +57,13 @@ class CheckService:
         clean = str(card_id).strip() if card_id else ""
         if not clean or clean == "None":
             return 0
-        card = next(
-            (c for c in get_all_customers() if str(c["id"]) == clean), None
-        )
+        card = next((c for c in get_all_customers() if str(c["id"]) == clean), None)
         return int(card["percent"] or 0) if card else 0
 
     def compute_totals(self, items: list, discount_percent: int) -> dict:
         cents = Decimal("0.0001")
         raw_total = sum(
-            (
-                Decimal(str(i["selling_price"])) * i["product_number"]
-                for i in items
-            ),
+            (Decimal(str(i["selling_price"])) * i["quantity"] for i in items),
             Decimal("0"),
         ).quantize(cents)
         discount_amount = (
@@ -85,6 +79,8 @@ class CheckService:
             "vat": vat,
         }
 
-    def get_total_units_sold(self, product_id: int, date_from: str, date_to: str) -> int:
+    def get_total_units_sold(
+        self, product_id: int, date_from: str, date_to: str
+    ) -> int:
         result = get_total_units_sold(product_id, date_from, date_to)
         return result["total_units"] or 0 if result else 0

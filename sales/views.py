@@ -7,9 +7,13 @@ from django.views import View
 from core.decorators import role_required
 from core.repository import get_user_by_id
 from core.roles import Role
-from employees.repository import get_all_cashiers
-from products.repository import get_all_store_products, get_store_product_by_upc
 from customers.repository import get_all_customers
+from employees.repository import get_all_cashiers
+from products.repository import (
+    decrement_store_product_number,
+    get_all_store_products,
+    get_store_product_by_upc,
+)
 
 from .repository import update_check_totals
 from .services import CheckService
@@ -54,7 +58,11 @@ class GetChecksView(View):
             {"key": "date_to", "label": "To date", "type": "date"},
         ]
         actions = [
-            {"label": "View", "url_name": "sales:check-detail", "icon": "fa-solid fa-eye"},
+            {
+                "label": "View",
+                "url_name": "sales:check-detail",
+                "icon": "fa-solid fa-eye",
+            },
         ]
         if not is_cashier:
             cashiers = get_all_cashiers()
@@ -135,64 +143,123 @@ class CreateCheckView(View):
         return redirect("sales:add-item")
 
 
+def render_check_page(request):
+    check_service = CheckService()
+    items = request.session.get("current_check_items", [])
+    in_check = {}
+    for item in items:
+        item["total"] = float(item["selling_price"]) * item["quantity"]
+        in_check[item["upc"]] = in_check.get(item["upc"], 0) + item["quantity"]
+
+    store_products = get_all_store_products()
+    for p in store_products:
+        p["available"] = p["products_number"] - in_check.get(p["UPC"], 0)
+
+    session_card = request.session.get("current_check_card")
+    selected_card = str(session_card).strip() if session_card else None
+
+    discount_percent = check_service.resolve_discount_percent(selected_card)
+    totals = check_service.compute_totals(items, discount_percent)
+
+    return render(
+        request,
+        "sales/create_check.html",
+        {
+            "items": items,
+            "store_products": store_products,
+            "customer_cards": get_all_customers(),
+            "selected_card": selected_card,
+            **totals,
+        },
+    )
+
+
 @role_required(Role.CASHIER)
 class AddItemToCheckView(View):
     check_service = CheckService()
 
     def get(self, request):
-        items = request.session.get("current_check_items", [])
-        for item in items:
-            item["total"] = float(item["selling_price"]) * item["product_number"]
-
-        session_card = request.session.get("current_check_card")
-        selected_card = str(session_card).strip() if session_card else None
-
-        discount_percent = self.check_service.resolve_discount_percent(selected_card)
-        totals = self.check_service.compute_totals(items, discount_percent)
-
-        return render(
-            request,
-            "sales/create_check.html",
-            {
-                "items": items,
-                "store_products": get_all_store_products(),
-                "customer_cards": get_all_customers(),
-                "selected_card": selected_card,
-                **totals,
-            },
-        )
+        return render_check_page(request)
 
     def post(self, request):
         upc = request.POST.get("upc")
-        product_number = int(request.POST.get("product_number", 1))
+        quantity = int(request.POST.get("quantity", 1))
 
         card_id = request.POST.get("card_id")
         if card_id is not None:
             request.session["current_check_card"] = card_id if card_id else None
 
         product = get_store_product_by_upc(upc)
-        if not product:
+        if not product or quantity < 1:
             return redirect("sales:add-item")
 
         items = request.session.get("current_check_items", [])
-        items.append(
-            {
-                "upc": upc,
-                "product_name": product["product_name"],
-                "selling_price": str(product["selling_price"]),
-                "product_number": product_number,
-                "promotional_product": product["promotional_product"],
-            }
-        )
+        existing = next((i for i in items if i["upc"] == upc), None)
+        already_in_check = existing["quantity"] if existing else 0
+
+        available = product["products_number"] - already_in_check
+        if quantity > available:
+            return HttpResponse(
+                f"Not enough stock: only {available} more unit(s) of "
+                f"{product['product_name']} available.",
+                status=409,
+            )
+
+        if existing:
+            existing["quantity"] += quantity
+        else:
+            items.append(
+                {
+                    "upc": upc,
+                    "product_name": product["product_name"],
+                    "selling_price": str(product["selling_price"]),
+                    "quantity": quantity,
+                    "promotional_product": product["promotional_product"],
+                }
+            )
         request.session["current_check_items"] = items
-        return redirect("sales:add-item")
+        return render_check_page(request)
+
+
+@role_required(Role.CASHIER)
+class UpdateCheckItemView(View):
+    def post(self, request):
+        upc = request.POST.get("upc")
+        quantity = int(request.POST.get("quantity", 1))
+        items = request.session.get("current_check_items", [])
+        item = next((i for i in items if i["upc"] == upc), None)
+        if not item:
+            return render_check_page(request)
+
+        if quantity < 1:
+            items = [i for i in items if i["upc"] != upc]
+            request.session["current_check_items"] = items
+            return render_check_page(request)
+
+        product = get_store_product_by_upc(upc)
+        if product and quantity > product["products_number"]:
+            return HttpResponse(
+                f"Not enough stock: only {product['products_number']} unit(s) of "
+                f"{product['product_name']} available.",
+                status=409,
+            )
+
+        item["quantity"] = quantity
+        request.session["current_check_items"] = items
+        return render_check_page(request)
+
+
+@role_required(Role.CASHIER)
+class RemoveCheckItemView(View):
+    def post(self, request):
+        upc = request.POST.get("upc")
+        items = request.session.get("current_check_items", [])
+        request.session["current_check_items"] = [i for i in items if i["upc"] != upc]
+        return render_check_page(request)
 
 
 @role_required(Role.CASHIER)
 class ApplyCardView(View):
-    """Apply / clear the customer card for the in-progress check and return the
-    refreshed totals (htmx partial) — no full-page reload."""
-
     check_service = CheckService()
 
     def post(self, request):
@@ -220,8 +287,9 @@ class FinalizeCheckView(View):
 
         for item in items:
             self.check_service.add_item(
-                check_id, item["upc"], item["product_number"], item["selling_price"]
+                check_id, item["upc"], item["quantity"], item["selling_price"]
             )
+            decrement_store_product_number(item["upc"], item["quantity"])
 
         discount_percent = self.check_service.resolve_discount_percent(card_id)
         totals = self.check_service.compute_totals(items, discount_percent)

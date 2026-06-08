@@ -5,6 +5,7 @@ from core.db import (
     execute_write,
 )
 
+
 def get_product_filters():
     categories = get_all_categories(order_by=" ORDER BY category_name")
     return [
@@ -21,6 +22,7 @@ def get_product_filters():
         {"key": "date_from", "label": "From", "type": "date"},
         {"key": "date_to", "label": "To", "type": "date"},
     ]
+
 
 STORE_PRODUCT_FILTERS = [
     {
@@ -101,7 +103,13 @@ def get_product_by_id(product_id: int) -> dict | None:
 def update_product(product_id: int, data: dict):
     execute_write(
         "UPDATE products_product SET category_id = %s, product_name = %s, manufacturer = %s, characteristics = %s WHERE id = %s",
-        [data["category"], data["product_name"], data["manufacturer"], data["characteristics"], product_id],
+        [
+            data["category"],
+            data["product_name"],
+            data["manufacturer"],
+            data["characteristics"],
+            product_id,
+        ],
     )
 
 
@@ -182,6 +190,15 @@ def update_store_product(upc: str, data: dict):
             data["promotional_product"],
             upc,
         ],
+    )
+
+
+def decrement_store_product_number(upc: str, quantity: int):
+    execute_write(
+        """UPDATE products_storeproduct
+           SET products_number = products_number - %s
+           WHERE "UPC" = %s""",
+        [quantity, upc],
     )
 
 

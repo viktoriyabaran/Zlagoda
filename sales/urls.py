@@ -8,6 +8,8 @@ from .views import (
     FinalizeCheckView,
     GetCheckDetailView,
     GetChecksView,
+    RemoveCheckItemView,
+    UpdateCheckItemView,
 )
 
 app_name = "sales"
@@ -20,6 +22,8 @@ urlpatterns = [
     ),
     path("checks/create/", CreateCheckView.as_view(), name="create-check"),
     path("checks/add-item/", AddItemToCheckView.as_view(), name="add-item"),
+    path("checks/update-item/", UpdateCheckItemView.as_view(), name="update-item"),
+    path("checks/remove-item/", RemoveCheckItemView.as_view(), name="remove-item"),
     path("checks/apply-card/", ApplyCardView.as_view(), name="apply-card"),
     path("checks/finalize/", FinalizeCheckView.as_view(), name="finalize-check"),
 ]

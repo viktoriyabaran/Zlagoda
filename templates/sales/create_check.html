@@ -3,14 +3,19 @@
 {% block title %}Create Check{% endblock %}
 
 {% block layout %}
-<main class="app-layout">
+<main class="app-layout" id="check-layout">
 
     <aside class="sidebar glass flex flex-col pt-8 pb-6 px-6 max-[480px]:px-5">
 
         <h2 class="text-white text-[24px] font-black tracking-[2px] mb-1 text-center">ADD ITEM</h2>
         <p class="text-white/80 text-[12px] mb-5 text-center">Select product and quantity</p>
 
-        <form action="{% url 'sales:add-item' %}" method="post" class="flex flex-col gap-3 flex-1 min-h-0">
+        <form action="{% url 'sales:add-item' %}" method="post" class="flex flex-col gap-3 flex-1 min-h-0"
+              hx-post="{% url 'sales:add-item' %}"
+              hx-target="#check-layout"
+              hx-select="#check-layout"
+              hx-swap="outerHTML"
+              hx-on::response-error="if (event.detail.xhr.status === 409) { window.zShowDeleteError(event.detail.xhr.responseText); }">
             {% csrf_token %}
             <div class="relative">
                 <input
@@ -31,10 +36,19 @@
                     type="button"
                     data-upc="{{ p.UPC }}"
                     data-name="{{ p.product_name|lower }}"
+                    {% if p.available <= 0 %}disabled{% endif %}
                     onclick="selectProduct(this)"
-                    class="product-option text-left px-3 py-2 rounded-lg text-white text-sm flex items-center justify-between gap-2"
+                    class="product-option text-left px-3 py-2 rounded-lg text-white text-sm flex items-center justify-between gap-2 {% if p.available <= 0 %}opacity-45 cursor-not-allowed{% endif %}"
                 >
-                    <span class="truncate">{{ p.product_name }}</span>
+                    <div class="flex flex-col gap-0.5 min-w-0">
+                        <span class="truncate">{{ p.product_name }}</span>
+                        <span class="w-fit text-[10px] font-semibold px-1.5 py-0.5 rounded-full
+                            {% if p.available <= 0 %}bg-red-400/20 text-red-200
+                            {% elif p.available <= 5 %}bg-amber-400/25 text-amber-100
+                            {% else %}bg-white/15 text-white/80{% endif %}">
+                            {% if p.available <= 0 %}Out of stock{% else %}{{ p.available }} left{% endif %}
+                        </span>
+                    </div>
                     <span class="flex items-center gap-2 flex-shrink-0 text-white/80">
                         {% if p.promotional_product %}<i class="fa-solid fa-tag text-[#EABFFF]" title="Promotional"></i>{% endif %}
                         {{ p.selling_price }}
@@ -49,7 +63,7 @@
                 <label class="text-white/80 text-[10px] font-semibold tracking-widest uppercase px-1">Quantity</label>
                 <input
                     type="number"
-                    name="product_number"
+                    name="quantity"
                     min="1"
                     value="1"
                     class="bg-transparent border border-white/50 rounded-lg px-4 py-2.5 w-full text-white outline-none focus:border-white transition-colors text-sm"
@@ -88,20 +102,42 @@
                         <th class="text-left text-[10px] font-semibold tracking-widest uppercase text-white/80 px-3 py-2 border-b border-white/20">Price</th>
                         <th class="text-left text-[10px] font-semibold tracking-widest uppercase text-white/80 px-3 py-2 border-b border-white/20">Total</th>
                         <th class="text-left text-[10px] font-semibold tracking-widest uppercase text-white/80 px-3 py-2 border-b border-white/20">Promo</th>
+                        <th class="border-b border-white/20"></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for item in items %}
                     <tr class="hover:bg-white/[0.04]">
                         <td class="px-3 py-2 border-b border-white/10">{{ item.product_name }}</td>
-                        <td class="px-3 py-2 border-b border-white/10">{{ item.product_number }}</td>
+                        <td class="px-3 py-2 border-b border-white/10">
+                            <input type="number" min="1" value="{{ item.quantity }}" name="quantity"
+                                   hx-post="{% url 'sales:update-item' %}"
+                                   hx-vals='{"upc": "{{ item.upc }}"}'
+                                   hx-target="#check-layout"
+                                   hx-select="#check-layout"
+                                   hx-swap="outerHTML"
+                                   hx-trigger="change"
+                                   hx-on::response-error="if (event.detail.xhr.status === 409) { window.zShowDeleteError(event.detail.xhr.responseText); this.value = this.defaultValue; }"
+                                   class="w-16 bg-transparent rounded-md px-2 py-1 text-white text-sm outline-none focus:border-white transition-colors">
+                        </td>
                         <td class="px-3 py-2 border-b border-white/10">{{ item.selling_price }}</td>
                         <td class="px-3 py-2 border-b border-white/10">{{ item.total }}</td>
-                        <td class="px-3 py-2 border-b border-white/10">{% if item.promotional_product %}Yes</i>{% else %}No{% endif %}</td>
+                        <td class="px-3 py-2 border-b border-white/10">{% if item.promotional_product %}Yes{% else %}No{% endif %}</td>
+                        <td class="px-3 py-2  text-right">
+                            <button type="button" title="Remove item"
+                                    hx-post="{% url 'sales:remove-item' %}"
+                                    hx-vals='{"upc": "{{ item.upc }}"}'
+                                    hx-target="#check-layout"
+                                    hx-select="#check-layout"
+                                    hx-swap="outerHTML"
+                                    class="text-white/55 hover:text-red-300 transition-colors px-1">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" class="text-white/70 text-sm text-center py-8">No items yet.</td>
+                        <td colspan="6" class="text-white/70 text-sm text-center py-8">No items yet.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
