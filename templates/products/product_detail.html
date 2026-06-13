@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.product_name }}{% endblock %}
+
+{% block layout %}
+<main class="app-layout">
+
+    {% include "_sidebar.html" %}
+
+    <section class="panel glass pt-8 pb-6 px-8 max-[480px]:px-5 flex flex-col">
+        <h2 class="text-white text-[24px] font-black tracking-[2px] mb-6">{{ product.product_name }}</h2>
+
+        <div class="flex gap-6 flex-1">
+
+            <div class="flex flex-col gap-3 text-white/80 text-sm min-w-[180px]">
+                <div><span class="text-white/50 uppercase text-[10px] tracking-widest">ID</span><p class="text-white mt-1">{{ product.id }}</p></div>
+                <div><span class="text-white/50 uppercase text-[10px] tracking-widest">Manufacturer</span><p class="text-white mt-1">{{ product.manufacturer }}</p></div>
+                <div><span class="text-white/50 uppercase text-[10px] tracking-widest">Category</span><p class="text-white mt-1">{{ product.category_name }}</p></div>
+                <div><span class="text-white/50 uppercase text-[10px] tracking-widest">Characteristics</span><p class="text-white mt-1">{{ product.characteristics }}</p></div>
+            </div>
+
+            {% if store_product %}
+            <div class="flex flex-col gap-3 text-white/80 text-sm border-l border-white/20 pl-6">
+                <h3 class="text-white/50 uppercase text-[10px] tracking-widest font-bold">Store Product</h3>
+                <div><span class="text-white/50 uppercase text-[10px] tracking-widest">UPC</span><p class="text-white mt-1">{{ store_product.UPC }}</p></div>
+                <div><span class="text-white/50 uppercase text-[10px] tracking-widest">Price</span><p class="text-white mt-1">{{ store_product.selling_price }}</p></div>
+                <div><span class="text-white/50 uppercase text-[10px] tracking-widest">In Stock</span><p class="text-white mt-1">{{ store_product.products_number }}</p></div>
+                <div><span class="text-white/50 uppercase text-[10px] tracking-widest">Total Sold</span><p class="text-white mt-1">{{ store_product.total_sold }}</p></div>
+            </div>
+            {% endif %}
+
+            {% if promo_product %}
+            <div class="flex flex-col gap-3 text-white/80 text-sm border-l border-white/20 pl-6">
+                <h3 class="text-white/50 uppercase text-[10px] tracking-widest font-bold">Promotional 🏷</h3>
+                <div><span class="text-white/50 uppercase text-[10px] tracking-widest">UPC</span><p class="text-white mt-1">{{ promo_product.UPC }}</p></div>
+                <div><span class="text-white/50 uppercase text-[10px] tracking-widest">Promo Price</span><p class="text-white mt-1">{{ promo_product.selling_price }}</p></div>
+                <div><span class="text-white/50 uppercase text-[10px] tracking-widest">In Stock</span><p class="text-white mt-1">{{ promo_product.products_number }}</p></div>
+                <div><span class="text-white/50 uppercase text-[10px] tracking-widest">Total Sold</span><p class="text-white mt-1">{{ promo_product.total_sold }}</p></div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <div class="mt-auto pt-6 flex justify-end">
+            <a href="{% url 'products:products' %}" class="btn w-auto px-10">Back</a>
+        </div>
+    </section>
+
+</main>
+{% endblock %}

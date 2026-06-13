@@ -184,7 +184,9 @@ class GetProductsView(View):
 
         for row in rows:
             if date_from and date_to:
-                row["units_sold"] = self.check_service.get_total_units_sold(row["id"], date_from, date_to)
+                row["units_sold"] = self.check_service.get_total_units_sold(
+                    row["id"], date_from, date_to
+                )
             else:
                 row["units_sold"] = "-"
 
@@ -212,6 +214,11 @@ class GetProductsView(View):
                     "filters": get_product_filters(),
                     "row_id_key": "id",
                     "actions": [
+                        {
+                            "label": "View",
+                            "url_name": "products:product-detail",
+                            "icon": "fa-solid fa-eye",
+                        },
                         {
                             "label": "Edit",
                             "url_name": "products:edit-product",
@@ -477,5 +484,34 @@ class EditCategoryView(View):
                 "form_title": "Edit Category",
                 "form_action": reverse("products:edit-category", args=[category_id]),
                 "submit_label": "Save",
+            },
+        )
+
+
+@role_required(Role.MANAGER, Role.CASHIER)
+class ProductDetailView(View):
+    def get(self, request, product_id):
+        from .repository import (
+            get_product_detail,
+            get_promo_store_product_with_sales,
+            get_store_product_with_sales,
+        )
+
+        product = get_product_detail(product_id)
+        if not product:
+            raise Http404(f"Product with id {product_id} was not found")
+
+        store_product = get_store_product_with_sales(product_id)
+        promo_product = (
+            get_promo_store_product_with_sales(product_id) if store_product else None
+        )
+
+        return render(
+            request,
+            "products/product_detail.html",
+            {
+                "product": product,
+                "store_product": store_product,
+                "promo_product": promo_product,
             },
         )

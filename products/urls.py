@@ -13,6 +13,7 @@ from .views import (
     GetCategoriesView,
     GetProductsView,
     GetStoreProductsView,
+    ProductDetailView,
 )
 
 app_name = "products"
@@ -55,5 +56,8 @@ urlpatterns = [
         "store-products/<str:upc>/delete/",
         DeleteStoreProductView.as_view(),
         name="delete-store-product",
+    ),
+    path(
+        "products/<int:product_id>/", ProductDetailView.as_view(), name="product-detail"
     ),
 ]

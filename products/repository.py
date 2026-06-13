@@ -267,3 +267,43 @@ def get_product_counts_by_category() -> dict:
         "SELECT category_id, COUNT(*) AS count FROM products_product GROUP BY category_id"
     )
     return {r["category_id"]: r["count"] for r in rows}
+
+
+def get_product_detail(product_id: int) -> dict | None:
+    return execute_single(
+        """
+        SELECT p.id, p.product_name, p.manufacturer, p.characteristics, c.category_name
+        FROM products_product p
+        JOIN products_category c ON p.category_id = c.id
+        WHERE p.id = %s
+        """,
+        [product_id],
+    )
+
+
+def get_store_product_with_sales(product_id: int) -> dict | None:
+    return execute_single(
+        """
+        SELECT sp."UPC", sp.selling_price, sp.products_number,
+               COALESCE(SUM(s.product_number), 0) as total_sold
+        FROM products_storeproduct sp
+        LEFT JOIN sales_sale s ON s."UPC" = sp."UPC"
+        WHERE sp.product_id = %s AND sp.promotional_product = FALSE
+        GROUP BY sp."UPC", sp.selling_price, sp.products_number
+        """,
+        [product_id],
+    )
+
+
+def get_promo_store_product_with_sales(product_id: int) -> dict | None:
+    return execute_single(
+        """
+        SELECT sp."UPC", sp.selling_price, sp.products_number,
+               COALESCE(SUM(s.product_number), 0) as total_sold
+        FROM products_storeproduct sp
+        LEFT JOIN sales_sale s ON s."UPC" = sp."UPC"
+        WHERE sp.product_id = %s AND sp.promotional_product = TRUE
+        GROUP BY sp."UPC", sp.selling_price, sp.products_number
+        """,
+        [product_id],
+    )
