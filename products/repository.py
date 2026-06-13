@@ -307,3 +307,9 @@ def get_promo_store_product_with_sales(product_id: int) -> dict | None:
         """,
         [product_id],
     )
+
+
+def get_category_by_name(name: str):
+    return execute_single(
+        "SELECT * FROM products_category WHERE category_name = %s", [name]
+    )

@@ -5,6 +5,7 @@ from core.forms import CHECKBOX_CLASS, LayoutForm
 from .repository import (
     get_all_categories,
     get_all_products,
+    get_category_by_name,
     get_store_product_by_upc,
     get_store_products_by_product,
 )
@@ -16,6 +17,12 @@ class CategoryForm(LayoutForm):
     category_name = forms.CharField(
         required=True, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
     )
+
+    def clean_category_name(self):
+        value = self.cleaned_data["category_name"]
+        if get_category_by_name(value):
+            raise forms.ValidationError("Category with this name already exists.")
+        return value
 
 
 class ProductForm(LayoutForm):
@@ -130,6 +137,7 @@ class ProductForm(LayoutForm):
                 self.add_error("promo_upc", "Must differ from the regular UPC")
         return cleaned
 
+
 class EditProductForm(LayoutForm):
     category = forms.ChoiceField(
         choices=[], widget=forms.Select(attrs={"class": TEXT_INPUT_CLASS})
@@ -150,6 +158,7 @@ class EditProductForm(LayoutForm):
         self.fields["category"].choices = [
             (c["id"], c["category_name"]) for c in categories
         ]
+
 
 class StoreProductForm(LayoutForm):
     product = forms.ChoiceField(
@@ -239,12 +248,13 @@ class StoreProductForm(LayoutForm):
                 self.add_error("promo_upc", "Must differ from the regular UPC")
         return cleaned
 
+
 class EditStoreProductForm(LayoutForm):
     upc = forms.CharField(
         label="UPC",
         required=False,
         disabled=True,
-        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS }),
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
     selling_price = forms.DecimalField(
         max_digits=13,
