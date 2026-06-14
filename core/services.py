@@ -3,6 +3,7 @@ from typing import Protocol
 from django.contrib.auth.hashers import check_password
 from django.http import HttpRequest
 
+from core.query_helpers import order_by_sql
 from core.repository import get_user_by_username
 from core.roles import Role
 from customers.repository import get_richest_customers
@@ -18,7 +19,9 @@ class IAuthService(Protocol):
 
 
 class IStatisticsService(Protocol):
-    def get_product_per_category_stats(self) -> list[dict]: ...
+    def get_product_per_category_stats(
+        self, sort_by: str, sort_dir: str
+    ) -> list[dict]: ...
     def get_richest_customers_stats(self) -> list[dict]: ...
 
 
@@ -41,8 +44,8 @@ class AuthService:
 
 
 class StatisticsService:
-    def get_product_per_category_stats(self) -> list[dict]:
-        return get_per_category_stat()
+    def get_product_per_category_stats(self, sort_by: str, sort_dir: str) -> list[dict]:
+        return get_per_category_stat(order_by_sql(sort_by, sort_dir))
 
     def get_richest_customers_stats(self) -> list[dict]:
         return get_richest_customers()

@@ -84,9 +84,9 @@ def get_total_units_sold(product_id: int, date_from: str, date_to: str):
     )
 
 
-def get_per_category_stat():
+def get_per_category_stat(order_by: str = ""):
     return execute_query(
-        """
+        f"""
         SELECT c.category_name, sp.promotional_product, SUM(s.product_number) AS total_units,
             SUM(s.selling_price * s.product_number) AS total_revenue,
             ROUND(
@@ -106,6 +106,6 @@ def get_per_category_stat():
         INNER JOIN products_storeproduct sp ON sp.product_id = p.id
         INNER JOIN sales_sale s ON s."UPC" = sp."UPC"
         GROUP BY c.category_name, c.id, sp.promotional_product
-        ORDER BY c.category_name, sp.promotional_product
+        {order_by}
         """
     )

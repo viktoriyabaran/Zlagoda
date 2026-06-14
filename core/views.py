@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, render
 from django.views import View
 
+from core.query_helpers import resolve_sort
 from core.roles import Role
 from core.services import (
     AuthService,
@@ -49,12 +50,25 @@ def home(request):
     return render(request, "home.html")
 
 
+PRODUCT_STATS_COLUMNS = [
+    {"key": "category_name", "label": "Category", "sortable": True},
+    {"key": "promotional_product", "label": "Promo?", "sortable": True},
+    {"key": "total_units", "label": "Total Units", "sortable": False},
+    {"key": "total_revenue", "label": "Total Revenue", "sortable": False},
+    {"key": "percent_of_category_revenue", "label": "Percent", "sortable": False},
+]
+PRODUCT_STATS_SORTABLE = {c["key"] for c in PRODUCT_STATS_COLUMNS if c["sortable"]}
+
+
 @role_required(Role.MANAGER)
 class GetProductsStatisticsView(View):
     stats_service: IStatisticsService = StatisticsService()
 
     def get(self, request):
-        data = self.stats_service.get_product_per_category_stats()
+        sort_by, sort_dir = resolve_sort(
+            request, PRODUCT_STATS_SORTABLE, default="category_name"
+        )
+        data = self.stats_service.get_product_per_category_stats(sort_by, sort_dir)
 
         return render(
             request,
@@ -64,33 +78,8 @@ class GetProductsStatisticsView(View):
                     "title": "Products per category",
                     "subtitle": "Some stats",
                     "rows": data,
-                    "columns": [
-                        {
-                            "key": "category_name",
-                            "label": "Category",
-                            "sortable": False,
-                        },
-                        {
-                            "key": "promotional_product",
-                            "label": "Promo Products?",
-                            "sortable": False,
-                        },
-                        {
-                            "key": "total_units",
-                            "label": "Total Units",
-                            "sortable": False,
-                        },
-                        {
-                            "key": "total_revenue",
-                            "label": "Total Revenue",
-                            "sortable": False,
-                        },
-                        {
-                            "key": "percent_of_category_revenue",
-                            "label": "Percent",
-                            "sortable": False,
-                        },
-                    ],
+                    "columns": PRODUCT_STATS_COLUMNS,
+                    "sort": {"by": sort_by, "dir": sort_dir},
                     "empty_message": "Not enough data for statistics.",
                     "row_id_key": "category_name",
                 }
