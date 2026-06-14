@@ -1,4 +1,9 @@
-from core.db import execute_insert_returning, execute_query, execute_write, execute_single
+from core.db import (
+    execute_insert_returning,
+    execute_query,
+    execute_single,
+    execute_write,
+)
 
 
 def get_all_checks(where_sql="", where_params=(), order_by=" ORDER BY print_date DESC"):
@@ -62,6 +67,7 @@ def update_check_totals(check_id: int, sum_total, vat):
         [sum_total, vat, check_id],
     )
 
+
 def get_total_units_sold(product_id: int, date_from: str, date_to: str):
     return execute_single(
         """
@@ -75,4 +81,31 @@ def get_total_units_sold(product_id: int, date_from: str, date_to: str):
           )
         """,
         [product_id, date_from, date_to],
+    )
+
+
+def get_per_category_stat():
+    return execute_query(
+        """
+        SELECT c.category_name, sp.promotional_product, SUM(s.product_number) AS total_units,
+            SUM(s.selling_price * s.product_number) AS total_revenue,
+            ROUND(
+                SUM(s.selling_price * s.product_number) / (
+                    SELECT SUM(s1.selling_price * s1.product_number)
+                    FROM products_product p1
+                    INNER JOIN products_storeproduct sp1
+                        ON sp1.product_id = p1.id
+                    INNER JOIN sales_sale s1
+                        ON s1."UPC" = sp1."UPC"
+                    WHERE p1.category_id = c.id
+                ) * 100,
+                2
+            )::text || '%%' AS percent_of_category_revenue
+        FROM products_category c
+        INNER JOIN products_product p ON p.category_id = c.id
+        INNER JOIN products_storeproduct sp ON sp.product_id = p.id
+        INNER JOIN sales_sale s ON s."UPC" = sp."UPC"
+        GROUP BY c.category_name, c.id, sp.promotional_product
+        ORDER BY c.category_name, sp.promotional_product
+        """
     )

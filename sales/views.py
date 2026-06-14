@@ -319,7 +319,9 @@ class GetCheckDetailView(View):
         items = self.check_service.get_items(check_id)
 
         for item in items:
-            item["subtotal"] = "{:.4f}".format(float(item["selling_price"]) * item["product_number"])
+            item["subtotal"] = "{:.4f}".format(
+                float(item["selling_price"]) * item["product_number"]
+            )
 
         return render(
             request,

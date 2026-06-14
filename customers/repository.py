@@ -57,6 +57,7 @@ def update_customer(customer_card_id: int, data: dict):
         ],
     )
 
+
 def count_checks_for_customer(customer_id: int) -> int:
     result = execute_single(
         "SELECT COUNT(*) as count FROM sales_check WHERE card_id = %s",
@@ -74,6 +75,26 @@ def get_check_counts_by_customer() -> dict:
 
 
 def delete_customer(customer_id: int):
-    execute_write(
-        "DELETE FROM customers_customercard WHERE id = %s", [customer_id]
+    execute_write("DELETE FROM customers_customercard WHERE id = %s", [customer_id])
+
+
+def get_richest_customers():
+    return execute_query(
+        """
+        SELECT cc.cust_surname, cc.cust_name, cc.phone_number, cc.percent
+        FROM customers_customercard cc
+        WHERE NOT EXISTS (SELECT *
+            FROM products_storeproduct sp
+            WHERE sp.promotional_product = False
+                AND (SELECT COUNT(*)
+                    FROM products_storeproduct sp2
+                    WHERE sp2.promotional_product = False
+                    AND sp2.selling_price > sp.selling_price) < 5
+                AND NOT EXISTS (SELECT *
+                                FROM sales_check ch
+                                        INNER JOIN sales_sale s ON ch.id = s.check_number_id
+                                WHERE ch.card_id = cc.id
+                                AND s."UPC" = sp."UPC")
+        )
+        """
     )

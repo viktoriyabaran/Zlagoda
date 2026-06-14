@@ -55,6 +55,14 @@ _NAV = [
             ("Add Employee", "employees:add-employee", (Role.MANAGER,)),
         ],
     ),
+    (
+        "Statistics",
+        "badge",
+        [
+            ("Products", "core:product-stats", (Role.MANAGER,)),
+            ("Customers", "core:customer-stats", (Role.MANAGER,)),
+        ],
+    ),
 ]
 
 

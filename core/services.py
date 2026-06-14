@@ -5,6 +5,8 @@ from django.http import HttpRequest
 
 from core.repository import get_user_by_username
 from core.roles import Role
+from customers.repository import get_richest_customers
+from sales.repository import get_per_category_stat
 
 
 class IAuthService(Protocol):
@@ -13,6 +15,11 @@ class IAuthService(Protocol):
         self, request: HttpRequest, user_id: int, user_role: str | None
     ) -> None: ...
     def unregister_session_user(self, request: HttpRequest) -> None: ...
+
+
+class IStatisticsService(Protocol):
+    def get_product_per_category_stats(self) -> list[dict]: ...
+    def get_richest_customers_stats(self) -> list[dict]: ...
 
 
 class AuthService:
@@ -31,3 +38,11 @@ class AuthService:
 
     def unregister_session_user(self, request: HttpRequest) -> None:
         request.session.flush()
+
+
+class StatisticsService:
+    def get_product_per_category_stats(self) -> list[dict]:
+        return get_per_category_stat()
+
+    def get_richest_customers_stats(self) -> list[dict]:
+        return get_richest_customers()
