@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Query Reports – Zlagoda{% endblock %}
+{% block title %}Zlagoda{% endblock %}
 
 {% block layout %}
 <main class="app-layout">
@@ -11,20 +11,19 @@
 
         <div class="border-b border-white/15 pb-2 mb-6">
             <h2 class="text-white text-[15px] font-black tracking-[1.5px] uppercase">
-                Query Reports
+                Analytics
             </h2>
             <p class="text-white/60 text-[10px] tracking-[0.5px] mt-0.5">
-                Complex SQL queries
+                Sales statistics and inventory performance
             </p>
         </div>
 
         <div class="mb-8">
             <h3 class="text-white/80 text-[11px] font-bold tracking-widest uppercase mb-1">
-                Query 1: Sales by category
+                Sales by category
             </h3>
             <p class="text-white/50 text-[11px] mb-3">
-                Виводить назви всіх товарів та загальну кількість проданих одиниць,
-                відфільтрованих за обраною категорією.
+                Total units sold for each product within the selected category over all time
             </p>
 
             <form method="get" class="flex flex-wrap items-end gap-2 mb-4">
@@ -73,7 +72,7 @@
                                 </th>
                                 <th class="text-left text-[10px] font-semibold tracking-widest uppercase
                                            text-white/80 px-3 py-1.5 border-b border-white/20">
-                                    Total Sold (units)
+                                    Total units sold
                                 </th>
                             </tr>
                         </thead>
@@ -105,11 +104,10 @@
 
         <div class="border-t border-white/10 pt-6">
             <h3 class="text-white/80 text-[11px] font-bold tracking-widest uppercase mb-1">
-                Query 2: Products where all batches were sold
+                Products where all batches were sold
             </h3>
             <p class="text-white/50 text-[11px] mb-4">
-                Знаходить назви товарів, для яких не існує жодної партії,
-                що не була б продана хоча б один раз.
+                Products where every single batch received in stock has been successfully sold out at least once
             </p>
 
             {% if all_batches_sold %}
