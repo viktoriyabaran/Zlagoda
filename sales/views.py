@@ -13,6 +13,7 @@ from products.repository import (
     decrement_store_product_number,
     get_all_store_products,
     get_store_product_by_upc,
+    get_all_categories
 )
 
 from .repository import update_check_totals
@@ -327,5 +328,39 @@ class GetCheckDetailView(View):
             {
                 "check_id": check_id,
                 "items": items,
+            },
+        )
+
+@role_required(Role.MANAGER)
+class QueryReportView(View):
+    check_service = CheckService()
+
+    def get(self, request):
+        categories = get_all_categories(order_by=" ORDER BY category_name")
+        selected_category_id = request.GET.get("category_id")
+
+        sold_by_category = []
+        selected_category_name = None
+
+        if selected_category_id:
+            sold_by_category = self.check_service.get_sold_by_category(
+                int(selected_category_id)
+            )
+            cat = next(
+                (c for c in categories if str(c["id"]) == selected_category_id), None
+            )
+            selected_category_name = cat["category_name"] if cat else None
+
+        all_batches_sold = self.check_service.get_all_batches_sold_products()
+
+        return render(
+            request,
+            "sales/query_report.html",
+            {
+                "categories": categories,
+                "selected_category_id": selected_category_id or "",
+                "selected_category_name": selected_category_name,
+                "sold_by_category": sold_by_category,
+                "all_batches_sold": all_batches_sold,
             },
         )

@@ -10,6 +10,7 @@ from .views import (
     GetChecksView,
     RemoveCheckItemView,
     UpdateCheckItemView,
+    QueryReportView
 )
 
 app_name = "sales"
@@ -26,4 +27,5 @@ urlpatterns = [
     path("checks/remove-item/", RemoveCheckItemView.as_view(), name="remove-item"),
     path("checks/apply-card/", ApplyCardView.as_view(), name="apply-card"),
     path("checks/finalize/", FinalizeCheckView.as_view(), name="finalize-check"),
+    path("reports/queries/", QueryReportView.as_view(), name="query-report"),
 ]

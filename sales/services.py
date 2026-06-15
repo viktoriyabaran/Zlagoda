@@ -11,6 +11,8 @@ from sales.repository import (
     get_check_by_id,
     get_check_items,
     get_total_units_sold,
+    get_total_sold_by_category,
+    get_products_all_batches_sold,
 )
 
 
@@ -84,3 +86,9 @@ class CheckService:
     ) -> int:
         result = get_total_units_sold(product_id, date_from, date_to)
         return result["total_units"] or 0 if result else 0
+
+    def get_sold_by_category(self, category_id: int) -> list:
+        return get_total_sold_by_category(category_id)
+
+    def get_all_batches_sold_products(self) -> list:
+        return get_products_all_batches_sold()

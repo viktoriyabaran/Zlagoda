@@ -9,6 +9,7 @@ _NAV = [
         [
             ("View Checks", "sales:checks", (Role.MANAGER, Role.CASHIER)),
             ("Create Check", "sales:create-check", (Role.CASHIER,)),
+            ("Query Reports", "sales:query-report", (Role.MANAGER,)),
         ],
     ),
     (

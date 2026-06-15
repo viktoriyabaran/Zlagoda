@@ -76,3 +76,39 @@ def get_total_units_sold(product_id: int, date_from: str, date_to: str):
         """,
         [product_id, date_from, date_to],
     )
+
+def get_total_sold_by_category(category_id: int):
+    return execute_query(
+        """
+        SELECT
+            p.product_name,
+            SUM(s.product_number) AS total_sold_quantity
+        FROM products_product AS p
+        INNER JOIN products_storeproduct AS sp ON p.id = sp.product_id
+        INNER JOIN sales_sale AS s ON sp."UPC" = s."UPC"
+        WHERE p.category_id = %s
+        GROUP BY p.product_name
+        ORDER BY total_sold_quantity DESC
+        """,
+        [category_id],
+    )
+
+
+def get_products_all_batches_sold():
+    return execute_query(
+        """
+        SELECT p.product_name
+        FROM products_product p
+        WHERE NOT EXISTS (
+            SELECT *
+            FROM products_storeproduct sp
+            WHERE sp.product_id = p.id
+            AND NOT EXISTS (
+                SELECT *
+                FROM sales_sale s
+                WHERE s."UPC" = sp."UPC"
+            )
+        )
+        ORDER BY p.product_name
+        """,
+    )

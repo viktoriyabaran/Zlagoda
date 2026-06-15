@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Query Reports – Zlagoda{% endblock %}
+
+{% block layout %}
+<main class="app-layout">
+    {% include "_sidebar.html" %}
+
+    <section class="panel glass pt-8 pb-6 px-8 max-[480px]:px-5 flex flex-col w-full"
+         style="height: 82vh; min-height: 500px; overflow-y: auto !important; display: block;">
+
+        <div class="border-b border-white/15 pb-2 mb-6">
+            <h2 class="text-white text-[15px] font-black tracking-[1.5px] uppercase">
+                Query Reports
+            </h2>
+            <p class="text-white/60 text-[10px] tracking-[0.5px] mt-0.5">
+                Complex SQL queries
+            </p>
+        </div>
+
+        <div class="mb-8">
+            <h3 class="text-white/80 text-[11px] font-bold tracking-widest uppercase mb-1">
+                Query 1: Sales by category
+            </h3>
+            <p class="text-white/50 text-[11px] mb-3">
+                Виводить назви всіх товарів та загальну кількість проданих одиниць,
+                відфільтрованих за обраною категорією.
+            </p>
+
+            <form method="get" class="flex flex-wrap items-end gap-2 mb-4">
+                <div class="flex flex-col gap-1">
+                    <span class="text-white/70 text-[10px] font-semibold tracking-widest uppercase px-1">
+                        Category
+                    </span>
+                    <select name="category_id"
+                            class="bg-transparent border-2 border-white/35 rounded-xl px-3 py-1.5
+                                   text-white text-sm outline-none focus:border-white/60 transition-colors
+                                   min-w-[180px]">
+                        <option value="" style="color: black;"> Any Category </option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.id }}" style="color: black;"
+                                {% if selected_category_id == cat.id|stringformat:"s" %}selected{% endif %}>
+                                {{ cat.category_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit"
+                        class="px-6 py-1.5 text-xs tracking-wider uppercase font-bold
+                               border-2 border-white/35 rounded-xl text-white
+                               hover:border-white/60 hover:bg-white/10 transition-colors">
+                    Apply
+                </button>
+                {% if selected_category_id %}
+                <a href="{% url 'sales:query-report' %}"
+                   class="px-4 py-1.5 text-xs tracking-wider uppercase font-bold
+                          border-2 border-white/35 rounded-xl text-white/70
+                          hover:border-white/60 hover:text-white transition-colors">
+                    Clear
+                </a>
+                {% endif %}
+            </form>
+
+            {% if selected_category_id %}
+                {% if sold_by_category %}
+                <div class="overflow-x-auto">
+                    <table class="w-full text-white text-sm border-separate border-spacing-0">
+                        <thead class="backdrop-blur-md bg-white/[0.08]">
+                            <tr>
+                                <th class="text-left text-[10px] font-semibold tracking-widest uppercase
+                                           text-white/80 px-3 py-1.5 border-b border-white/20">
+                                    Product Name
+                                </th>
+                                <th class="text-left text-[10px] font-semibold tracking-widest uppercase
+                                           text-white/80 px-3 py-1.5 border-b border-white/20">
+                                    Total Sold (units)
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in sold_by_category %}
+                            <tr class="hover:bg-white/[0.04]">
+                                <td class="px-3 py-1.5 border-b border-white/10">
+                                    {{ row.product_name }}
+                                </td>
+                                <td class="px-3 py-1.5 border-b border-white/10 text-emerald-400 font-bold">
+                                    {{ row.total_sold_quantity }} шт.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-white/40 text-sm italic">
+                    No sales found for category «{{ selected_category_name }}».
+                </p>
+                {% endif %}
+            {% else %}
+                <p class="text-white/40 text-sm italic">
+                    Select a category to see results.
+                </p>
+            {% endif %}
+        </div>
+
+        <div class="border-t border-white/10 pt-6">
+            <h3 class="text-white/80 text-[11px] font-bold tracking-widest uppercase mb-1">
+                Query 2: Products where all batches were sold
+            </h3>
+            <p class="text-white/50 text-[11px] mb-4">
+                Знаходить назви товарів, для яких не існує жодної партії,
+                що не була б продана хоча б один раз.
+            </p>
+
+            {% if all_batches_sold %}
+            <div class="overflow-x-auto">
+                <table class="w-full text-white text-sm border-separate border-spacing-0">
+                    <thead class="backdrop-blur-md bg-white/[0.08]">
+                        <tr>
+                            <th class="text-left text-[10px] font-semibold tracking-widest uppercase
+                                       text-white/80 px-3 py-1.5 border-b border-white/20">
+                                Product Name
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in all_batches_sold %}
+                        <tr class="hover:bg-white/[0.04]">
+                            <td class="px-3 py-1.5 border-b border-white/10">
+                                {{ row.product_name }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-white/40 text-sm italic">No such products found.</p>
+            {% endif %}
+        </div>
+
+    </section>
+</main>
+{% endblock %}
