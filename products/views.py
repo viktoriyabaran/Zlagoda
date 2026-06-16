@@ -6,6 +6,15 @@ from django.views import View
 from core.decorators import role_required
 from core.query_helpers import resolve_sort
 from core.roles import Role
+from products.table_config import (
+    CATEGORY_COLUMNS,
+    CATEGORY_SORTABLE,
+    PRODUCT_COLUMNS,
+    PRODUCT_SORTABLE,
+    STORE_PRODUCT_COLUMNS,
+    STORE_PRODUCT_FILTERS,
+    STORE_PRODUCT_SORTABLE,
+)
 from sales.services import CheckService
 
 from .forms import (
@@ -15,35 +24,13 @@ from .forms import (
     ProductForm,
     StoreProductForm,
 )
-from .repository import STORE_PRODUCT_FILTERS, get_product_filters
+from .repository import get_product_filters
 from .services import (
     CategoryService,
     ProductService,
     StoreProductListService,
     StoreProductService,
 )
-
-CATEGORY_COLUMNS = [
-    {"key": "category_name", "label": "Category", "sortable": True},
-]
-CATEGORY_SORTABLE = {c["key"] for c in CATEGORY_COLUMNS if c["sortable"]}
-
-PRODUCT_COLUMNS = [
-    {"key": "product_name", "label": "Product Name", "sortable": True},
-    {"key": "manufacturer", "label": "Manufacturer", "sortable": True},
-    {"key": "characteristics", "label": "Characteristics", "sortable": False},
-    {"key": "category_name", "label": "Category", "sortable": True},
-]
-PRODUCT_SORTABLE = {c["key"] for c in PRODUCT_COLUMNS if c["sortable"]}
-
-STORE_PRODUCT_COLUMNS = [
-    {"key": "UPC", "label": "UPC", "sortable": False},
-    {"key": "product_name", "label": "Product Name", "sortable": True},
-    {"key": "selling_price", "label": "Price", "sortable": True},
-    {"key": "products_number", "label": "Quantity", "sortable": True},
-    {"key": "promotional_product", "label": "Promo", "sortable": False},
-]
-STORE_PRODUCT_SORTABLE = {c["key"] for c in STORE_PRODUCT_COLUMNS if c["sortable"]}
 
 
 @role_required(Role.MANAGER)
@@ -414,14 +401,6 @@ class EditStoreProductView(View):
     def post(self, request, upc):
         form = EditStoreProductForm(request.POST)
         if form.is_valid():
-            update_data = {
-                "selling_price": form.cleaned_data["selling_price"],
-                "products_number": form.cleaned_data["products_number"],
-                "promotional_product": request.POST.get("promotional_product")
-                is not None
-                if "promotional_product" in request.POST
-                else self.store_product_service.get_by_upc(upc)["promotional_product"],
-            }
             self.store_product_service.update(upc, form.cleaned_data)
             return redirect("products:store-products")
 

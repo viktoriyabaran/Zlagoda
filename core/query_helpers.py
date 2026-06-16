@@ -9,7 +9,7 @@ def resolve_sort(
     default: str | None = None,
 ) -> tuple[str | None, str]:
     sort_by = request.GET.get("sort") or default
-    if sort_by not in sortable:
+    if sort_by is None or sort_by not in sortable:
         sort_by = default
     sort_dir = request.GET.get("dir", "asc").lower()
     if sort_dir not in ("asc", "desc"):
@@ -17,7 +17,7 @@ def resolve_sort(
     return sort_by, sort_dir
 
 
-def order_by_sql(sort_by: str | None, sort_dir: str) -> str:
+def order_by_sql(sort_by: str | None, sort_dir: str | None) -> str:
     if not sort_by:
         return ""
     direction = "DESC" if sort_dir == "desc" else "ASC"

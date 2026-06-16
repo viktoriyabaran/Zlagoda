@@ -237,6 +237,7 @@ class Command(BaseCommand):
                     zip_code,
                 ],
             )
+            assert emp_id is not None
             ids[surname] = emp_id
         return ids
 
@@ -337,6 +338,7 @@ class Command(BaseCommand):
                 """,
                 [surname, name, patronymic, phone, city, street, zip_code, percent],
             )
+            assert cust_id is not None
             ids.append(cust_id)
         return ids
 
@@ -412,4 +414,5 @@ class Command(BaseCommand):
             'SELECT selling_price FROM products_storeproduct WHERE "UPC" = %s',
             [upc],
         )
+        assert row is not None
         return row["selling_price"]
