@@ -8,7 +8,7 @@ from core.decorators import role_required
 from core.repository import get_user_by_id
 from core.roles import Role
 from customers.repository import get_all_customers
-from employees.repository import get_all_cashiers
+from employees.repository import get_all_cashiers, get_employee_by_id
 from products.repository import (
     decrement_store_product_number,
     get_all_store_products,
@@ -307,13 +307,16 @@ class GetCheckDetailView(View):
     check_service = CheckService()
 
     def get(self, request, check_id):
+        check = self.check_service.get_by_id(check_id)
+        if not check:
+            return HttpResponseForbidden("Check not found.")
+
         if request.session.get("user_role") == Role.CASHIER:
-            check = self.check_service.get_by_id(check_id)
             employee = get_user_by_id(request.session["user_id"])
             if not employee:
                 return redirect("core:login")
             employee_id = employee["employee_id"]
-            if not check or check["employee_id"] != employee_id:
+            if check["employee_id"] != employee_id:
                 return HttpResponseForbidden(
                     "Viewing this resource is not allowed for you."
                 )
@@ -324,11 +327,35 @@ class GetCheckDetailView(View):
                 float(item["selling_price"]) * item["product_number"]
             )
 
+        cashier = get_employee_by_id(check["employee_id"])
+        cashier_name = (
+            f"{cashier['empl_surname']} {cashier['empl_name']}" if cashier else "—"
+        )
+
+        customer_name = "No Card"
+        if check["card_id"]:
+            card = next(
+                (c for c in get_all_customers() if c["id"] == check["card_id"]), None
+            )
+            if card:
+                customer_name = f"{card['cust_surname']} {card['cust_name']}"
+
+        discount_percent = self.check_service.resolve_discount_percent(check["card_id"])
+        items_for_totals = [
+            {"selling_price": item["selling_price"], "quantity": item["product_number"]}
+            for item in items
+        ]
+        totals = self.check_service.compute_totals(items_for_totals, discount_percent)
+
         return render(
             request,
             "sales/check_detail.html",
             {
                 "check_id": check_id,
                 "items": items,
+                "cashier_name": cashier_name,
+                "customer_name": customer_name,
+                "print_date": check["print_date"],
+                **totals,
             },
         )
