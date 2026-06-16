@@ -133,8 +133,9 @@ def get_store_products_by_product(product_id):
 def create_store_product(data: dict):
     execute_write(
         """INSERT INTO products_storeproduct
-           ("UPC", "UPC_prom_id", product_id, selling_price, products_number, promotional_product)
-           VALUES (%s, %s, %s, %s, %s, %s)""",
+           ("UPC", "UPC_prom_id", product_id, selling_price, products_number,
+            promotional_product, expiration_date)
+           VALUES (%s, %s, %s, %s, %s, %s, %s)""",
         [
             data["UPC"],
             data["UPC_prom"],
@@ -142,6 +143,7 @@ def create_store_product(data: dict):
             data["selling_price"],
             data["products_number"],
             data["promotional_product"],
+            data.get("expiration_date"),
         ],
     )
 
@@ -179,6 +181,57 @@ def decrement_store_product_number(upc: str, quantity: int):
            SET products_number = products_number - %s
            WHERE "UPC" = %s""",
         [quantity, upc],
+    )
+
+
+def add_store_product_stock(upc: str, quantity: int):
+    execute_write(
+        """UPDATE products_storeproduct
+           SET products_number = products_number + %s
+           WHERE "UPC" = %s""",
+        [quantity, upc],
+    )
+
+
+def set_store_product_number(upc: str, quantity: int):
+    execute_write(
+        'UPDATE products_storeproduct SET products_number = %s WHERE "UPC" = %s',
+        [quantity, upc],
+    )
+
+
+def get_promo_twin(base_upc: str) -> dict | None:
+    return execute_single(
+        """SELECT * FROM products_storeproduct
+           WHERE "UPC_prom_id" = %s AND promotional_product = TRUE""",
+        [base_upc],
+    )
+
+
+def get_non_promo_expiring_with_stock(cutoff_date) -> list:
+    """Regular-price products that still have stock and expire on or before the
+    given cutoff date (today + promotion window)."""
+    return execute_query(
+        """SELECT "UPC", product_id, selling_price, products_number, expiration_date
+           FROM products_storeproduct
+           WHERE promotional_product = FALSE
+             AND products_number > 0
+             AND expiration_date IS NOT NULL
+             AND expiration_date <= %s""",
+        [cutoff_date],
+    )
+
+
+def get_expired_promo_with_stock(today) -> list:
+    """Promotional products that still have stock and have reached expiration."""
+    return execute_query(
+        """SELECT "UPC"
+           FROM products_storeproduct
+           WHERE promotional_product = TRUE
+             AND products_number > 0
+             AND expiration_date IS NOT NULL
+             AND expiration_date <= %s""",
+        [today],
     )
 
 
