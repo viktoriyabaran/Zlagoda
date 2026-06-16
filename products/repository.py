@@ -152,7 +152,8 @@ def get_all_store_products(where_sql="", where_params=(), order_by=""):
     return execute_query(
         f"""
         SELECT sp."UPC", p.product_name, p.characteristics,
-               sp.selling_price, sp.products_number, sp.promotional_product
+               sp.selling_price, sp.products_number, sp.promotional_product,
+               sp.expiration_date
         FROM products_storeproduct sp
         JOIN products_product p ON sp.product_id = p.id
         {where_sql}{order_by}
@@ -164,12 +165,14 @@ def get_all_store_products(where_sql="", where_params=(), order_by=""):
 def update_store_product(upc: str, data: dict):
     execute_write(
         """UPDATE products_storeproduct
-           SET selling_price = %s, products_number = %s, promotional_product = %s
+           SET selling_price = %s, products_number = %s, promotional_product = %s,
+               expiration_date = %s
            WHERE "UPC" = %s""",
         [
             data["selling_price"],
             data["products_number"],
             data["promotional_product"],
+            data.get("expiration_date"),
             upc,
         ],
     )

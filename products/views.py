@@ -380,6 +380,7 @@ class EditStoreProductView(View):
                 "selling_price": store_product["selling_price"],
                 "products_number": store_product["products_number"],
                 "promotional_product": store_product["promotional_product"],
+                "expiration_date": store_product["expiration_date"],
             }
         )
         return render(

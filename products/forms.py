@@ -67,6 +67,13 @@ class ProductForm(LayoutForm):
         required=False,
         widget=forms.NumberInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
+    expiration_date = forms.DateField(
+        required=False,
+        label="Expiration date",
+        widget=forms.DateInput(
+            format="%Y-%m-%d", attrs={"class": TEXT_INPUT_CLASS, "type": "date"}
+        ),
+    )
 
     add_promo_variant = forms.BooleanField(
         required=False,
@@ -96,6 +103,7 @@ class ProductForm(LayoutForm):
             "upc",
             "selling_price",
             "products_number",
+            "expiration_date",
             "add_promo_variant",
         ],
         "add_promo_variant": ["promo_upc", "promo_products_number"],
@@ -181,6 +189,13 @@ class StoreProductForm(LayoutForm):
         min_value=0,
         widget=forms.NumberInput(attrs={"class": TEXT_INPUT_CLASS}),
     )
+    expiration_date = forms.DateField(
+        required=False,
+        label="Expiration date",
+        widget=forms.DateInput(
+            format="%Y-%m-%d", attrs={"class": TEXT_INPUT_CLASS, "type": "date"}
+        ),
+    )
 
     add_promo_variant = forms.BooleanField(
         required=False,
@@ -265,6 +280,13 @@ class EditStoreProductForm(LayoutForm):
     products_number = forms.IntegerField(
         min_value=0,
         widget=forms.NumberInput(attrs={"class": TEXT_INPUT_CLASS}),
+    )
+    expiration_date = forms.DateField(
+        required=False,
+        label="Expiration date",
+        widget=forms.DateInput(
+            format="%Y-%m-%d", attrs={"class": TEXT_INPUT_CLASS, "type": "date"}
+        ),
     )
     promotional_product = forms.BooleanField(
         required=False,

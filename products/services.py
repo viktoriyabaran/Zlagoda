@@ -68,6 +68,7 @@ def _create_store_product_with_optional_promo(data: dict) -> None:
             "selling_price": data["selling_price"],
             "products_number": data["products_number"],
             "promotional_product": False,
+            "expiration_date": data.get("expiration_date"),
         }
     )
     if data.get("add_promo_variant"):
@@ -82,6 +83,7 @@ def _create_store_product_with_optional_promo(data: dict) -> None:
                 "selling_price": promo_price,
                 "products_number": data["promo_products_number"],
                 "promotional_product": True,
+                "expiration_date": data.get("expiration_date"),
             }
         )
 
