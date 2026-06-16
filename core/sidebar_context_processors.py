@@ -55,6 +55,18 @@ _NAV = [
             ("Add Employee", "employees:add-employee", (Role.MANAGER,)),
         ],
     ),
+    (
+        "Extra Statistics",
+        "chart",
+        [
+            ("Customer Purchases", "statistics:customer-purchases", (Role.MANAGER,)),
+            (
+                "Cashiers All Customers",
+                "statistics:cashiers-all-customers",
+                (Role.MANAGER,),
+            ),
+        ],
+    ),
 ]
 
 
