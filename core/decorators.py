@@ -1,8 +1,11 @@
 from functools import wraps
+from typing import Callable, TypeVar, cast
 
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 from django.views import View
+
+T = TypeVar("T")
 
 
 def _guard(view, roles):
@@ -40,5 +43,8 @@ def _guard(view, roles):
     return wrapper
 
 
-def role_required(*roles):
-    return lambda view: _guard(view, frozenset(roles))
+def role_required(*roles) -> Callable[[T], T]:
+    def decorator(view: T) -> T:
+        return cast(T, _guard(view, frozenset(roles)))
+
+    return decorator

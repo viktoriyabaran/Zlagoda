@@ -8,17 +8,8 @@ from core.query_helpers import resolve_sort
 from core.roles import Role
 
 from .forms import EmployeeForm
-from .repository import EMPLOYEE_FILTERS
 from .services import EmployeeService
-
-EMPLOYEE_COLUMNS = [
-    {"key": "empl_surname", "label": "Surname", "sortable": True},
-    {"key": "empl_name", "label": "Name", "sortable": False},
-    {"key": "empl_role", "label": "Role", "sortable": True},
-    {"key": "salary", "label": "Salary", "sortable": True},
-    {"key": "phone_number", "label": "Phone", "sortable": False},
-]
-EMPLOYEE_SORTABLE = {c["key"] for c in EMPLOYEE_COLUMNS if c["sortable"]}
+from .table_config import EMPLOYEE_COLUMNS, EMPLOYEE_FILTERS, EMPLOYEE_SORTABLE
 
 
 @role_required(Role.MANAGER, Role.CASHIER)
@@ -90,6 +81,7 @@ class GetEmployeesView(View):
         )
         rows = self.employee_service.get_all(request, sort_by, sort_dir)
         self.employee_service.annotate_deletable(rows)
+
         return render(
             request,
             "home.html",

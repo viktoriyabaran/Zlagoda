@@ -22,7 +22,7 @@
         {% endif %}
     </div>
     {% if search_filters or field_filters or list.add_url %}
-    <div class="flex items-center gap-2 flex-shrink-0">
+    <div class="print-hide flex items-center gap-2 flex-shrink-0">
         {% if search_filters %}
         <button type="button" title="Search" aria-label="Toggle search"
                 onclick="this.classList.toggle('bg-white/10'); document.getElementById('list-search-row').classList.toggle('open');"
@@ -164,7 +164,7 @@
                     {% endfor %}
 
                     {% if list.actions %}
-                    <th class="px-3 py-1.5 border-b border-white/20 w-10"></th>
+                    <th class="print-hide px-3 py-1.5 border-b border-white/20 w-10"></th>
                     {% endif %}
                 </tr>
             </thead>
@@ -181,7 +181,7 @@
                     </td>
                     {% endfor %}
                     {% if list.actions %}
-                    <td class="px-3 py-1.5 border-b border-white/10 text-right">
+                    <td class="print-hide px-3 py-1.5 border-b border-white/10 text-right">
                         {% visible_actions list.actions request.session.user_role as acts %}
                         <div class="inline-flex items-center gap-2">
                             {% for a in acts %}

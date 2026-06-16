@@ -5,20 +5,6 @@ from core.db import (
     execute_write,
 )
 
-EMPLOYEE_FILTERS = [
-    {"key": "q", "label": "Search surname", "type": "search", "column": "empl_surname"},
-    {
-        "key": "role",
-        "label": "Role",
-        "type": "select",
-        "column": "empl_role",
-        "options": [
-            {"value": "Cashier", "label": "Cashier"},
-            {"value": "Manager", "label": "Manager"},
-        ],
-    },
-]
-
 
 def get_all_employees(where_sql="", where_params=(), order_by=""):
     return execute_query(
@@ -27,7 +13,7 @@ def get_all_employees(where_sql="", where_params=(), order_by=""):
     )
 
 
-def create_employee(data: dict) -> int:
+def create_employee(data: dict) -> int | None:
     return execute_insert_returning(
         """
         INSERT INTO employees_employee (

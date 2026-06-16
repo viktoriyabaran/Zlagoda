@@ -24,26 +24,6 @@ def get_product_filters():
     ]
 
 
-STORE_PRODUCT_FILTERS = [
-    {
-        "key": "upc",
-        "label": "Search by UPC",
-        "type": "search",
-        "column": 'sp."UPC"',
-    },
-    {
-        "key": "promo",
-        "label": "Promo Status",
-        "type": "select",
-        "column": "sp.promotional_product",
-        "options": [
-            {"value": "true", "label": "Promotional"},
-            {"value": "false", "label": "Non-promotional"},
-        ],
-    },
-]
-
-
 def get_category_by_id(category_id: int):
     return execute_single(
         "SELECT * FROM products_category WHERE id = %s", [category_id]

@@ -6,8 +6,6 @@ from django.http import HttpRequest
 
 from core.query_helpers import order_by_sql, resolve_filters
 from products.repository import (
-    STORE_PRODUCT_FILTERS,
-    get_product_filters,
     count_products_in_category,
     count_sales_for_store_product,
     count_store_products_for_product,
@@ -23,6 +21,7 @@ from products.repository import (
     get_category_by_id,
     get_product_by_id,
     get_product_counts_by_category,
+    get_product_filters,
     get_sale_counts_by_store_product,
     get_store_product_by_upc,
     get_store_product_counts_by_product,
@@ -30,6 +29,7 @@ from products.repository import (
     update_product,
     update_store_product,
 )
+from products.table_config import STORE_PRODUCT_FILTERS
 
 PROMO_DISCOUNT = Decimal("0.8")
 
@@ -48,9 +48,7 @@ def product_block_reason(count: int) -> str:
 
 def store_product_block_reason(count: int) -> str:
     return (
-        f"Cannot delete store product: it appears in {count} sale(s)."
-        if count
-        else ""
+        f"Cannot delete store product: it appears in {count} sale(s)." if count else ""
     )
 
 
@@ -82,12 +80,12 @@ def _create_store_product_with_optional_promo(data: dict) -> None:
 
 
 class ICategoryService(Protocol):
-    def get_all(self, sort_by: str, sort_dir: str) -> list: ...
+    def get_all(self, sort_by: str | None, sort_dir: str | None) -> list: ...
     def create(self, category_name: str) -> None: ...
 
 
 class CategoryService:
-    def get_all(self, sort_by: str, sort_dir: str) -> list:
+    def get_all(self, sort_by: str | None, sort_dir: str | None) -> list:
         return get_all_categories(order_by_sql(sort_by, sort_dir))
 
     def create(self, category_name: str) -> None:
@@ -102,9 +100,7 @@ class CategoryService:
     def annotate_deletable(self, rows: list) -> list:
         counts = get_product_counts_by_category()
         for row in rows:
-            row["delete_block_reason"] = category_block_reason(
-                counts.get(row["id"], 0)
-            )
+            row["delete_block_reason"] = category_block_reason(counts.get(row["id"], 0))
         return rows
 
     def get_by_id(self, category_id: int) -> dict | None:
@@ -116,13 +112,17 @@ class CategoryService:
 
 class IProductService(Protocol):
     def create(self, data: dict) -> None: ...
-    def get_all(self, request: HttpRequest, sort_by: str, sort_dir: str) -> list: ...
+    def get_all(
+        self, request: HttpRequest, sort_by: str | None, sort_dir: str | None
+    ) -> list: ...
     def get_by_id(self, product_id: int) -> dict | None: ...
     def update(self, product_id: int, data: dict) -> None: ...
 
 
 class ProductService:
-    def get_all(self, request: HttpRequest, sort_by: str, sort_dir: str) -> list:
+    def get_all(
+        self, request: HttpRequest, sort_by: str | None, sort_dir: str | None
+    ) -> list:
         _, where_sql, where_params = resolve_filters(request, get_product_filters())
         return get_all_products(
             where_sql, where_params, order_by_sql(sort_by, sort_dir)
@@ -151,9 +151,7 @@ class ProductService:
     def annotate_deletable(self, rows: list) -> list:
         counts = get_store_product_counts_by_product()
         for row in rows:
-            row["delete_block_reason"] = product_block_reason(
-                counts.get(row["id"], 0)
-            )
+            row["delete_block_reason"] = product_block_reason(counts.get(row["id"], 0))
         return rows
 
 
@@ -181,13 +179,13 @@ class StoreProductService:
 
 class IStoreProductListService(Protocol):
     def get_all(
-        self, request: HttpRequest, sort_by: str, sort_dir: str
+        self, request: HttpRequest, sort_by: str | None, sort_dir: str | None
     ) -> list: ...
 
 
 class StoreProductListService:
     def get_all(
-        self, request: HttpRequest, sort_by: str, sort_dir: str
+        self, request: HttpRequest, sort_by: str | None, sort_dir: str | None
     ) -> list:
         _, where_sql, where_params = resolve_filters(request, STORE_PRODUCT_FILTERS)
         return get_all_store_products(
