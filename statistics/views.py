@@ -34,7 +34,9 @@ def customer_purchase_stats(request):
 
 @role_required(Role.MANAGER)
 def cashiers_served_all_customers(request):
-    rows = _service.get_cashiers_served_all_customers()
+    surname = request.GET.get("surname") or None
+
+    rows = _service.get_cashiers_served_all_customers(surname)
     return render(
         request,
         "home.html",
@@ -43,12 +45,16 @@ def cashiers_served_all_customers(request):
                 "title": "CASHIERS WHO SERVED ALL CUSTOMERS",
                 "subtitle": "Cashiers that have served every loyalty card holder",
                 "columns": [
-                    {"key": "id", "label": "Employee ID"},
-                    {"key": "empl_surname", "label": "Surname"},
-                    {"key": "empl_name", "label": "Name"},
+                    {"key": "id", "label": "Employee ID", "sortable": False},
+                    {"key": "empl_surname", "label": "Surname", "sortable": False},
+                    {"key": "empl_name", "label": "Name", "sortable": False},
                 ],
                 "rows": rows,
                 "empty_message": "No cashiers have served all customers yet.",
+                "row_id_key": "id",
+                "filters": [
+                    {"key": "surname", "type": "search", "label": "Search by surname"},
+                ],
             }
         },
     )

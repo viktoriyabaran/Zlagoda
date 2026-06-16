@@ -15,7 +15,7 @@ def get_customer_purchase_stats() -> list:
     )
 
 
-def get_cashiers_served_all_customers(employee_id: int = None) -> list:
+def get_cashiers_served_all_customers(surname: str = None) -> list:
     sql = """
         SELECT e.id, e.empl_surname, e.empl_name
         FROM employees_employee AS e
@@ -30,7 +30,7 @@ def get_cashiers_served_all_customers(employee_id: int = None) -> list:
             )
         )
     """
-    if employee_id:
-        sql += " AND e.id = %s"
-        return execute_query(sql, [employee_id])
+    if surname:
+        sql += " AND e.empl_surname ILIKE %s"
+        return execute_query(sql, [f"%{surname}%"])
     return execute_query(sql)
