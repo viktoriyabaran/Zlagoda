@@ -145,6 +145,67 @@
             html[data-sidebar-collapsed] .flyout-title { display: none; }
             html[data-sidebar-collapsed] .sidebar-toggle .chevron { transform: none; }
         }
+
+        @media print {
+            @page { margin: 1.4cm; }
+
+            html, body {
+                height: auto !important;
+                overflow: visible !important;
+                background: #fff !important;
+                color: #000 !important;
+            }
+
+
+            body > .fixed.inset-0,
+            #site-header,
+            #app-sidebar,
+            #confirm-modal,
+            #error-modal,
+            #list-search-row,
+            #list-filter-row,
+            .print-hide { display: none !important; }
+
+            .app-layout {
+                display: block !important;
+                height: auto !important;
+                padding: 0 !important;
+                gap: 0 !important;
+            }
+            .panel {
+                display: block !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                border-radius: 0 !important;
+                overflow: visible !important;
+                padding: 0 !important;
+            }
+
+            #list-region,
+            #list-region > div {
+                overflow: visible !important;
+                height: auto !important;
+                max-height: none !important;
+            }
+
+            .app-layout h2,
+            .app-layout p,
+            table { color: #000 !important; }
+            thead {
+                position: static !important;
+                background: #fff !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+            }
+            th, td {
+                color: #000 !important;
+                border-color: #999 !important;
+                background: transparent !important;
+            }
+            tr { page-break-inside: avoid; }
+        }
     </style>
     {% block head %}{% endblock %}
 </head>
