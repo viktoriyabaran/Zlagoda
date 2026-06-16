@@ -50,82 +50,68 @@ def home(request):
     return render(request, "home.html")
 
 
-PRODUCT_STATS_COLUMNS = [
+CATEGORY_REVENUE_COLUMNS = [
     {"key": "category_name", "label": "Category", "sortable": True},
-    {"key": "promotional_product", "label": "Promo?", "sortable": True},
-    {"key": "total_units", "label": "Total Units", "sortable": False},
-    {"key": "total_revenue", "label": "Total Revenue", "sortable": False},
-    {"key": "percent_of_category_revenue", "label": "Percent", "sortable": False},
+    {"key": "promotional_product", "label": "Promotional", "sortable": True},
+    {"key": "total_units", "label": "Items Sold", "sortable": False},
+    {"key": "total_revenue", "label": "Revenue", "sortable": False},
+    {
+        "key": "percent_of_category_revenue",
+        "label": "Share of Category",
+        "sortable": False,
+    },
 ]
-PRODUCT_STATS_SORTABLE = {c["key"] for c in PRODUCT_STATS_COLUMNS if c["sortable"]}
+CATEGORY_REVENUE_SORTABLE = {
+    c["key"] for c in CATEGORY_REVENUE_COLUMNS if c["sortable"]
+}
+
+TOP_CUSTOMERS_COLUMNS = [
+    {"key": "cust_surname", "label": "Surname", "sortable": False},
+    {"key": "cust_name", "label": "Name", "sortable": False},
+    {"key": "phone_number", "label": "Phone", "sortable": False},
+    {"key": "percent", "label": "Discount %", "sortable": False},
+]
 
 
 @role_required(Role.MANAGER)
-class GetProductsStatisticsView(View):
+class CategoryRevenueView(View):
     stats_service: IStatisticsService = StatisticsService()
 
     def get(self, request):
         sort_by, sort_dir = resolve_sort(
-            request, PRODUCT_STATS_SORTABLE, default="category_name"
+            request, CATEGORY_REVENUE_SORTABLE, default="category_name"
         )
-        data = self.stats_service.get_product_per_category_stats(sort_by, sort_dir)
-
         return render(
             request,
             "home.html",
             {
                 "list": {
-                    "title": "Products per category",
-                    "subtitle": "Some stats",
-                    "rows": data,
-                    "columns": PRODUCT_STATS_COLUMNS,
+                    "title": "Category Revenue",
+                    "subtitle": "Items sold and revenue share by promotional status",
+                    "rows": self.stats_service.get_category_revenue(sort_by, sort_dir),
+                    "columns": CATEGORY_REVENUE_COLUMNS,
                     "sort": {"by": sort_by, "dir": sort_dir},
                     "empty_message": "Not enough data for statistics.",
-                    "row_id_key": "category_name",
                 }
             },
         )
 
 
 @role_required(Role.MANAGER)
-class GetCustomersStatisticsView(View):
+class TopCustomersView(View):
     stats_service: IStatisticsService = StatisticsService()
 
     def get(self, request):
-        data = self.stats_service.get_richest_customers_stats()
-
         return render(
             request,
             "home.html",
             {
                 "list": {
-                    "title": "Customers who have bought fie most expensive non-promo products",
-                    "subtitle": "Some stats",
-                    "rows": data,
-                    "columns": [
-                        {
-                            "key": "cust_surname",
-                            "label": "Surname",
-                            "sortable": False,
-                        },
-                        {
-                            "key": "cust_name",
-                            "label": "Surname",
-                            "sortable": False,
-                        },
-                        {
-                            "key": "phone_number",
-                            "label": "Phone Number",
-                            "sortable": False,
-                        },
-                        {
-                            "key": "percent",
-                            "label": "Discount Percent",
-                            "sortable": False,
-                        },
-                    ],
+                    "title": "Top Customers",
+                    "subtitle": "Bought all 5 of the most expensive non-promotional products",
+                    "rows": self.stats_service.get_top_customers(),
+                    "columns": TOP_CUSTOMERS_COLUMNS,
                     "empty_message": "Not enough data for statistics.",
-                    "row_id_key": "cust_surname",
                 }
             },
         )

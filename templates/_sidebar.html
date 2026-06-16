@@ -13,6 +13,8 @@
                         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
                     {% elif group.icon == "badge" %}
                         <rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M5 17a3 3 0 0 1 6 0M15 9h4M15 13h4"/>
+                    {% elif group.icon == "chart" %}
+                        <path d="M3 3v18h18"/><path d="M7 16v-5M12 16V7M17 16v-8"/>
                     {% endif %}
                 </svg>
                 <span class="nav-text">{{ group.label }}</span>

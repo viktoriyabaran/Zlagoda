@@ -78,7 +78,7 @@ def delete_customer(customer_id: int):
     execute_write("DELETE FROM customers_customercard WHERE id = %s", [customer_id])
 
 
-def get_richest_customers():
+def get_top_customers():
     return execute_query(
         """
         SELECT cc.cust_surname, cc.cust_name, cc.phone_number, cc.percent

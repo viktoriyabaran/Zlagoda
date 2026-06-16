@@ -57,10 +57,10 @@ _NAV = [
     ),
     (
         "Statistics",
-        "badge",
+        "chart",
         [
-            ("Products", "core:product-stats", (Role.MANAGER,)),
-            ("Customers", "core:customer-stats", (Role.MANAGER,)),
+            ("Category Revenue", "core:category-revenue", (Role.MANAGER,)),
+            ("Top Customers", "core:top-customers", (Role.MANAGER,)),
         ],
     ),
 ]

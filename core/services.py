@@ -6,8 +6,8 @@ from django.http import HttpRequest
 from core.query_helpers import order_by_sql
 from core.repository import get_user_by_username
 from core.roles import Role
-from customers.repository import get_richest_customers
-from sales.repository import get_per_category_stat
+from customers.repository import get_top_customers
+from sales.repository import get_category_revenue_stats
 
 
 class IAuthService(Protocol):
@@ -19,10 +19,8 @@ class IAuthService(Protocol):
 
 
 class IStatisticsService(Protocol):
-    def get_product_per_category_stats(
-        self, sort_by: str, sort_dir: str
-    ) -> list[dict]: ...
-    def get_richest_customers_stats(self) -> list[dict]: ...
+    def get_category_revenue(self, sort_by: str, sort_dir: str) -> list[dict]: ...
+    def get_top_customers(self) -> list[dict]: ...
 
 
 class AuthService:
@@ -44,8 +42,8 @@ class AuthService:
 
 
 class StatisticsService:
-    def get_product_per_category_stats(self, sort_by: str, sort_dir: str) -> list[dict]:
-        return get_per_category_stat(order_by_sql(sort_by, sort_dir))
+    def get_category_revenue(self, sort_by: str, sort_dir: str) -> list[dict]:
+        return get_category_revenue_stats(order_by_sql(sort_by, sort_dir))
 
-    def get_richest_customers_stats(self) -> list[dict]:
-        return get_richest_customers()
+    def get_top_customers(self) -> list[dict]:
+        return get_top_customers()

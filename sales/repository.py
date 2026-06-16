@@ -84,7 +84,7 @@ def get_total_units_sold(product_id: int, date_from: str, date_to: str):
     )
 
 
-def get_per_category_stat(order_by: str = ""):
+def get_category_revenue_stats(order_by: str = ""):
     return execute_query(
         f"""
         SELECT c.category_name, sp.promotional_product, SUM(s.product_number) AS total_units,
