@@ -40,7 +40,7 @@ def delete_check_by_id(check_id: str):
     execute_write("DELETE FROM sales_check WHERE id = %s", [check_id])
 
 
-def create_check(employee_id: int, card_id=None) -> int:
+def create_check(employee_id: int, card_id=None) -> int | None:
     return execute_insert_returning(
         """
         INSERT INTO sales_check (employee_id, card_id, print_date, sum_total, vat)

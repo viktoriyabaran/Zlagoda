@@ -5,11 +5,11 @@ from core.query_helpers import order_by_sql
 from .repository import (
     count_checks_for_customer,
     create_customer,
+    delete_customer,
     get_all_customers,
     get_check_counts_by_customer,
     get_customer_by_id,
     update_customer,
-    delete_customer,
 )
 
 
@@ -22,14 +22,15 @@ def customer_block_reason(count: int) -> str:
 
 
 class ICustomerService(Protocol):
-    def get_all(self, sort_by: str, sort_dir: str) -> list: ...
+    def get_all(self, sort_by: str | None, sort_dir: str | None) -> list: ...
     def create(self, data: dict) -> None: ...
     def get_by_id(self, id: int) -> dict | None: ...
     def update(self, id: int, data: dict) -> None: ...
+    def annotate_deletable(self, rows: list) -> list: ...
 
 
 class CustomerService:
-    def get_all(self, sort_by: str, sort_dir: str) -> list:
+    def get_all(self, sort_by: str | None, sort_dir: str | None) -> list:
         return get_all_customers(order_by_sql(sort_by, sort_dir))
 
     def create(self, data: dict) -> None:
@@ -59,7 +60,5 @@ class CustomerService:
     def annotate_deletable(self, rows: list) -> list:
         counts = get_check_counts_by_customer()
         for row in rows:
-            row["delete_block_reason"] = customer_block_reason(
-                counts.get(row["id"], 0)
-            )
+            row["delete_block_reason"] = customer_block_reason(counts.get(row["id"], 0))
         return rows
