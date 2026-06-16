@@ -6,18 +6,10 @@ from django.views import View
 from core.decorators import role_required
 from core.query_helpers import resolve_sort
 from core.roles import Role
+from customers.table_config import CUSTOMER_COLUMNS, CUSTOMER_SORTABLE
 
 from .forms import CustomerCardForm
 from .services import CustomerService, ICustomerService
-
-CUSTOMER_COLUMNS = [
-    {"key": "id", "label": "Card Number", "sortable": False},
-    {"key": "cust_surname", "label": "Surname", "sortable": True},
-    {"key": "cust_name", "label": "Name", "sortable": False},
-    {"key": "phone_number", "label": "Phone", "sortable": False},
-    {"key": "percent", "label": "Discount %", "sortable": False},
-]
-CUSTOMER_SORTABLE = {c["key"] for c in CUSTOMER_COLUMNS if c["sortable"]}
 
 
 @role_required(Role.MANAGER, Role.CASHIER)
@@ -61,6 +53,7 @@ class GetCustomersView(View):
         )
         rows = self.customer_service.get_all(sort_by, sort_dir)
         self.customer_service.annotate_deletable(rows)
+
         return render(
             request,
             "home.html",

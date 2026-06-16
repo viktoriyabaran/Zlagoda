@@ -18,6 +18,7 @@ from products.repository import (
 
 from .repository import update_check_totals
 from .services import CheckService
+from .table_config import CHECK_COLUMNS
 
 
 @role_required(Role.MANAGER, Role.CASHIER)
@@ -31,7 +32,10 @@ class GetChecksView(View):
         is_cashier = request.session.get("user_role") == Role.CASHIER
         if is_cashier:
             # Cashiers only ever see their own checks, regardless of any filter.
-            employee_id = get_user_by_id(request.session["user_id"])["employee_id"]
+            employee = get_user_by_id(request.session["user_id"])
+            if not employee:
+                return redirect("core:login")
+            employee_id = employee["employee_id"]
         else:
             employee_id = request.GET.get("employee_id")
 
@@ -54,11 +58,11 @@ class GetChecksView(View):
             if owns_check:
                 check_items = self.check_service.get_items(int(selected_check_id))
 
-        filters = [
+        filters: list[dict] = [
             {"key": "date_from", "label": "From date", "type": "date"},
             {"key": "date_to", "label": "To date", "type": "date"},
         ]
-        actions = [
+        actions: list[dict] = [
             {
                 "label": "View",
                 "url_name": "sales:check-detail",
@@ -101,13 +105,7 @@ class GetChecksView(View):
                     "title": "CHECKS",
                     "subtitle": "My sales" if is_cashier else "Sales history",
                     "rows": checks,
-                    "columns": [
-                        {"key": "id", "label": "Check #", "sortable": False},
-                        {"key": "print_date", "label": "Date", "sortable": False},
-                        {"key": "empl_surname", "label": "Cashier", "sortable": False},
-                        {"key": "sum_total", "label": "Total", "sortable": False},
-                        {"key": "vat", "label": "VAT", "sortable": False},
-                    ],
+                    "columns": CHECK_COLUMNS,
                     "sort": {"by": "print_date", "dir": "desc"},
                     "empty_message": "No checks found.",
                     "has_date_filter": True,
@@ -312,7 +310,10 @@ class GetCheckDetailView(View):
     def get(self, request, check_id):
         if request.session.get("user_role") == Role.CASHIER:
             check = self.check_service.get_by_id(check_id)
-            employee_id = get_user_by_id(request.session["user_id"])["employee_id"]
+            employee = get_user_by_id(request.session["user_id"])
+            if not employee:
+                return redirect("core:login")
+            employee_id = employee["employee_id"]
             if not check or check["employee_id"] != employee_id:
                 return HttpResponseForbidden(
                     "Viewing this resource is not allowed for you."
@@ -320,7 +321,9 @@ class GetCheckDetailView(View):
         items = self.check_service.get_items(check_id)
 
         for item in items:
-            item["subtotal"] = "{:.4f}".format(float(item["selling_price"]) * item["product_number"])
+            item["subtotal"] = "{:.4f}".format(
+                float(item["selling_price"]) * item["product_number"]
+            )
 
         return render(
             request,

@@ -47,8 +47,13 @@ class CheckService:
         delete_check_by_id(check_id)
 
     def start_check(self, user_id: int, card_id=None) -> int:
-        employee_id = get_user_by_id(user_id)["employee_id"]
-        return create_check(employee_id, card_id)
+        user = get_user_by_id(user_id)
+        if not user:
+            raise ValueError(f"No user found for id {user_id}")
+        check_id = create_check(user["employee_id"], card_id)
+        if check_id is None:
+            raise RuntimeError("Failed to create check")
+        return check_id
 
     def add_item(
         self, check_id: int, upc: str, product_number: int, selling_price
