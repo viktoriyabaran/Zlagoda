@@ -63,6 +63,7 @@ class CategoryRevenueView(View):
         sort_by, sort_dir = resolve_sort(
             request, CATEGORY_REVENUE_SORTABLE, default="category_name"
         )
+        promotional = {"true": True, "false": False}.get(request.GET.get("promotional"))
         return render(
             request,
             "home.html",
@@ -70,9 +71,24 @@ class CategoryRevenueView(View):
                 "list": {
                     "title": "Category Revenue",
                     "subtitle": "Items sold and revenue share by promotional status",
-                    "rows": self.stats_service.get_category_revenue(sort_by, sort_dir),
+                    "rows": self.stats_service.get_category_revenue(
+                        sort_by,
+                        sort_dir,
+                        promotional=promotional,
+                    ),
                     "columns": CATEGORY_REVENUE_COLUMNS,
                     "sort": {"by": sort_by, "dir": sort_dir},
+                    "filters": [
+                        {
+                            "key": "promotional",
+                            "label": "Promotional",
+                            "type": "select",
+                            "options": [
+                                {"value": "true", "label": "Promotional"},
+                                {"value": "false", "label": "Non-promotional"},
+                            ],
+                        },
+                    ],
                     "empty_message": "Not enough data for statistics.",
                 }
             },

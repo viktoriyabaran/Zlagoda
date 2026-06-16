@@ -20,7 +20,10 @@ class IAuthService(Protocol):
 
 class IStatisticsService(Protocol):
     def get_category_revenue(
-        self, sort_by: str | None, sort_dir: str | None
+        self,
+        sort_by: str | None,
+        sort_dir: str | None,
+        promotional: bool | None = None,
     ) -> list[dict]: ...
     def get_top_customers(self) -> list[dict]: ...
 
@@ -45,9 +48,15 @@ class AuthService:
 
 class StatisticsService:
     def get_category_revenue(
-        self, sort_by: str | None, sort_dir: str | None
+        self,
+        sort_by: str | None,
+        sort_dir: str | None,
+        promotional: bool | None = None,
     ) -> list[dict]:
-        return get_category_revenue_stats(order_by_sql(sort_by, sort_dir))
+        return get_category_revenue_stats(
+            order_by_sql(sort_by, sort_dir),
+            promotional=promotional,
+        )
 
     def get_top_customers(self) -> list[dict]:
         return get_top_customers()
