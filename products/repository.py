@@ -10,6 +10,12 @@ def get_product_filters():
     categories = get_all_categories(order_by=" ORDER BY category_name")
     return [
         {
+            "key": "product_name",
+            "label": "Search by Product Name",
+            "type": "search",
+            "column": "p.product_name",
+        },
+        {
             "key": "category_name",
             "label": "Category",
             "type": "select",

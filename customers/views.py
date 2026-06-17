@@ -9,6 +9,7 @@ from core.roles import Role
 from customers.table_config import CUSTOMER_COLUMNS, CUSTOMER_SORTABLE
 
 from .forms import CustomerCardForm
+from .repository import get_customer_filters
 from .services import CustomerService, ICustomerService
 
 
@@ -51,7 +52,7 @@ class GetCustomersView(View):
         sort_by, sort_dir = resolve_sort(
             request, CUSTOMER_SORTABLE, default="cust_surname"
         )
-        rows = self.customer_service.get_all(sort_by, sort_dir)
+        rows = self.customer_service.get_all(request, sort_by, sort_dir)
         self.customer_service.annotate_deletable(rows)
 
         return render(
@@ -64,6 +65,7 @@ class GetCustomersView(View):
                     "rows": rows,
                     "columns": CUSTOMER_COLUMNS,
                     "sort": {"by": sort_by, "dir": sort_dir},
+                    "filters": get_customer_filters(),
                     "add_url": reverse("customers:add-customer"),
                     "add_label": "Add customer",
                     "empty_message": "No customers yet.",

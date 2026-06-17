@@ -1,8 +1,22 @@
 from core.db import execute_query, execute_single, execute_write
 
 
-def get_all_customers(order_by: str = "") -> list:
-    return execute_query(f"SELECT * FROM customers_customercard{order_by}")
+def get_customer_filters():
+    return [
+        {
+            "key": "cust_surname",
+            "label": "Search by Surname",
+            "type": "search",
+            "column": "cust_surname",
+        },
+    ]
+
+
+def get_all_customers(where_sql: str = "", where_params=(), order_by: str = "") -> list:
+    return execute_query(
+        f"SELECT * FROM customers_customercard{where_sql}{order_by}",
+        list(where_params),
+    )
 
 
 def get_customer_by_id(customer_id: int) -> dict | None:
