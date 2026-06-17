@@ -6,6 +6,7 @@ from django.db import transaction
 from django.http import HttpRequest
 
 from core.query_helpers import order_by_sql, resolve_filters
+from core.roles import Role
 from products.repository import (
     add_store_product_stock,
     count_products_in_category,
@@ -177,7 +178,10 @@ class ProductService:
     def get_all(
         self, request: HttpRequest, sort_by: str | None, sort_dir: str | None
     ) -> list:
-        _, where_sql, where_params = resolve_filters(request, get_product_filters())
+        is_cashier = request.session.get("user_role") == Role.CASHIER
+        _, where_sql, where_params = resolve_filters(
+            request, get_product_filters(is_cashier)
+        )
         return get_all_products(
             where_sql, where_params, order_by_sql(sort_by, sort_dir)
         )

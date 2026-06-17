@@ -6,9 +6,9 @@ from core.db import (
 )
 
 
-def get_product_filters():
+def get_product_filters(is_cashier: bool = False):
     categories = get_all_categories(order_by=" ORDER BY category_name")
-    return [
+    filters = [
         {
             "key": "category_name",
             "label": "Category",
@@ -22,6 +22,17 @@ def get_product_filters():
         {"key": "date_from", "label": "From", "type": "date"},
         {"key": "date_to", "label": "To", "type": "date"},
     ]
+    if is_cashier:
+        filters.insert(
+            0,
+            {
+                "key": "product_name",
+                "label": "Search by Product Name",
+                "type": "search",
+                "column": "p.product_name",
+            },
+        )
+    return filters
 
 
 def get_category_by_id(category_id: int):

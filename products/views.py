@@ -198,7 +198,9 @@ class GetProductsView(View):
                     else None,
                     "add_label": "Add product",
                     "empty_message": "No products yet.",
-                    "filters": get_product_filters(),
+                    "filters": get_product_filters(
+                        request.session.get("user_role") == Role.CASHIER
+                    ),
                     "row_id_key": "id",
                     "actions": [
                         {
