@@ -1,0 +1,2 @@
+SHELL=/bin/sh
+0 2 * * * root cd /app && /usr/local/bin/python manage.py apply_expiring_promotions >> /proc/1/fd/1 2>&1

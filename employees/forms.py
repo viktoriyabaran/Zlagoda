@@ -1,3 +1,5 @@
+from datetime import date
+
 from django import forms
 
 from core.forms import CHECKBOX_CLASS, LayoutForm
@@ -92,6 +94,10 @@ class EmployeeForm(LayoutForm):
 
     conditional_groups = {"has_user_account": ["username", "password"]}
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["date_of_birth"].widget.attrs["max"] = date.today().isoformat()
+
     def clean_date_of_birth(self):
         value = self.cleaned_data["date_of_birth"]
         validate_age(value)
@@ -118,6 +124,12 @@ class EmployeeForm(LayoutForm):
 
     def clean(self):
         cleaned = super().clean()
+        dob = cleaned.get("date_of_birth")
+        dos = cleaned.get("date_of_start")
+        if dob and dos and dos < dob:
+            self.add_error(
+                "date_of_start", "Start date cannot be earlier than the date of birth."
+            )
         if cleaned.get("has_user_account"):
             if not cleaned.get("username"):
                 self.add_error("username", "Username is required")

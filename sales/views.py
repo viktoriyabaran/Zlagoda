@@ -1,5 +1,7 @@
 # Define sales views here
 
+from datetime import date
+
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
 from django.views import View
@@ -25,10 +27,20 @@ class GetChecksView(View):
     check_service = CheckService()
 
     def get(self, request):
+        is_cashier = request.session.get("user_role") == Role.CASHIER
+
         date_from = request.GET.get("date_from")
         date_to = request.GET.get("date_to")
 
-        is_cashier = request.session.get("user_role") == Role.CASHIER
+        if is_cashier and date_from is None and date_to is None:
+            today = date.today().isoformat()
+            params = request.GET.copy()
+            params["date_from"] = today
+            params["date_to"] = today
+            return redirect(f"{request.path}?{params.urlencode()}")
+
+        check_number = request.GET.get("check_number") if is_cashier else None
+
         if is_cashier:
             # Cashiers only ever see their own checks, regardless of any filter.
             employee = get_user_by_id(request.session["user_id"])
@@ -42,6 +54,7 @@ class GetChecksView(View):
             date_from=date_from,
             date_to=date_to,
             employee_id=employee_id or None,
+            check_number=check_number or None,
         )
 
         total_sum = sum(float(c["sum_total"]) for c in checks) if checks else 0
@@ -61,6 +74,11 @@ class GetChecksView(View):
             {"key": "date_from", "label": "From date", "type": "date"},
             {"key": "date_to", "label": "To date", "type": "date"},
         ]
+        if is_cashier:
+            filters.insert(
+                0,
+                {"key": "check_number", "label": "Search by Check #", "type": "search"},
+            )
         actions: list[dict] = [
             {
                 "label": "View",
@@ -108,6 +126,7 @@ class GetChecksView(View):
                     "sort": {"by": "print_date", "dir": "desc"},
                     "empty_message": "No checks found.",
                     "has_date_filter": True,
+                    "show_today_button": is_cashier,
                     "row_id_key": "id",
                     "filters": filters,
                     "actions": actions,

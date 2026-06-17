@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from decimal import Decimal
 from typing import Protocol
 
@@ -5,7 +6,9 @@ from django.db import transaction
 from django.http import HttpRequest
 
 from core.query_helpers import order_by_sql, resolve_filters
+from core.roles import Role
 from products.repository import (
+    add_store_product_stock,
     count_products_in_category,
     count_sales_for_store_product,
     count_store_products_for_product,
@@ -19,12 +22,16 @@ from products.repository import (
     get_all_products,
     get_all_store_products,
     get_category_by_id,
+    get_expired_promo_with_stock,
+    get_non_promo_expiring_with_stock,
     get_product_by_id,
     get_product_counts_by_category,
     get_product_filters,
+    get_promo_twin,
     get_sale_counts_by_store_product,
     get_store_product_by_upc,
     get_store_product_counts_by_product,
+    set_store_product_number,
     update_category,
     update_product,
     update_store_product,
@@ -32,6 +39,7 @@ from products.repository import (
 from products.table_config import STORE_PRODUCT_FILTERS
 
 PROMO_DISCOUNT = Decimal("0.8")
+EXPIRY_PROMO_WINDOW_DAYS = 7
 
 
 def category_block_reason(count: int) -> str:
@@ -61,6 +69,7 @@ def _create_store_product_with_optional_promo(data: dict) -> None:
             "selling_price": data["selling_price"],
             "products_number": data["products_number"],
             "promotional_product": False,
+            "expiration_date": data.get("expiration_date"),
         }
     )
     if data.get("add_promo_variant"):
@@ -75,8 +84,54 @@ def _create_store_product_with_optional_promo(data: dict) -> None:
                 "selling_price": promo_price,
                 "products_number": data["promo_products_number"],
                 "promotional_product": True,
+                "expiration_date": data.get("expiration_date"),
             }
         )
+
+
+def _generate_promo_upc(base_upc: str) -> str:
+    for lead in "23456789":
+        candidate = lead + base_upc[1:]
+        if candidate != base_upc and not get_store_product_by_upc(candidate):
+            return candidate
+    raise RuntimeError(f"Could not generate a free promo UPC for {base_upc}")
+
+
+def apply_expiring_promotions(
+    today: date, window_days: int = EXPIRY_PROMO_WINDOW_DAYS
+) -> dict:
+    cutoff = today + timedelta(days=window_days)
+    moved = 0
+    zeroed = 0
+    with transaction.atomic():
+        for sp in get_non_promo_expiring_with_stock(cutoff):
+            quantity = sp["products_number"]
+            twin = get_promo_twin(sp["UPC"])
+            if twin:
+                add_store_product_stock(twin["UPC"], quantity)
+            else:
+                promo_price = (sp["selling_price"] * PROMO_DISCOUNT).quantize(
+                    Decimal("0.0001")
+                )
+                create_store_product(
+                    {
+                        "UPC": _generate_promo_upc(sp["UPC"]),
+                        "UPC_prom": sp["UPC"],
+                        "product": sp["product_id"],
+                        "selling_price": promo_price,
+                        "products_number": quantity,
+                        "promotional_product": True,
+                        "expiration_date": sp["expiration_date"],
+                    }
+                )
+            set_store_product_number(sp["UPC"], 0)
+            moved += 1
+
+        for sp in get_expired_promo_with_stock(today):
+            set_store_product_number(sp["UPC"], 0)
+            zeroed += 1
+
+    return {"moved": moved, "zeroed": zeroed}
 
 
 class ICategoryService(Protocol):
@@ -123,7 +178,10 @@ class ProductService:
     def get_all(
         self, request: HttpRequest, sort_by: str | None, sort_dir: str | None
     ) -> list:
-        _, where_sql, where_params = resolve_filters(request, get_product_filters())
+        is_cashier = request.session.get("user_role") == Role.CASHIER
+        _, where_sql, where_params = resolve_filters(
+            request, get_product_filters(is_cashier)
+        )
         return get_all_products(
             where_sql, where_params, order_by_sql(sort_by, sort_dir)
         )
