@@ -198,7 +198,9 @@ class GetProductsView(View):
                     else None,
                     "add_label": "Add product",
                     "empty_message": "No products yet.",
-                    "filters": get_product_filters(),
+                    "filters": get_product_filters(
+                        request.session.get("user_role") == Role.CASHIER
+                    ),
                     "row_id_key": "id",
                     "actions": [
                         {
@@ -380,6 +382,7 @@ class EditStoreProductView(View):
                 "selling_price": store_product["selling_price"],
                 "products_number": store_product["products_number"],
                 "promotional_product": store_product["promotional_product"],
+                "expiration_date": store_product["expiration_date"],
             }
         )
         return render(

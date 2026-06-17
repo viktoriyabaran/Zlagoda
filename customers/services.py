@@ -1,6 +1,9 @@
 from typing import Protocol
 
-from core.query_helpers import order_by_sql
+from django.http import HttpRequest
+
+from core.query_helpers import order_by_sql, resolve_filters
+from core.roles import Role
 
 from .repository import (
     count_checks_for_customer,
@@ -9,6 +12,7 @@ from .repository import (
     get_all_customers,
     get_check_counts_by_customer,
     get_customer_by_id,
+    get_customer_filters,
     update_customer,
 )
 
@@ -22,7 +26,9 @@ def customer_block_reason(count: int) -> str:
 
 
 class ICustomerService(Protocol):
-    def get_all(self, sort_by: str | None, sort_dir: str | None) -> list: ...
+    def get_all(
+        self, request: HttpRequest, sort_by: str | None, sort_dir: str | None
+    ) -> list: ...
     def create(self, data: dict) -> None: ...
     def get_by_id(self, id: int) -> dict | None: ...
     def update(self, id: int, data: dict) -> None: ...
@@ -30,8 +36,18 @@ class ICustomerService(Protocol):
 
 
 class CustomerService:
-    def get_all(self, sort_by: str | None, sort_dir: str | None) -> list:
-        return get_all_customers(order_by_sql(sort_by, sort_dir))
+    def get_all(
+        self, request: HttpRequest, sort_by: str | None, sort_dir: str | None
+    ) -> list:
+        is_cashier = request.session.get("user_role") == Role.CASHIER
+        _, where_sql, where_params = resolve_filters(
+            request, get_customer_filters(is_cashier)
+        )
+        return get_all_customers(
+            where_sql=where_sql,
+            where_params=where_params,
+            order_by=order_by_sql(sort_by, sort_dir),
+        )
 
     def create(self, data: dict) -> None:
         create_customer(

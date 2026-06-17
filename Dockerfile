@@ -7,12 +7,17 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
     libpq-dev \
+    cron \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+
+RUN cp docker-crontab /etc/cron.d/zlagoda \
+    && chmod 0644 /etc/cron.d/zlagoda \
+    && chmod +x docker-entrypoint-cron.sh
 
 RUN python manage.py collectstatic --noinput
 
