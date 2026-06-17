@@ -76,10 +76,7 @@ class Command(BaseCommand):
             )
         return ids
 
-    def _seed_store_products(
-        self, products: dict[str, int]
-    ) -> dict[str, dict[str, str | None]]:
-        # (product_name, UPC, price, qty, has_promo_with_qty)
+    def _seed_store_products(self, products: dict[str, int]) -> list[str]:
         rows = [
             ("Milk 1L", "100000000001", Decimal("32.00"), 120, 5, 40),
             ("Yogurt 200g", "100000000002", Decimal("18.00"), 80, 4, None),
@@ -97,9 +94,10 @@ class Command(BaseCommand):
             ("Soap", "100000000014", Decimal("15.00"), 80, 730, None),
             ("Toilet Paper 8pk", "100000000015", Decimal("120.00"), 35, 999, 10),
         ]
-        # name -> {"base": non-promo UPC, "promo": promo UPC or None}
-        upcs: dict[str, dict[str, str | None]] = {}
-        for name, upc, price, qty, promo_qty in rows:
+        today = date.today()
+        all_upcs: list[str] = []
+        for name, upc, price, qty, expires_in_days, promo_qty in rows:
+            expiration = today + timedelta(days=expires_in_days)
             execute_write(
                 """
                 INSERT INTO products_storeproduct
@@ -109,7 +107,7 @@ class Command(BaseCommand):
                 """,
                 [upc, products[name], price, qty, expiration],
             )
-            upcs[name] = {"base": upc, "promo": None}
+            all_upcs.append(upc)
             if promo_qty is not None:
                 promo_upc = "2" + upc[1:]
                 promo_price = (price * Decimal("0.8")).quantize(Decimal("0.0001"))
@@ -129,8 +127,8 @@ class Command(BaseCommand):
                         expiration,
                     ],
                 )
-                upcs[name]["promo"] = promo_upc
-        return upcs
+                all_upcs.append(promo_upc)
+        return all_upcs
 
     def _seed_employees(self) -> dict[str, int]:
         rows = [
@@ -256,8 +254,8 @@ class Command(BaseCommand):
     def _seed_users(self, employees: dict[str, int]) -> None:
         # username, password, employee surname
         rows = [
-            ("Manager", "manager", "Shevchenko"),  # manager employee
-            ("Cashier", "cashier", "Bondar"),  # cashier employee
+            ("olena", "password", "Shevchenko"),  # manager
+            ("iryna", "password", "Bondar"),  # cashier
         ]
         for username, password, surname in rows:
             execute_write(
@@ -358,92 +356,34 @@ class Command(BaseCommand):
         self,
         employees: dict[str, int],
         customers: list[int],
-        upcs: dict[str, dict[str, str | None]],
+        upcs: list[str],
     ) -> None:
+        cashier_surnames = ["Bondar", "Tkachenko", "Melnyk", "Sydorenko"]
         now = datetime.now(tz=timezone.utc).replace(microsecond=0)
 
+        # (offset_days, cashier_surname, customer_index or None, [(upc_index, qty), ...])
         plan = [
-            (
-                0,
-                "Bondar",
-                0,
-                [
-                    ("Toilet Paper 8pk", 1, False),
-                    ("Cheese 200g", 1, False),
-                    ("Cola 1.5L", 2, False),
-                ],
-            ),
-            (
-                1,
-                "Bondar",
-                0,
-                [
-                    ("Orange Juice 1L", 1, False),
-                    ("Beer 0.5L", 3, False),
-                    ("Milk 1L", 2, False),
-                ],
-            ),
-            (
-                2,
-                "Tkachenko",
-                3,
-                [
-                    ("Beer 0.5L", 2, False),
-                    ("Cola 1.5L", 1, False),
-                    ("Orange Juice 1L", 2, False),
-                ],
-            ),
-            (
-                3,
-                "Tkachenko",
-                3,
-                [("Cheese 200g", 1, False), ("Toilet Paper 8pk", 1, False)],
-            ),
-            (
-                4,
-                "Melnyk",
-                1,
-                [
-                    ("Toilet Paper 8pk", 1, False),
-                    ("Cheese 200g", 1, False),
-                    ("Orange Juice 1L", 1, False),
-                    ("Cola 1.5L", 1, False),
-                ],
-            ),
-            (
-                5,
-                "Melnyk",
-                None,
-                [
-                    ("Milk 1L", 2, True),
-                    ("Cola 1.5L", 1, True),
-                    ("Chocolate Bar", 3, True),
-                ],
-            ),
-            (
-                6,
-                "Sydorenko",
-                4,
-                [("Chips 100g", 2, False), ("Crackers 200g", 1, False)],
-            ),
-            (7, "Sydorenko", 5, [("White Bread", 2, False), ("Croissant", 2, True)]),
-            (
-                8,
-                "Bondar",
-                None,
-                [("Yogurt 200g", 3, False), ("Mineral Water 1.5L", 2, False)],
-            ),
-            (10, "Melnyk", 7, [("Cheese 200g", 1, True), ("Soap", 1, False)]),
+            (0, "Bondar", 0, [(20, 1), (3, 1), (9, 2)]),
+            (1, "Bondar", 0, [(11, 1), (13, 2)]),
+            (2, "Tkachenko", 3, [(13, 1), (9, 1), (11, 2)]),
+            (3, "Tkachenko", 3, [(3, 1), (20, 1)]),
+            (0, "Bondar", None, [(2, 1), (8, 4)]),
+            (1, "Tkachenko", 1, [(6, 2), (11, 2), (13, 1)]),
+            (1, "Melnyk", None, [(7, 1), (12, 1)]),
+            (2, "Melnyk", 2, [(0, 1), (3, 2), (8, 2)]),
+            (3, "Sydorenko", 4, [(14, 1), (10, 1)]),
+            (4, "Bondar", None, [(1, 3), (5, 2), (9, 1)]),
+            (5, "Tkachenko", 5, [(0, 1), (2, 1), (11, 2)]),
+            (7, "Sydorenko", 7, [(4, 2), (6, 1), (12, 2)]),
+            (10, "Melnyk", None, [(8, 1), (9, 2), (13, 3)]),
         ]
 
         for offset, surname, cust_idx, line_items in plan:
             print_date = now - timedelta(days=offset, hours=offset % 6)
             sum_total = Decimal("0")
             sales_payload = []
-            for name, qty, use_promo in line_items:
-                upc = upcs[name]["promo"] if use_promo else upcs[name]["base"]
-                if upc is None:  # no promo variant exists; fall back to base
-                    upc = upcs[name]["base"]
+            for upc_idx, qty in line_items:
+                upc = upcs[upc_idx]
                 price = self._get_store_product_price(upc)
                 sales_payload.append((upc, qty, price))
                 sum_total += price * qty
