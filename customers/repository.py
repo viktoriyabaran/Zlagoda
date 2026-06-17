@@ -1,8 +1,42 @@
 from core.db import execute_query, execute_single, execute_write
 
 
-def get_all_customers(order_by: str = "") -> list:
-    return execute_query(f"SELECT * FROM customers_customercard{order_by}")
+def get_distinct_customer_percents() -> list:
+    return execute_query(
+        "SELECT DISTINCT percent FROM customers_customercard ORDER BY percent"
+    )
+
+
+def get_customer_filters(is_cashier: bool = False):
+    if is_cashier:
+        return [
+            {
+                "key": "cust_surname",
+                "label": "Search by Surname",
+                "type": "search",
+                "column": "cust_surname",
+            },
+        ]
+    percents = get_distinct_customer_percents()
+    return [
+        {
+            "key": "percent",
+            "label": "Discount %",
+            "type": "select",
+            "column": "percent",
+            "options": [
+                {"value": str(p["percent"]), "label": f"{p['percent']}%"}
+                for p in percents
+            ],
+        },
+    ]
+
+
+def get_all_customers(where_sql: str = "", where_params=(), order_by: str = "") -> list:
+    return execute_query(
+        f"SELECT * FROM customers_customercard{where_sql}{order_by}",
+        list(where_params),
+    )
 
 
 def get_customer_by_id(customer_id: int) -> dict | None:
@@ -57,6 +91,7 @@ def update_customer(customer_card_id: int, data: dict):
         ],
     )
 
+
 def count_checks_for_customer(customer_id: int) -> int:
     result = execute_single(
         "SELECT COUNT(*) as count FROM sales_check WHERE card_id = %s",
@@ -74,6 +109,4 @@ def get_check_counts_by_customer() -> dict:
 
 
 def delete_customer(customer_id: int):
-    execute_write(
-        "DELETE FROM customers_customercard WHERE id = %s", [customer_id]
-    )
+    execute_write("DELETE FROM customers_customercard WHERE id = %s", [customer_id])

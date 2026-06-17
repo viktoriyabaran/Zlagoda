@@ -25,6 +25,7 @@
                 <div><span class="text-white/50 uppercase text-[10px] tracking-widest">UPC</span><p class="text-white mt-1">{{ store_product.UPC }}</p></div>
                 <div><span class="text-white/50 uppercase text-[10px] tracking-widest">Price</span><p class="text-white mt-1">{{ store_product.selling_price }}</p></div>
                 <div><span class="text-white/50 uppercase text-[10px] tracking-widest">In Stock</span><p class="text-white mt-1">{{ store_product.products_number }}</p></div>
+                <div><span class="text-white/50 uppercase text-[10px] tracking-widest">Expiration</span><p class="text-white mt-1">{{ store_product.expiration_date|default:"—" }}</p></div>
                 <div><span class="text-white/50 uppercase text-[10px] tracking-widest">Total Sold</span><p class="text-white mt-1">{{ store_product.total_sold }}</p></div>
             </div>
             {% endif %}
@@ -35,6 +36,7 @@
                 <div><span class="text-white/50 uppercase text-[10px] tracking-widest">UPC</span><p class="text-white mt-1">{{ promo_product.UPC }}</p></div>
                 <div><span class="text-white/50 uppercase text-[10px] tracking-widest">Promo Price</span><p class="text-white mt-1">{{ promo_product.selling_price }}</p></div>
                 <div><span class="text-white/50 uppercase text-[10px] tracking-widest">In Stock</span><p class="text-white mt-1">{{ promo_product.products_number }}</p></div>
+                <div><span class="text-white/50 uppercase text-[10px] tracking-widest">Expiration</span><p class="text-white mt-1">{{ promo_product.expiration_date|default:"—" }}</p></div>
                 <div><span class="text-white/50 uppercase text-[10px] tracking-widest">Total Sold</span><p class="text-white mt-1">{{ promo_product.total_sold }}</p></div>
             </div>
             {% endif %}

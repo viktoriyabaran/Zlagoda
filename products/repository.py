@@ -6,9 +6,9 @@ from core.db import (
 )
 
 
-def get_product_filters():
+def get_product_filters(is_cashier: bool = False):
     categories = get_all_categories(order_by=" ORDER BY category_name")
-    return [
+    filters = [
         {
             "key": "category_name",
             "label": "Category",
@@ -22,6 +22,17 @@ def get_product_filters():
         {"key": "date_from", "label": "From", "type": "date"},
         {"key": "date_to", "label": "To", "type": "date"},
     ]
+    if is_cashier:
+        filters.insert(
+            0,
+            {
+                "key": "product_name",
+                "label": "Search by Product Name",
+                "type": "search",
+                "column": "p.product_name",
+            },
+        )
+    return filters
 
 
 def get_category_by_id(category_id: int):
@@ -133,8 +144,9 @@ def get_store_products_by_product(product_id):
 def create_store_product(data: dict):
     execute_write(
         """INSERT INTO products_storeproduct
-           ("UPC", "UPC_prom_id", product_id, selling_price, products_number, promotional_product)
-           VALUES (%s, %s, %s, %s, %s, %s)""",
+           ("UPC", "UPC_prom_id", product_id, selling_price, products_number,
+            promotional_product, expiration_date)
+           VALUES (%s, %s, %s, %s, %s, %s, %s)""",
         [
             data["UPC"],
             data["UPC_prom"],
@@ -142,6 +154,7 @@ def create_store_product(data: dict):
             data["selling_price"],
             data["products_number"],
             data["promotional_product"],
+            data.get("expiration_date"),
         ],
     )
 
@@ -150,7 +163,8 @@ def get_all_store_products(where_sql="", where_params=(), order_by=""):
     return execute_query(
         f"""
         SELECT sp."UPC", p.product_name, p.characteristics,
-               sp.selling_price, sp.products_number, sp.promotional_product
+               sp.selling_price, sp.products_number, sp.promotional_product,
+               sp.expiration_date
         FROM products_storeproduct sp
         JOIN products_product p ON sp.product_id = p.id
         {where_sql}{order_by}
@@ -162,12 +176,14 @@ def get_all_store_products(where_sql="", where_params=(), order_by=""):
 def update_store_product(upc: str, data: dict):
     execute_write(
         """UPDATE products_storeproduct
-           SET selling_price = %s, products_number = %s, promotional_product = %s
+           SET selling_price = %s, products_number = %s, promotional_product = %s,
+               expiration_date = %s
            WHERE "UPC" = %s""",
         [
             data["selling_price"],
             data["products_number"],
             data["promotional_product"],
+            data.get("expiration_date"),
             upc,
         ],
     )
@@ -179,6 +195,57 @@ def decrement_store_product_number(upc: str, quantity: int):
            SET products_number = products_number - %s
            WHERE "UPC" = %s""",
         [quantity, upc],
+    )
+
+
+def add_store_product_stock(upc: str, quantity: int):
+    execute_write(
+        """UPDATE products_storeproduct
+           SET products_number = products_number + %s
+           WHERE "UPC" = %s""",
+        [quantity, upc],
+    )
+
+
+def set_store_product_number(upc: str, quantity: int):
+    execute_write(
+        'UPDATE products_storeproduct SET products_number = %s WHERE "UPC" = %s',
+        [quantity, upc],
+    )
+
+
+def get_promo_twin(base_upc: str) -> dict | None:
+    return execute_single(
+        """SELECT * FROM products_storeproduct
+           WHERE "UPC_prom_id" = %s AND promotional_product = TRUE""",
+        [base_upc],
+    )
+
+
+def get_non_promo_expiring_with_stock(cutoff_date) -> list:
+    """Regular-price products that still have stock and expire on or before the
+    given cutoff date (today + promotion window)."""
+    return execute_query(
+        """SELECT "UPC", product_id, selling_price, products_number, expiration_date
+           FROM products_storeproduct
+           WHERE promotional_product = FALSE
+             AND products_number > 0
+             AND expiration_date IS NOT NULL
+             AND expiration_date <= %s""",
+        [cutoff_date],
+    )
+
+
+def get_expired_promo_with_stock(today) -> list:
+    """Promotional products that still have stock and have reached expiration."""
+    return execute_query(
+        """SELECT "UPC"
+           FROM products_storeproduct
+           WHERE promotional_product = TRUE
+             AND products_number > 0
+             AND expiration_date IS NOT NULL
+             AND expiration_date <= %s""",
+        [today],
     )
 
 
@@ -264,12 +331,12 @@ def get_product_detail(product_id: int) -> dict | None:
 def get_store_product_with_sales(product_id: int) -> dict | None:
     return execute_single(
         """
-        SELECT sp."UPC", sp.selling_price, sp.products_number,
+        SELECT sp."UPC", sp.selling_price, sp.products_number, sp.expiration_date,
                COALESCE(SUM(s.product_number), 0) as total_sold
         FROM products_storeproduct sp
         LEFT JOIN sales_sale s ON s."UPC" = sp."UPC"
         WHERE sp.product_id = %s AND sp.promotional_product = FALSE
-        GROUP BY sp."UPC", sp.selling_price, sp.products_number
+        GROUP BY sp."UPC", sp.selling_price, sp.products_number, sp.expiration_date
         """,
         [product_id],
     )
@@ -278,12 +345,12 @@ def get_store_product_with_sales(product_id: int) -> dict | None:
 def get_promo_store_product_with_sales(product_id: int) -> dict | None:
     return execute_single(
         """
-        SELECT sp."UPC", sp.selling_price, sp.products_number,
+        SELECT sp."UPC", sp.selling_price, sp.products_number, sp.expiration_date,
                COALESCE(SUM(s.product_number), 0) as total_sold
         FROM products_storeproduct sp
         LEFT JOIN sales_sale s ON s."UPC" = sp."UPC"
         WHERE sp.product_id = %s AND sp.promotional_product = TRUE
-        GROUP BY sp."UPC", sp.selling_price, sp.products_number
+        GROUP BY sp."UPC", sp.selling_price, sp.products_number, sp.expiration_date
         """,
         [product_id],
     )

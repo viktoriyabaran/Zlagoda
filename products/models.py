@@ -30,6 +30,7 @@ class StoreProduct(models.Model):
     )
     products_number = models.IntegerField(validators=[MinValueValidator(0)])
     promotional_product = models.BooleanField()
+    expiration_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.product.product_name} for {self.selling_price}"

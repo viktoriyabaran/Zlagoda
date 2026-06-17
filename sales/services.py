@@ -23,17 +23,22 @@ class ICheckService(Protocol):
 
 
 class CheckService:
-    def get_all(self, date_from=None, date_to=None, employee_id=None) -> list:
+    def get_all(
+        self, date_from=None, date_to=None, employee_id=None, check_number=None
+    ) -> list:
         clauses, params = [], []
         if date_from:
-            clauses.append("c.print_date >= %s")
+            clauses.append("CAST(c.print_date AS DATE) >= %s")
             params.append(date_from)
         if date_to:
-            clauses.append("c.print_date <= %s")
+            clauses.append("CAST(c.print_date AS DATE) <= %s")
             params.append(date_to)
         if employee_id:
             clauses.append("c.employee_id = %s")
             params.append(employee_id)
+        if check_number:
+            clauses.append("CAST(c.id AS TEXT) ILIKE %s")
+            params.append(f"%{check_number}%")
         where_sql = (" WHERE " + " AND ".join(clauses)) if clauses else ""
         return get_all_checks(where_sql, params)
 

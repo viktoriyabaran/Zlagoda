@@ -22,6 +22,7 @@ STORE_PRODUCT_COLUMNS = [
     {"key": "selling_price", "label": "Price", "sortable": True},
     {"key": "products_number", "label": "Quantity", "sortable": True},
     {"key": "promotional_product", "label": "Promo", "sortable": False},
+    {"key": "expiration_date", "label": "Expires", "sortable": True},
 ]
 
 STORE_PRODUCT_SORTABLE = {c["key"] for c in STORE_PRODUCT_COLUMNS if c["sortable"]}

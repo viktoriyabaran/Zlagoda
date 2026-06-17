@@ -77,33 +77,35 @@ class Command(BaseCommand):
         return ids
 
     def _seed_store_products(self, products: dict[str, int]) -> list[str]:
-        # (product_name, UPC, price, qty, has_promo_with_qty)
         rows = [
-            ("Milk 1L", "100000000001", Decimal("32.00"), 120, 40),
-            ("Yogurt 200g", "100000000002", Decimal("18.00"), 80, None),
-            ("Cheese 200g", "100000000003", Decimal("95.00"), 30, 10),
-            ("White Bread", "100000000004", Decimal("25.00"), 60, None),
-            ("Croissant", "100000000005", Decimal("22.50"), 45, 15),
-            ("Whole Wheat Bread", "100000000006", Decimal("28.00"), 40, None),
-            ("Cola 1.5L", "100000000007", Decimal("40.00"), 100, 30),
-            ("Orange Juice 1L", "100000000008", Decimal("55.00"), 50, None),
-            ("Mineral Water 1.5L", "100000000009", Decimal("18.00"), 150, None),
-            ("Beer 0.5L", "100000000010", Decimal("35.00"), 90, 25),
-            ("Chips 100g", "100000000011", Decimal("30.00"), 70, None),
-            ("Chocolate Bar", "100000000012", Decimal("28.00"), 65, 20),
-            ("Crackers 200g", "100000000013", Decimal("32.50"), 55, None),
-            ("Soap", "100000000014", Decimal("15.00"), 80, None),
-            ("Toilet Paper 8pk", "100000000015", Decimal("120.00"), 35, 10),
+            ("Milk 1L", "100000000001", Decimal("32.00"), 120, 5, 40),
+            ("Yogurt 200g", "100000000002", Decimal("18.00"), 80, 4, None),
+            ("Cheese 200g", "100000000003", Decimal("95.00"), 30, 25, 10),
+            ("White Bread", "100000000004", Decimal("25.00"), 60, 2, None),
+            ("Croissant", "100000000005", Decimal("22.50"), 45, 3, 15),
+            ("Whole Wheat Bread", "100000000006", Decimal("28.00"), 40, 6, None),
+            ("Cola 1.5L", "100000000007", Decimal("40.00"), 100, 200, 30),
+            ("Orange Juice 1L", "100000000008", Decimal("55.00"), 50, 45, None),
+            ("Mineral Water 1.5L", "100000000009", Decimal("18.00"), 150, 365, None),
+            ("Beer 0.5L", "100000000010", Decimal("35.00"), 90, 120, 25),
+            ("Chips 100g", "100000000011", Decimal("30.00"), 70, 90, None),
+            ("Chocolate Bar", "100000000012", Decimal("28.00"), 65, 150, 20),
+            ("Crackers 200g", "100000000013", Decimal("32.50"), 55, 100, None),
+            ("Soap", "100000000014", Decimal("15.00"), 80, 730, None),
+            ("Toilet Paper 8pk", "100000000015", Decimal("120.00"), 35, 999, 10),
         ]
+        today = date.today()
         all_upcs: list[str] = []
-        for name, upc, price, qty, promo_qty in rows:
+        for name, upc, price, qty, expires_in_days, promo_qty in rows:
+            expiration = today + timedelta(days=expires_in_days)
             execute_write(
                 """
                 INSERT INTO products_storeproduct
-                ("UPC", product_id, selling_price, products_number, promotional_product, "UPC_prom_id")
-                VALUES (%s, %s, %s, %s, FALSE, NULL)
+                ("UPC", product_id, selling_price, products_number,
+                 promotional_product, "UPC_prom_id", expiration_date)
+                VALUES (%s, %s, %s, %s, FALSE, NULL, %s)
                 """,
-                [upc, products[name], price, qty],
+                [upc, products[name], price, qty, expiration],
             )
             all_upcs.append(upc)
             if promo_qty is not None:
@@ -112,10 +114,18 @@ class Command(BaseCommand):
                 execute_write(
                     """
                     INSERT INTO products_storeproduct
-                    ("UPC", product_id, selling_price, products_number, promotional_product, "UPC_prom_id")
-                    VALUES (%s, %s, %s, %s, TRUE, %s)
+                    ("UPC", product_id, selling_price, products_number,
+                     promotional_product, "UPC_prom_id", expiration_date)
+                    VALUES (%s, %s, %s, %s, TRUE, %s, %s)
                     """,
-                    [promo_upc, products[name], promo_price, promo_qty, upc],
+                    [
+                        promo_upc,
+                        products[name],
+                        promo_price,
+                        promo_qty,
+                        upc,
+                        expiration,
+                    ],
                 )
                 all_upcs.append(promo_upc)
         return all_upcs
@@ -353,7 +363,10 @@ class Command(BaseCommand):
 
         # (offset_days, cashier_surname, customer_index or None, [(upc_index, qty), ...])
         plan = [
-            (0, "Bondar", 0, [(0, 2), (4, 1), (10, 3)]),
+            (0, "Bondar", 0, [(20, 1), (3, 1), (9, 2)]),
+            (1, "Bondar", 0, [(11, 1), (13, 2)]),
+            (2, "Tkachenko", 3, [(13, 1), (9, 1), (11, 2)]),
+            (3, "Tkachenko", 3, [(3, 1), (20, 1)]),
             (0, "Bondar", None, [(2, 1), (8, 4)]),
             (1, "Tkachenko", 1, [(6, 2), (11, 2), (13, 1)]),
             (1, "Melnyk", None, [(7, 1), (12, 1)]),
