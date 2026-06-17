@@ -331,12 +331,12 @@ def get_product_detail(product_id: int) -> dict | None:
 def get_store_product_with_sales(product_id: int) -> dict | None:
     return execute_single(
         """
-        SELECT sp."UPC", sp.selling_price, sp.products_number,
+        SELECT sp."UPC", sp.selling_price, sp.products_number, sp.expiration_date,
                COALESCE(SUM(s.product_number), 0) as total_sold
         FROM products_storeproduct sp
         LEFT JOIN sales_sale s ON s."UPC" = sp."UPC"
         WHERE sp.product_id = %s AND sp.promotional_product = FALSE
-        GROUP BY sp."UPC", sp.selling_price, sp.products_number
+        GROUP BY sp."UPC", sp.selling_price, sp.products_number, sp.expiration_date
         """,
         [product_id],
     )
@@ -345,12 +345,12 @@ def get_store_product_with_sales(product_id: int) -> dict | None:
 def get_promo_store_product_with_sales(product_id: int) -> dict | None:
     return execute_single(
         """
-        SELECT sp."UPC", sp.selling_price, sp.products_number,
+        SELECT sp."UPC", sp.selling_price, sp.products_number, sp.expiration_date,
                COALESCE(SUM(s.product_number), 0) as total_sold
         FROM products_storeproduct sp
         LEFT JOIN sales_sale s ON s."UPC" = sp."UPC"
         WHERE sp.product_id = %s AND sp.promotional_product = TRUE
-        GROUP BY sp."UPC", sp.selling_price, sp.products_number
+        GROUP BY sp."UPC", sp.selling_price, sp.products_number, sp.expiration_date
         """,
         [product_id],
     )
