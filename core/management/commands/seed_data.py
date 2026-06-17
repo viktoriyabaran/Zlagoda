@@ -363,7 +363,10 @@ class Command(BaseCommand):
 
         # (offset_days, cashier_surname, customer_index or None, [(upc_index, qty), ...])
         plan = [
-            (0, "Bondar", 0, [(0, 2), (4, 1), (10, 3)]),
+            (0, "Bondar", 0, [(20, 1), (3, 1), (9, 2)]),
+            (1, "Bondar", 0, [(11, 1), (13, 2)]),
+            (2, "Tkachenko", 3, [(13, 1), (9, 1), (11, 2)]),
+            (3, "Tkachenko", 3, [(3, 1), (20, 1)]),
             (0, "Bondar", None, [(2, 1), (8, 4)]),
             (1, "Tkachenko", 1, [(6, 2), (11, 2), (13, 1)]),
             (1, "Melnyk", None, [(7, 1), (12, 1)]),
