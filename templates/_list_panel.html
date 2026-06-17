@@ -141,13 +141,29 @@
                 Apply
             </button>
             <button type="button" title="Clear filters"
-                    onclick="var f = this.closest('form'); document.getElementById('list-filter-row').querySelectorAll('select, input[type=date]').forEach(function (e) { e.value = ''; }); htmx.ajax('GET', '{{ request.path }}', {source: f, target: '#list-region', select: '#list-region', swap: 'outerHTML'});"
+                    onclick="var f = this.closest('form'); document.getElementById('list-filter-row').querySelectorAll('select, input[type=date]').forEach(function (e) { e.value = ''; e.removeAttribute('min'); e.removeAttribute('max'); }); htmx.ajax('GET', '{{ request.path }}', {source: f, target: '#list-region', select: '#list-region', swap: 'outerHTML'});"
                     class="w-auto px-4 py-1.5 text-xs tracking-wider uppercase font-bold text-white/70 hover:text-white border-2 border-white/35 hover:border-white/60 rounded-xl transition-colors">
                 Clear
             </button>
         </div>
     </div>
 </div>
+<script>
+    (function () {
+        var row = document.getElementById('list-filter-row');
+        if (!row) return;
+        var from = row.querySelector('input[name=date_from]');
+        var to = row.querySelector('input[name=date_to]');
+        if (!from || !to) return;
+        function sync() {
+            to.min = from.value || '';
+            from.max = to.value || '';
+        }
+        from.addEventListener('change', sync);
+        to.addEventListener('change', sync);
+        sync();
+    })();
+</script>
 {% endif %}
 
 <div id="list-region" class="flex-1 min-h-0 flex flex-col">

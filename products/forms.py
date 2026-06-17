@@ -1,3 +1,5 @@
+from datetime import date
+
 from django import forms
 
 from core.forms import CHECKBOX_CLASS, LayoutForm
@@ -13,6 +15,21 @@ from .repository import (
 TEXT_INPUT_CLASS = "bg-transparent border border-white/50 rounded-lg px-4 py-2 text-white outline-none focus:border-white transition-colors text-sm w-full disabled:border-white/20 disabled:bg-white/[0.02] disabled:text-white/80 cursor-not-allowed"
 
 
+class ExpirationDateGuardMixin:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if "expiration_date" in self.fields:
+            self.fields["expiration_date"].widget.attrs["min"] = (
+                date.today().isoformat()
+            )
+
+    def clean_expiration_date(self):
+        value = self.cleaned_data.get("expiration_date")
+        if value and value < date.today() and "expiration_date" in self.changed_data:
+            raise forms.ValidationError("Expiration date cannot be earlier than today.")
+        return value
+
+
 class CategoryForm(LayoutForm):
     category_name = forms.CharField(
         required=True, widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS})
@@ -25,7 +42,7 @@ class CategoryForm(LayoutForm):
         return value
 
 
-class ProductForm(LayoutForm):
+class ProductForm(ExpirationDateGuardMixin, LayoutForm):
     category = forms.ChoiceField(
         choices=[], widget=forms.Select(attrs={"class": TEXT_INPUT_CLASS})
     )
@@ -168,7 +185,7 @@ class EditProductForm(LayoutForm):
         ]
 
 
-class StoreProductForm(LayoutForm):
+class StoreProductForm(ExpirationDateGuardMixin, LayoutForm):
     product = forms.ChoiceField(
         choices=[],
         label="Product",
@@ -264,7 +281,7 @@ class StoreProductForm(LayoutForm):
         return cleaned
 
 
-class EditStoreProductForm(LayoutForm):
+class EditStoreProductForm(ExpirationDateGuardMixin, LayoutForm):
     upc = forms.CharField(
         label="UPC",
         required=False,
