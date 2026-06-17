@@ -904,9 +904,6 @@
   .text-black {
     color: var(--color-black);
   }
-  .text-emerald-400 {
-    color: var(--color-emerald-400);
-  }
   .text-red-200 {
     color: var(--color-red-200);
   }

@@ -3,6 +3,7 @@ from typing import Protocol
 from django.http import HttpRequest
 
 from core.query_helpers import order_by_sql, resolve_filters
+from core.roles import Role
 
 from .repository import (
     count_checks_for_customer,
@@ -38,7 +39,10 @@ class CustomerService:
     def get_all(
         self, request: HttpRequest, sort_by: str | None, sort_dir: str | None
     ) -> list:
-        _, where_sql, where_params = resolve_filters(request, get_customer_filters())
+        is_cashier = request.session.get("user_role") == Role.CASHIER
+        _, where_sql, where_params = resolve_filters(
+            request, get_customer_filters(is_cashier)
+        )
         return get_all_customers(
             where_sql=where_sql,
             where_params=where_params,

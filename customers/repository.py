@@ -1,7 +1,9 @@
 from core.db import execute_query, execute_single, execute_write
 
 
-def get_customer_filters():
+def get_customer_filters(is_cashier: bool = False):
+    if not is_cashier:
+        return []
     return [
         {
             "key": "cust_surname",

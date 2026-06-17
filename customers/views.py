@@ -65,7 +65,9 @@ class GetCustomersView(View):
                     "rows": rows,
                     "columns": CUSTOMER_COLUMNS,
                     "sort": {"by": sort_by, "dir": sort_dir},
-                    "filters": get_customer_filters(),
+                    "filters": get_customer_filters(
+                        request.session.get("user_role") == Role.CASHIER
+                    ),
                     "add_url": reverse("customers:add-customer"),
                     "add_label": "Add customer",
                     "empty_message": "No customers yet.",

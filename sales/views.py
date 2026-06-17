@@ -39,7 +39,7 @@ class GetChecksView(View):
             params["date_to"] = today
             return redirect(f"{request.path}?{params.urlencode()}")
 
-        check_number = request.GET.get("check_number")
+        check_number = request.GET.get("check_number") if is_cashier else None
 
         if is_cashier:
             # Cashiers only ever see their own checks, regardless of any filter.
@@ -71,10 +71,14 @@ class GetChecksView(View):
                 check_items = self.check_service.get_items(int(selected_check_id))
 
         filters: list[dict] = [
-            {"key": "check_number", "label": "Search by Check #", "type": "search"},
             {"key": "date_from", "label": "From date", "type": "date"},
             {"key": "date_to", "label": "To date", "type": "date"},
         ]
+        if is_cashier:
+            filters.insert(
+                0,
+                {"key": "check_number", "label": "Search by Check #", "type": "search"},
+            )
         actions: list[dict] = [
             {
                 "label": "View",
@@ -122,7 +126,7 @@ class GetChecksView(View):
                     "sort": {"by": "print_date", "dir": "desc"},
                     "empty_message": "No checks found.",
                     "has_date_filter": True,
-                    "show_today_button": True,
+                    "show_today_button": is_cashier,
                     "row_id_key": "id",
                     "filters": filters,
                     "actions": actions,
